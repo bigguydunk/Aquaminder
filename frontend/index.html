@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Aquaminder</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Scada&display=swap" rel="stylesheet">
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Scada', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #28D0FF;
+      }
+
+      .container {
+        width: 375px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background: rgb(255, 255, 255);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .header {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .header img {
+        max-width: 200px;
+        height: auto;
+      }
+
+      .calendar-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        position: relative;
+      }
+
+      .calendar-controls button {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+      }
+
+      .calendar-controls span {
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .dropdown {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .dropdown select {
+        width: 100%;
+        padding: 5px;
+      }
+
+      .calendar-week {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        margin: 10px 0;
+      }
+
+      .day-header {
+        text-align: center;
+        padding: 10px;
+        background-color: #f0f0f0;
+        font-size: 0.9em;
+      }
+
+      .day-cell {
+        text-align: center;
+        padding: 15px 0;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .day-cell.has-schedule::after {
+        content: "";
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 6px;
+        height: 6px;
+        background-color: #28D0FF;
+        border-radius: 50%;
+      }
+
+      .schedule-box {
+        padding: 15px;
+        margin: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        position: relative;
+      }
+
+      .add-schedule {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        background: #28D0FF;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2em;
+      }
+
+      .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+      }
+
+      .selected-aquarium {
+        background-color: #28D0FF !important;
+        color: white !important;
+      }
+
+      .swipe-area {
+        overflow: hidden;
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const Header = () => (
+        <header className="header">
+          <img src="https://via.placeholder.com/200x50.png?text=Aquaminder+Logo" alt="Aquaminder" />
+          <hr className="header-divider" />
+        </header>
+      );
+
+      const daysOfWeek = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+
+      const WeeklyCalendar = ({ aquariumId, schedules, selectedDate, onDateChange, onWeekChange, onMonthYearChange }) => {
+        const [showDropdown, setShowDropdown] = React.useState(false);
+        const [month, setMonth] = React.useState(selectedDate.getMonth());
+        const [year, setYear] = React.useState(selectedDate.getFullYear());
+
+        const getWeekDates = (date) => {
+          const startDate = new Date(date);
+          startDate.setDate(date.getDate() - date.getDay());
+          return Array.from({ length: 7 }, (_, i) => {
+            const day = new Date(startDate);
+            day.setDate(startDate.getDate() + i);
+            return day;
+          });
+        };
+
+        const handleMonthYearChange = () => {
+          const newDate = new Date(year, month, 1);
+          onMonthYearChange(newDate);
+          setShowDropdown(false);
+        };
+
+        const weekDates = getWeekDates(selectedDate);
+
+        const currentMonthYear = `${selectedDate.toLocaleString('default', { month: 'long' })} ${selectedDate.getFullYear()}`;
+
+        return (
+          <div>
+            <div className="calendar-controls">
+              <button onClick={() => onWeekChange(-1)}>&lt;</button>
+              <span onClick={() => setShowDropdown((prev) => !prev)}>{currentMonthYear}</span>
+              <button onClick={() => onWeekChange(1)}>&gt;</button>
+              {showDropdown && (
+                <div className="dropdown">
+                  <select value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <option key={i} value={i}>
+                        {new Date(0, i).toLocaleString('default', { month: 'long' })}
+                      </option>
+                    ))}
+                  </select>
+                  <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <option key={i} value={year - 5 + i}>
+                        {year - 5 + i}
+                      </option>
+                    ))}
+                  </select>
+                  <button onClick={handleMonthYearChange}>Go</button>
+                </div>
+              )}
+            </div>
+            <div className="calendar-week">
+              {daysOfWeek.map((day) => (
+                <div key={day} className="day-header">{day}</div>
+              ))}
+            </div>
+            <div className="calendar-week">
+              {weekDates.map((date, index) => {
+                const isSelected = selectedDate.toDateString() === date.toDateString();
+                const hasSchedule = schedules[aquariumId]?.some(s =>
+                  new Date(s.date).toDateString() === date.toDateString()
+                );
+                return (
+                  <div
+                    key={index}
+                    className={`day-cell ${hasSchedule ? 'has-schedule' : ''} ${isSelected ? 'selected-aquarium' : ''}`}
+                    onClick={() => onDateChange(date)}
+                  >
+                    {date.getDate()}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      };
+
+      const ScheduleBox = ({ aquariumId, schedules, selectedDate, onAddSchedule }) => {
+        const [showForm, setShowForm] = React.useState(false);
+        const [newSchedule, setNewSchedule] = React.useState({
+          date: selectedDate?.toISOString().split('T')[0] || '',
+          time: '',
+          task: 'Feeding' // Default task value
+        });
+
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          onAddSchedule(aquariumId, newSchedule);
+          setShowForm(false);
+          setNewSchedule({ date: selectedDate?.toISOString().split('T')[0] || '', time: '', task: 'Feeding' });
+        };
+
+        const filteredSchedules = schedules[aquariumId]?.filter(
+          (schedule) => new Date(schedule.date).toDateString() === selectedDate?.toDateString()
+        ) || [];
+
+        return (
+          <div className="schedule-box">
+            <button className="add-schedule" onClick={() => setShowForm(true)}>+</button>
+            <h3>Jadwal untuk {selectedDate?.toLocaleDateString() || 'Pilih Tanggal'}</h3>
+            {filteredSchedules.map((schedule, index) => (
+              <div key={index} style={{ margin: '10px 0', padding: '10px', background: '#f0f0f0', borderRadius: '5px' }}>
+                <div>{schedule.task}</div>
+                <div>{schedule.date} - {schedule.time}</div>
+              </div>
+            ))}
+
+            {showForm && (
+              <form onSubmit={handleSubmit} style={{ marginTop: '10px' }}>
+                <input
+                  type="date"
+                  required
+                  value={newSchedule.date}
+                  onChange={(e) => setNewSchedule({ ...newSchedule, date: e.target.value })}
+                  style={{ margin: '5px' }}
+                />
+                <input
+                  type="time"
+                  required
+                  value={newSchedule.time}
+                  onChange={(e) => setNewSchedule({ ...newSchedule, time: e.target.value })}
+                  style={{ margin: '5px' }}
+                />
+                <select
+                  required
+                  value={newSchedule.task}
+                  onChange={(e) => setNewSchedule({ ...newSchedule, task: e.target.value })}
+                  style={{ margin: '5px', padding: '5px' }}
+                >
+                  <option value="Feeding">Feeding</option>
+                  <option value="Cleaning">Cleaning</option>
+                </select>
+                <button type="submit" style={{ margin: '5px' }}>Tambah</button>
+              </form>
+            )}
+          </div>
+        );
+      };
+
+      const App = () => {
+        const [selectedAquarium, setSelectedAquarium] = React.useState(1);
+        const [selectedDate, setSelectedDate] = React.useState(new Date());
+        const [schedules, setSchedules] = React.useState({
+          1: [],
+          2: []
+        });
+
+        const handleAddSchedule = (aquariumId, newSchedule) => {
+          setSchedules((prev) => ({
+            ...prev,
+            [aquariumId]: [...prev[aquariumId], newSchedule]
+          }));
+        };
+
+        const handleWeekChange = (direction) => {
+          setSelectedDate((prevDate) => {
+            const newDate = new Date(prevDate);
+            newDate.setDate(prevDate.getDate() + direction * 7);
+            return newDate;
+          });
+        };
+
+        const handleMonthYearChange = (newDate) => {
+          setSelectedDate(newDate);
+        };
+
+        return (
+          <div className="container">
+            <Header />
+            <div style={{ padding: '10px', flex: 1 }}>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <button
+                  className={selectedAquarium === 1 ? 'selected-aquarium' : ''}
+                  onClick={() => setSelectedAquarium(1)}
+                  style={{ flex: 1, padding: '10px' }}
+                >
+                  1
+                </button>
+                <button
+                  className={selectedAquarium === 2 ? 'selected-aquarium' : ''}
+                  onClick={() => setSelectedAquarium(2)}
+                  style={{ flex: 1, padding: '10px' }}
+                >
+                  2
+                </button>
+              </div>
+
+              <WeeklyCalendar
+                aquariumId={selectedAquarium}
+                schedules={schedules}
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+                onWeekChange={handleWeekChange}
+                onMonthYearChange={handleMonthYearChange}
+              />
+
+              <ScheduleBox
+                aquariumId={selectedAquarium}
+                schedules={schedules}
+                selectedDate={selectedDate}
+                onAddSchedule={handleAddSchedule}
+              />
+            </div>
+          </div>
+        );
+      };
+
+      ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+  </body>
+</html>
