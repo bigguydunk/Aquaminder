@@ -1,0 +1,1 @@
+Guys, frontend sama backend harus digabung. gw bakal tarok file file gw, ini dijadiin template aja. Jadi kalo ada yang udah bikin progress atau sesuatu lu tambahin aja ke template gw ya. Dan kalau mau push jangan langsung di main. Bikin branch sendiri dulu aja. cari google caranya gimana. thank u for reading
