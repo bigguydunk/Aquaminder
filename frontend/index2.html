@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquaminder - Login or Register</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to <span class="brand">Aquaminder</span></h1>
+        <div class="form-container">
+            <div class="tab">
+                <button id="loginTab" class="tab-btn active">Login</button>
+                <button id="registerTab" class="tab-btn">Register</button>
+            </div>
+            <form id="loginForm" class="form active">
+                <input type="email" placeholder="Masukkan Email" required>
+                <input type="password" placeholder="Masukkan Password" required>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <form id="registerForm" class="form">
+                <input type="text" placeholder="Nama Lengkap" required>
+                <input type="email" placeholder="Masukkan Email" required>
+                <input type="password" placeholder="Masukkan Password" required>
+                <input type="password" placeholder="Ulangi Password" required>
+                <button type="submit" class="btn">Register</button>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
