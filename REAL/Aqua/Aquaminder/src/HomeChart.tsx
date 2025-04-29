@@ -77,9 +77,9 @@ class RadialBar extends Component<{}, RadialBarState> {
                     options={this.state.options}
                     series={this.state.series}
                     type="radialBar"
-                    width="380"
+                    width="100%"
                 />
-                <h1 style={{ color: 'black', fontWeight: 'bold' }}>Aquarium 1</h1>
+                <h1 className="chart-title" style={{ color: '#181619', fontWeight: 'bold' }}>Aquarium 1</h1>
             </div>
         );
     }
