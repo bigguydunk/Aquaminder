@@ -1,5 +1,2 @@
-Oke yang Login + Register ud ada prototypenya
-
-mungkin bisa diubah2 dikit UI-nya
-
-dan urusan limit access (register -> manager only) dan storage data akunnya urusan backend mungkin
+Oke yang Login + Register ud ada prototypenya (index 2)
+ urusan limit access (register -> manager only) dan storage data akunnya urusan backend mungkin
