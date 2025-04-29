@@ -18,15 +18,16 @@ class RadialBar extends Component<{}, RadialBarState> {
                     height: 280,
                     type: "radialBar",
                 },
-                colors: ["#20E647"],
+                colors: ["#3443E9"], // Updated color
                 plotOptions: {
                     radialBar: {
                         hollow: {
                             margin: 0,
-                            size: "70%",
-                            background: "#293450",
+                            size: "50%",
+                            background: "transparent", // Set to transparent
                         },
                         track: {
+    
                             dropShadow: {
                                 enabled: true,
                                 top: 2,
@@ -38,13 +39,16 @@ class RadialBar extends Component<{}, RadialBarState> {
                         dataLabels: {
                             name: {
                                 offsetY: -10,
-                                color: "#fff",
-                                fontSize: "13px",
+                                color: "#black",
+                                fontSize: "20px",
+                                fontWeight: "bold",
+                                show: false,
                             },
                             value: {
-                                color: "#fff",
-                                fontSize: "30px",
-                                show: true,
+                                color: "#black",
+                                fontSize: "40px",
+                                fontWeight: "bold",
+                                show: false,
                             },
                         },
                     },
@@ -54,12 +58,11 @@ class RadialBar extends Component<{}, RadialBarState> {
                     gradient: {
                         shade: "dark",
                         type: "vertical",
-                        gradientToColors: ["#20E647"],
+                        gradientToColors: ["#3443E9"], // Updated gradient color
                         stops: [0, 100],
                     },
                 },
                 stroke: {
-                    lineCap: "round",
                 },
                 labels: ["Kesehatan Ikan"],
             },
@@ -76,7 +79,7 @@ class RadialBar extends Component<{}, RadialBarState> {
                     type="radialBar"
                     width="380"
                 />
-                <h1>Aquarium 1</h1>
+                <h1 style={{ color: 'black', fontWeight: 'bold' }}>Aquarium 1</h1>
             </div>
         );
     }

@@ -18,16 +18,16 @@
     background-color: rgb(244, 247, 249);
   }
 
-.donut {
+  .donut {
     display: flex; /* Centers the chart vertically and horizontally */
-    height: 25em;
+    justify-content: left;
     align-items: center;
-    will-change: filter;
-    transition: filter 300ms;
-    background-color: #3443E9;
+    height: 20em; /* Reduced height */
+    width: 50em; /* Reduced width */
     color: white;
-    border-radius: 1000px;
-  }
+    border-radius: 20%; /* Ensures it's a perfect circle */
+    margin: auto; /* Centers within its parent container */
+}
 
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);
