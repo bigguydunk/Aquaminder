@@ -3,6 +3,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import HomeData from './HomeData';
 import WeekRow from './components/ui/weekrow';
+import { Box } from "./schedulebox";
 
 
 function Homepage() {
@@ -11,6 +12,7 @@ function Homepage() {
       <div className="header">
           <HomeData/>
           <WeekRow/>
+          <Box />
       </div>
     </>
   );
