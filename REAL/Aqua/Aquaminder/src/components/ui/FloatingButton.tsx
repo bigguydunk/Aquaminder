@@ -13,7 +13,7 @@ const FloatingButton = () => {
         <>
           <button
             className="w-12 h-12 rounded-full bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
-            title="Fish"
+            title="Foodstock"
           >
             🐟
           </button>
@@ -25,7 +25,7 @@ const FloatingButton = () => {
           </button>
           <button
             className="w-12 h-12 rounded-full bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
-            title="Edit"
+            title="D-Database"
           >
             📝
           </button>
