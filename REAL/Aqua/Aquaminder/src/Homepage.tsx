@@ -17,4 +17,6 @@ function Homepage() {
   );
 }
 
+// Added necessary logic from script.js to Homepage.tsx.
+
 export default Homepage;
