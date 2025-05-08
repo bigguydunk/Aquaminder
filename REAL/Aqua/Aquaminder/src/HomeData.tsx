@@ -13,15 +13,17 @@ import {
 
 function HomeData() {
   return (
-    <div>
-    <Carousel >
-    <CarouselPrevious variant="ghost" className="!bg-white text-black hover:bg-gray-100 w-10 h-10 rounded-full" />
-    <CarouselContent>
-      <CarouselItem ><RadialBar /></CarouselItem>
-      <CarouselItem ><RadialBar /></CarouselItem>
-    </CarouselContent>
-    <CarouselNext variant="ghost" className="!bg-white text-black hover:bg-gray-100 w-10 h-10 rounded-full" />
-  </Carousel>
+    <div style={{ userSelect: 'none' }}>
+      <div>
+        <Carousel >
+          <CarouselPrevious variant="ghost" className="!bg-white text-black hover:bg-gray-100 w-10 h-10 rounded-full" />
+          <CarouselContent>
+            <CarouselItem ><RadialBar /></CarouselItem>
+            <CarouselItem ><RadialBar /></CarouselItem>
+          </CarouselContent>
+          <CarouselNext variant="ghost" className="!bg-white text-black hover:bg-gray-100 w-10 h-10 rounded-full" />
+        </Carousel>
+      </div>
     </div>
   );
 }

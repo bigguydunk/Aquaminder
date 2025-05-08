@@ -1,88 +1,91 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function WeekRow() {
   const today = new Date();
-  const [selectedDay, setSelectedDay] = useState(today.getDay());
-  const [currentWeek, setCurrentWeek] = useState(0);
-  const [slidingX, setSlidingX] = useState(0);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const currentDay = today.getDay();
+  const currentDate = today.getDate();
+  const [currentWeek, setCurrentWeek] = useState(5); // Centered at the 5th week (current week)
+  const [selectedDay, setSelectedDay] = useState<{ week: number; day: number } | null>(null);
+  const [carouselApi, setCarouselApi] = useState(null);
 
-  const handleCardClick = (index: number) => {
-    setSelectedDay(index);
-    const cardEl = cardRefs.current[index];
-    if (cardEl) {
-      setSlidingX(cardEl.offsetLeft);
-    }
+  const generateWeekDates = (weekOffset: number) => {
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date();
+      date.setDate(today.getDate() - today.getDay() + index + weekOffset * 7);
+      return date.getDate();
+    });
   };
 
-  useEffect(() => {
-    const initialCard = cardRefs.current[today.getDay()];
-    if (initialCard) {
-      setSlidingX(initialCard.offsetLeft);
-    }
-  }, []);
+  const weeks = Array.from({ length: 11 }, (_, index) => generateWeekDates(index - 5));
 
-  const weekDates = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date();
-    date.setDate(today.getDate() - today.getDay() + index + currentWeek * 7);
-    return date.getDate();
-  });
+  const handleDayClick = (weekIndex: number, dayIndex: number) => {
+    setSelectedDay({ week: weekIndex, day: dayIndex });
+  };
+
+
+
+
 
   return (
-    <div className="relative">
-      <div className="w-full h-[1px] bg-black mb-4"></div>
-      <div className="relative flex items-center">
-        {/* Previous Button */}
-        <button
-          onClick={() => setCurrentWeek((prev) => prev - 1)}
-          className="absolute top-1/2 -left-4 transform -translate-y-1/2 bg-transparent text-black w-8 h-8 rounded-full z-20 sm:w-10 sm:h-10"
+    <div style={{ userSelect: 'none' }}>
+      <div className="relative">
+        <div className="w-full h-[1px] bg-black mb-2"></div>
+        <Carousel
         >
-          &lt;
-        </button>
+          <CarouselPrevious
+            variant="ghost"
+            className="!bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
+          />
 
-        {/* Week Days */}
-        <div className="grid grid-cols-7 gap-2 w-full sm:gap-4 relative">
-          {/* Sliding background */}
-          <div
-            className="absolute top-0 left-0 h-16 w-16 sm:h-20 sm:w-20 bg-white rounded-lg transition-transform duration-300 z-0"
-            style={{ transform: `translateX(${slidingX}px)` }}
-          ></div>
-
-          {days.map((day, index) => (
-            <div
-              key={day}
-              className="relative"
-              ref={(el) => {
-                cardRefs.current[index] = el;
-              }}
-            >
-              <Card
-                onClick={() => handleCardClick(index)}
-                className="text-center h-16 w-16 flex flex-col items-center justify-center transition-colors p-2 cursor-pointer border-none shadow-none relative z-10 bg-transparent sm:h-20 sm:w-20 sm:p-4"
-              >
-                <CardContent className="text-sm font-semibold p-0 flex flex-col items-center justify-center sm:text-xl">
-                  {day}
-                  <div className="text-xs mt-1 sm:text-base">
-                    {weekDates[index]}
-                  </div>
-                </CardContent>
-              </Card>
+<CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[900px] lg:w-[700px] sm:w-[600px] w-[350px]">  {weeks.map((week, weekIndex) => (
+    <CarouselItem
+      key={weekIndex}
+      className="flex w-full justify-evenly items-center px-0 min-w-full shrink-0 grow-0 basis-full !pl-0"
+    >
+      {days.map((day, dayIndex) => (
+        <Card
+          key={dayIndex}
+          onClick={() => handleDayClick(weekIndex, dayIndex)}
+          className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
+            lg:h-16 lg:w-16 sm:h-14 sm:w-14 h-10 w-10
+            transition-all duration-300 ease-in-out
+            ${
+              selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
+                ? "bg-white text-black opacity-100 " 
+                : weekIndex === 5 && currentDay === dayIndex
+                ? "bg-blue-500 text-white opacity-100"
+                : "bg-transparent text-black bg-opacity-50"
+            } cursor-pointer !pl-0`}
+        >
+          <CardContent className="text-sm font-semibold p-0 flex flex-col items-center justify-center lg:text-lg sm:text-md text-xs">
+            {day}
+            <div className="text-xs mt-1 sm:text-sm">
+              {week[dayIndex]}
             </div>
-          ))}
-        </div>
+          </CardContent>
+        </Card>
+      ))}
+    </CarouselItem>
+  ))}
+</CarouselContent>
 
-        {/* Next Button */}
-        <button
-          onClick={() => setCurrentWeek((prev) => prev + 1)}
-          className="absolute top-1/2 -right-4 transform -translate-y-1/2 bg-transparent text-black w-8 h-8 rounded-full z-20 sm:w-10 sm:h-10"
-        >
-          &gt;
-        </button>
+          <CarouselNext
+            variant="ghost"
+            className="!bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
+          />
+        </Carousel>
+        <div className="w-full h-[1px] bg-black mt-2"></div>
       </div>
-      <div className="w-full h-[1px] bg-black mt-4"></div>
     </div>
   );
 }

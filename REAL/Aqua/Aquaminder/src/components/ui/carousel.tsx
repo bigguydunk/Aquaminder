@@ -146,7 +146,9 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
           className
         )}
         {...props}
-      />
+      >
+        {props.children}
+      </div>
     </div>
   )
 }
