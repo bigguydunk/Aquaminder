@@ -1,0 +1,65 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.wrap {
+  width: 100%; /* Adjusted to take full width */
+  max-width: 400px; /* Set a max width for better responsiveness */
+  margin: 0 auto; /* Center the search bar */
+  position: relative;
+}
+
+.search {
+  width: 100%;
+  display: flex;
+  margin-top: 15px;
+}
+
+.searchTerm {
+  width: 100%;
+  border: 1.5px solid #ffffff;
+  border-right: none;
+  padding: 10px; /* Increased padding for better usability */
+  height: 30px; /* Adjusted height to match button */
+  border-radius: 5px 0 0 5px;
+  outline: none;
+  color: #434544;
+  font-size: 10px; /* Increased font size for better readability */
+}
+
+.searchTerm:focus {
+  color: #323333;
+}
+
+.searchButton {
+  width: 40px;
+  height: 30px; /* Match the height of the input */
+  border: 3px solid #ffffff; /* Match border style with input */
+  background: #ffffff;
+  text-align: center;
+  color: #fff;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  display: flex;               /* make button flex container */
+  justify-content: center;     /* center horizontally */
+  align-items: center;         /* center vertically */
+  padding: 0;                  /* remove default padding */
+  font-size: 15px;
+}
+
+.searchButton svg {
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .wrap {
+    width: 80%; /* Adjust width for smaller screens */
+  }
+}
