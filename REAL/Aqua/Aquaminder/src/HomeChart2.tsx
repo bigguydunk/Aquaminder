@@ -11,7 +11,7 @@ interface RadialBarState {
 }
 
 
-class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; series: number[]; aquariumID: number }> {
+class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; series: number[]; aquariumID: number }> {
     constructor(props: {}) {
         super(props);
 
@@ -70,7 +70,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
                 labels: ["Kesehatan Ikan"],
             },
             series: [0],
-            aquariumID: 1, // Example progress value
+            aquariumID: 2, // Example progress value
         };
     }
     async componentDidMount() {
@@ -108,4 +108,4 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
     }
 }
 
-export default RadialBar;
+export default RadialBar2;
