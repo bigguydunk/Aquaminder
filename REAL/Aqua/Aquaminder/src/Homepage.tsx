@@ -12,7 +12,7 @@ import "./App.css";
 function Homepage() {
   // console.log(supabase);
   return (
-    <div style={{ userSelect: 'none' }}>
+    <div style={{ userSelect: 'none' }} >
       <div className="header">
         <HomeData />
         <WeekRow />

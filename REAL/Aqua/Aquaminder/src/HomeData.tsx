@@ -10,19 +10,64 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "./components/ui/carousel.tsx"
+import { useState, useEffect } from "react";
+import type { EmblaCarouselType } from "embla-carousel";
 
 
 function HomeData() {
+  const [carouselApi, setCarouselApi] = useState<EmblaCarouselType | null>(null);
+
+  const handleSetApi = (api: EmblaCarouselType | undefined) => {
+    setCarouselApi(api || null);
+  };
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const updateCarouselState = () => {
+      setCurrentIndex(carouselApi.selectedScrollSnap());
+      setTotalItems(carouselApi.scrollSnapList().length);
+    };
+
+    updateCarouselState();
+
+    carouselApi.on("select", updateCarouselState);
+
+    return () => {
+      carouselApi.off("select", updateCarouselState);
+    };
+  }, [carouselApi]);
+
+  const scrollToIndex = (index: number) => {
+    carouselApi?.scrollTo(index);
+  };
+
   return (
     <div>
-    <Carousel >
-    <CarouselPrevious variant="ghost" className="!bg-white text-black hover:bg-gray-100 w-10 h-10 rounded-full" />
-    <CarouselContent>
-      <CarouselItem ><RadialBar /></CarouselItem>
-      <CarouselItem ><RadialBar2 /></CarouselItem>
-    </CarouselContent>
-    <CarouselNext variant="ghost" className="!bg-white text-black hover:bg-gray-100 w-10 h-10 rounded-full" />
-  </Carousel>
+      <Carousel setApi={handleSetApi}>
+        
+        <CarouselContent>
+          <CarouselItem><RadialBar /></CarouselItem>
+          <CarouselItem><RadialBar2 /></CarouselItem>
+        </CarouselContent>
+        
+      </Carousel>
+
+      {/* Navigation Dots */}
+      <div className="flex justify-center space-x-2 mt-4">
+        {Array.from({ length: totalItems }).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => scrollToIndex(index)}
+            className={`rounded-full focus:outline-none focus-visible:outline-none ${
+              currentIndex === index ? "w-3 h-3 !bg-white" : "w-2 h-2 !bg-gray-300"
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

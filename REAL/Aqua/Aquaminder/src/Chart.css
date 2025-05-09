@@ -18,6 +18,8 @@
     background-color: rgb(244, 247, 249);
 }
 
+
+
 .donut {
   display: flex;
   flex-direction: row; /* Change to row layout */
