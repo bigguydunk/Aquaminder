@@ -47,7 +47,7 @@ export default function WeekRow() {
             className="!bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
           />
 
-<CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[900px] lg:w-[700px] sm:w-[600px] w-[350px]">  {weeks.map((week, weekIndex) => (
+<CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[550px] lg:w-[500px] sm:w-[350px]">  {weeks.map((week, weekIndex) => (
     <CarouselItem
       key={weekIndex}
       className="flex w-full justify-evenly items-center px-0 min-w-full shrink-0 grow-0 basis-full !pl-0"
