@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import './Chart.css';
+import supabase from '../supabaseClient';
 
 interface RadialBarState {
     options: ApexOptions;
     series: number[];
+    aquariumID: number;
 }
 
-class RadialBar extends Component<{}, RadialBarState> {
+
+class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; series: number[]; aquariumID: number }> {
     constructor(props: {}) {
         super(props);
 
@@ -66,9 +69,27 @@ class RadialBar extends Component<{}, RadialBarState> {
                 },
                 labels: ["Kesehatan Ikan"],
             },
-            series: [67], // Example progress value
+            series: [0],
+            aquariumID: 1, // Example progress value
         };
     }
+    async componentDidMount() {
+        try {
+          const { data, error } = await supabase
+            .from('akuarium')
+            .select('akuarium_id, jumlah_ikan_sakit, jumlah_ikan_total')
+            .eq('akuarium_id', this.state.aquariumID);
+          if (error) throw error;
+
+          if (data && data.length > 0) {
+          const { akuarium_id, jumlah_ikan_sakit: s, jumlah_ikan_total: t } = data[0];
+          const persen     = t > 0 ? (s / t) * 100 : 0;
+          this.setState({ aquariumID: akuarium_id, series: [parseFloat(persen.toFixed(2))] });
+        }
+        } catch (err) {
+          console.error('Gagal fetch persentase:', err);
+        }
+      }      
 
     render() {
         return (
@@ -79,7 +100,9 @@ class RadialBar extends Component<{}, RadialBarState> {
                     type="radialBar"
                     width="100%"
                 />
-                <h1 className="chart-title" style={{ color: '#181619', fontWeight: 'bold' }}>Aquarium 1</h1>
+                <h1 className="chart-title" style={{ color: '#181619', fontWeight: 'bold' }}>
+                    Aquarium {this.state.aquariumID}
+                </h1>
             </div>
         );
     }
