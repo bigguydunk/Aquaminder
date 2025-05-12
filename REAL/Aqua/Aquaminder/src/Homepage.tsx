@@ -16,6 +16,7 @@ function Homepage() {
       <div className="header">
         <HomeData />
         <WeekRow />
+        <timePicker />
       </div>
       <FloatingButton />
     </div>

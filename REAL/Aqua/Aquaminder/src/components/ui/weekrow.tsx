@@ -32,6 +32,8 @@ import {
 
 import supabase from '../../../supabaseClient';
 
+import { DateTimePicker24h } from './timePicker';
+
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function WeekRow() {
@@ -43,6 +45,9 @@ export default function WeekRow() {
   const [carouselApi, setCarouselApi] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [akuariumOptions, setAkuariumOptions] = useState<{ akuarium_id: number }[]>([]);
+  const [tugasOptions, setTugasOptions] = useState<{ tugas_id: number; deskripsi_tugas: string | null }[]>([]);
+  const [userOptions, setUserOptions] = useState<{ user_id: number; username: string }[]>([]);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAkuariumData = async () => {
@@ -55,6 +60,26 @@ export default function WeekRow() {
     };
 
     fetchAkuariumData();
+
+    const fetchTugasData = async () => {
+      const { data, error } = await supabase.from('tugas').select('tugas_id, deskripsi_tugas');
+      if (error) {
+        console.error('Error fetching tugas data:', error);
+      } else {
+        setTugasOptions(data || []);
+      }
+    };
+    fetchTugasData();
+
+    const fetchUserData = async () => {
+      const { data, error } = await supabase.from('users').select('user_id, username');
+      if (error) {
+        console.error('Error fetching user data:', error);
+      } else {
+        setUserOptions(data || []);
+      }
+    };
+    fetchUserData();
   }, []);
 
   const generateWeekDates = (weekOffset: number) => {
@@ -145,9 +170,9 @@ export default function WeekRow() {
         </DialogTrigger>
         <DialogContent className="w-1/3 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>Scheduler</DialogTitle>
           <DialogDescription>
-        Make changes to your profile here. Click save when you're done.
+        Tambahkan jadwal baru.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -155,20 +180,67 @@ export default function WeekRow() {
         <Label htmlFor="dropdown" className="text-right">
           Aquarium
         </Label>
-        <DropdownMenu>
+        <DropdownMenu open={openDropdown === 'akuarium'} onOpenChange={(open) => setOpenDropdown(open ? 'akuarium' : null)}>
           <DropdownMenuTrigger asChild>
-            <Button className="col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border !border-gray-300 rounded-md">
-              Select an option
+            <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'akuarium' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
+              Pilih aquarium
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             {akuariumOptions.map((option) => (
-              <DropdownMenuItem key={option.akuarium_id} onClick={() => console.log(`Akuarium ${option.akuarium_id} selected`)}>
-                Akuarium {option.akuarium_id}
+              <DropdownMenuItem key={option.akuarium_id} 
+              onClick={() => { console.log(`Aquarium ${option.akuarium_id} selected`); setOpenDropdown(null); }}
+              className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200">
+                Aquarium {option.akuarium_id}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
+        {/* New Dropdown for Tugas */}
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="tugas-dropdown" className="text-right">
+            Tugas
+          </Label>
+          <DropdownMenu open={openDropdown === 'tugas'} onOpenChange={(open) => setOpenDropdown(open ? 'tugas' : null)}>
+            <DropdownMenuTrigger asChild>
+              <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'tugas' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
+                Pilih tugas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {tugasOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.tugas_id}
+                  onClick={() => { console.log(`Tugas ${option.tugas_id} selected`); setOpenDropdown(null); }}
+                  className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
+                >
+                  {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
+                </DropdownMenuItem>
+              ))}
+              
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {/* New Dropdown for Users */}
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="user-dropdown" className="text-right">
+            User
+          </Label>
+          <DropdownMenu open={openDropdown === 'user'} onOpenChange={(open) => setOpenDropdown(open ? 'user' : null)}>
+            <DropdownMenuTrigger asChild>
+              <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'user' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
+                Pilih user
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {userOptions.map((option) => (
+                <DropdownMenuItem key={option.user_id} onClick={() => { console.log(`User ${option.user_id} selected`); setOpenDropdown(null); }} className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200">
+                  {option.username}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="username" className="text-right">
@@ -202,5 +274,5 @@ export default function WeekRow() {
         </div>
       </div>
     </div>  
-  );
+  )
 }
