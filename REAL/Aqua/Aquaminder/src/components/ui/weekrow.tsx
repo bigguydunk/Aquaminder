@@ -32,7 +32,7 @@ import {
 
 import supabase from '../../../supabaseClient';
 
-import { DateTimePicker24h } from './timePicker';
+import { TimePickerOnly } from './timePicker';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -48,6 +48,9 @@ export default function WeekRow() {
   const [tugasOptions, setTugasOptions] = useState<{ tugas_id: number; deskripsi_tugas: string | null }[]>([]);
   const [userOptions, setUserOptions] = useState<{ user_id: number; username: string }[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [selectedAkuarium, setSelectedAkuarium] = useState<number | null>(null);
+  const [selectedTugas, setSelectedTugas] = useState<{ tugas_id: number; deskripsi_tugas: string | null } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{ user_id: number; username: string } | null>(null);
 
   useEffect(() => {
     const fetchAkuariumData = async () => {
@@ -107,7 +110,7 @@ export default function WeekRow() {
             className="focus:outline-none focus-visible:outline-none !bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
           />
 
-<CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[550px] lg:w-[500px] sm:w-[350px]">  {weeks.map((week, weekIndex) => (
+<CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[550px] lg:w-[500px] sm:w-[300px]">  {weeks.map((week, weekIndex) => (
     <CarouselItem
       key={weekIndex}
       className="flex w-full justify-evenly items-center px-0 min-w-full shrink-0 grow-0 basis-full !pl-0"
@@ -117,7 +120,7 @@ export default function WeekRow() {
           key={dayIndex}
           onClick={() => handleDayClick(weekIndex, dayIndex)}
           className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
-            lg:h-16 lg:w-16 sm:h-14 sm:w-14 h-10 w-10
+            lg:h-16 lg:w-16 sm:h-14 sm:w-14 
             transition-all duration-300 ease-in-out
             ${
               selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
@@ -183,13 +186,13 @@ export default function WeekRow() {
         <DropdownMenu open={openDropdown === 'akuarium'} onOpenChange={(open) => setOpenDropdown(open ? 'akuarium' : null)}>
           <DropdownMenuTrigger asChild>
             <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'akuarium' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
-              Pilih aquarium
+              {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             {akuariumOptions.map((option) => (
               <DropdownMenuItem key={option.akuarium_id} 
-              onClick={() => { console.log(`Aquarium ${option.akuarium_id} selected`); setOpenDropdown(null); }}
+              onClick={() => { setSelectedAkuarium(option.akuarium_id); setOpenDropdown(null); }}
               className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200">
                 Aquarium {option.akuarium_id}
               </DropdownMenuItem>
@@ -205,14 +208,14 @@ export default function WeekRow() {
           <DropdownMenu open={openDropdown === 'tugas'} onOpenChange={(open) => setOpenDropdown(open ? 'tugas' : null)}>
             <DropdownMenuTrigger asChild>
               <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'tugas' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
-                Pilih tugas
+                {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {tugasOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.tugas_id}
-                  onClick={() => { console.log(`Tugas ${option.tugas_id} selected`); setOpenDropdown(null); }}
+                  onClick={() => { setSelectedTugas(option); setOpenDropdown(null); }}
                   className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
                 >
                   {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
@@ -230,17 +233,26 @@ export default function WeekRow() {
           <DropdownMenu open={openDropdown === 'user'} onOpenChange={(open) => setOpenDropdown(open ? 'user' : null)}>
             <DropdownMenuTrigger asChild>
               <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'user' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
-                Pilih user
+                {selectedUser ? selectedUser.username : 'Pilih user'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {userOptions.map((option) => (
-                <DropdownMenuItem key={option.user_id} onClick={() => { console.log(`User ${option.user_id} selected`); setOpenDropdown(null); }} className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200">
+                <DropdownMenuItem key={option.user_id} onClick={() => { setSelectedUser(option); setOpenDropdown(null); }} className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200">
                   {option.username}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+        {/* New Option for Tanggal */}
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="tanggal-picker" className="text-right">
+            Tanggal
+          </Label>
+          <div className="col-span-3">
+            <TimePickerOnly/>
+          </div>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="username" className="text-right">
