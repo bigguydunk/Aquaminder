@@ -17,6 +17,10 @@ const DatabaseSearch = () => {
     setResults(filteredResults);
   };
 
+  const handleResultClick = () => {
+    navigate("/disease-detail");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#28D0FF] to-[#88D7FF] text-gray-800">
       <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
@@ -46,7 +50,15 @@ const DatabaseSearch = () => {
           </h3>
           <ul className="list-disc pl-5">
             {results.length > 0 ? (
-              results.map((result, index) => <li key={index}>{result}</li>)
+              results.map((result, index) => (
+                <li
+                  key={index}
+                  onClick={handleResultClick}
+                  className="cursor-pointer text-blue-600 hover:underline"
+                >
+                  {result}
+                </li>
+              ))
             ) : (
               <li>No results found.</li>
             )}
