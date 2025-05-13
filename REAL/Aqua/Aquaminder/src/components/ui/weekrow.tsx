@@ -32,7 +32,7 @@ import {
 
 import supabase from '../../../supabaseClient';
 
-import { TimePickerOnly } from './timePicker';
+import TimePickerOnly from './timePicker';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
