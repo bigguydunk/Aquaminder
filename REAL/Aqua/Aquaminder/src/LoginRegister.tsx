@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
+import supabase from '../supabaseClient';
 
 const LoginRegister = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const LoginRegister = () => {
     return passwordRegex.test(password);
   };
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const form = event.currentTarget;
@@ -42,21 +43,23 @@ const LoginRegister = () => {
       return;
     }
 
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('password', password)
+      .single();
 
-    const validAccount = accounts.find((account: { email: string; password: string }) =>
-      account.email === email && account.password === password
-    );
-
-    if (validAccount) {
-      alert(`Login berhasil! Selamat datang, ${validAccount.name}.`);
-      navigate('/homepage'); // Redirect to homepage
-    } else {
-      alert('Login gagal! Email atau password salah.');
+    if (error || !data) {
+      alert('Login gagal: ' + (error?.message || 'Akun tidak ditemukan'));
+      return;
     }
+    alert('Login berhasil! Selamat datang, ' + data.username);
+    localStorage.setItem('user', JSON.stringify(data));
+    navigate('/homepage');
   };
 
-  const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const form = event.currentTarget;
@@ -95,16 +98,14 @@ const LoginRegister = () => {
       return;
     }
 
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-    const accountExists = accounts.find((account: { email: string }) => account.email === email);
+    const {data, error} = await supabase.from('users').insert([
+      { username: name, email, password}
+    ]);
 
-    if (accountExists) {
-      alert('Email sudah terdaftar! Gunakan email lain.');
+    if (error) {
+      alert(`Registrasi gagal: ${error.message}`);
       return;
     }
-
-    accounts.push({ name, email, password });
-    localStorage.setItem('accounts', JSON.stringify(accounts));
 
     alert('Registrasi berhasil! Silakan login dengan akun Anda.');
     toggleTabs('login');
