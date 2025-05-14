@@ -5,6 +5,7 @@ import HomeData from './HomeData';
 import WeekRow from './components/ui/weekrow';
 import FloatingButton from './components/ui/FloatingButton';
 import AquariumTable from './components/AquariumTable';
+
 import "./App.css";
 // import supabase from '../supabaseClient';
 
@@ -16,7 +17,6 @@ function Homepage() {
       <div className="header">
         <HomeData />
         <WeekRow />
-        <timePicker />
       </div>
       <FloatingButton />
     </div>

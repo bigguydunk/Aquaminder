@@ -63,10 +63,6 @@ export default function TimePickerOnly() {
           </div>
         </div>
       </div>
-      <div className="mt-4 text-center">
-        <span className="text-md font-medium">Selected range: </span>
-        <span className="font-mono">{start.toString().slice(0,5)} - {end.toString().slice(0,5)}</span>
-      </div>
     </div>
   );
 }

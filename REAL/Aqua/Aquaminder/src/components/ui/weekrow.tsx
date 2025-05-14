@@ -171,7 +171,7 @@ export default function WeekRow() {
         <DialogTrigger asChild>
         <span className="text-gray-500 text-2xl font-bold cursor-pointer">+</span>
         </DialogTrigger>
-        <DialogContent className="w-1/3 sm:max-w-[425px]">
+        <DialogContent className="w-1/3.5 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Scheduler</DialogTitle>
           <DialogDescription>
@@ -248,24 +248,12 @@ export default function WeekRow() {
         {/* New Option for Tanggal */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="tanggal-picker" className="text-right">
-            Tanggal
+            Jam
           </Label>
           <div className="col-span-3">
             <TimePickerOnly/>
           </div>
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="username" className="text-right">
-          Username
-        </Label>
-        <Input
-          id="username"
-          defaultValue="@peduarte"
-          className="col-span-3"
-          onChange={(e) => console.log(e.target.value)} // Add an onChange handler to capture input
-        />
-        </div>
-          
+        </div>    
         </div>
         <DialogFooter>
             <Button type="submit" className="!bg-[#3443E9] text-white hover:bg-gray-800">

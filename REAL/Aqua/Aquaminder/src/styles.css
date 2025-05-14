@@ -6,6 +6,9 @@ html, body, #root {
     min-width: auto;
     width: auto;
     border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   body {
     font-family: Arial, sans-serif;

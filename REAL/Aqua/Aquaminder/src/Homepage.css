@@ -54,7 +54,7 @@
   top: 0;
   left: 0;
   right: 0;
-  width: 100%; /* Ensure it spans the full width */
+  width: 10%; /* Ensure it spans the full width */
   margin: 0; /* Remove unintended margins */
 }
 
