@@ -54,9 +54,8 @@ const LoginRegister = () => {
       alert('Login gagal: ' + (error?.message || 'Akun tidak ditemukan'));
       return;
     }
-    alert('Login berhasil! Selamat datang, ' + data.username);
-    localStorage.setItem('user', JSON.stringify(data));
-    navigate('/homepage');
+    alert('Login berhasil! Selamat datang');
+    navigate('/homepage', { state: { email: data.email } });
   };
 
   const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {

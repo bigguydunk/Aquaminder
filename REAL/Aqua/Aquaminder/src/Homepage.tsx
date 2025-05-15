@@ -6,14 +6,36 @@ import WeekRow from './components/ui/weekrow';
 import FloatingButton from './components/ui/FloatingButton';
 import AquariumTable from './components/AquariumTable';
 import "./App.css";
+import { useEffect, useState } from 'react';
+import supabase from '../supabaseClient';
+import { data } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 // import supabase from '../supabaseClient';
 
 
 function Homepage() {
-  // console.log(supabase);
+  const [userName, setUserName] = useState<string | null>(null);
+  const location = useLocation();
+  const email = location.state?.email;
+
+  useEffect(() => {
+    if (email) {
+      supabase
+        .from('users')
+        .select('username')
+        .eq('email', email)
+        .then(({ data, error }) => {
+          if (data?.[0].username) {
+            setUserName(data[0].username);
+          }
+        });
+    }
+  }, [email]);
+
   return (
     <div style={{ userSelect: 'none' }}>
       <div className="header">
+        <h2> Welcome, {userName ?? 'Guest'}</h2>
         <HomeData />
         <WeekRow />
       </div>
