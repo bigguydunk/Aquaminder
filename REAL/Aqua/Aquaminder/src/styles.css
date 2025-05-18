@@ -9,6 +9,7 @@ html, body, #root {
     display: flex;
     justify-content: center;
     align-items: center;
+    
   }
   body {
     font-family: Arial, sans-serif;
@@ -23,7 +24,6 @@ html, body, #root {
 
 .container {
     text-align: center;
-    background: white;
     border-radius: 15px;
     padding: 20px;
     width: 100%;
