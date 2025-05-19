@@ -1,17 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
-import React from "react";
-import { Button }from "@heroui/button"
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { Button } from "@heroui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownSection,
-  DropdownItem
-} from "@heroui/dropdown";
-
-import { Radio, RadioGroup } from "@heroui/radio";
+import { TimePickerDemo } from "@/components/ui/timePicker";
 
 import {
   Carousel,
@@ -23,7 +15,6 @@ import {
 
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -32,23 +23,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Input } from "@/components/ui/input";
-
 import { Label } from "@/components/ui/label";
 
 import supabase from '../../../supabaseClient';
 
-import TimePickerOnly from './timePicker';
+
+
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Time } from "@internationalized/date";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export default function WeekRow() {
+export default function () {
   const today = new Date();
   const currentDay = today.getDay();
-  const currentDate = today.getDate();
-  const [currentWeek, setCurrentWeek] = useState(5); // Centered at the 5th week (current week)
   const [selectedDay, setSelectedDay] = useState<{ week: number; day: number } | null>(null);
-  const [carouselApi, setCarouselApi] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [akuariumOptions, setAkuariumOptions] = useState<{ akuarium_id: number }[]>([]);
   const [tugasOptions, setTugasOptions] = useState<{ tugas_id: number; deskripsi_tugas: string | null }[]>([]);
@@ -56,8 +45,14 @@ export default function WeekRow() {
   const [selectedAkuarium, setSelectedAkuarium] = useState<number | null>(null);
   const [selectedTugas, setSelectedTugas] = useState<{ tugas_id: number; deskripsi_tugas: string | null } | null>(null);
   const [selectedUser, setSelectedUser] = useState<{ user_id: number; username: string } | null>(null);
-  const [selectedColor] = React.useState<'default'>('default');
-  const variants = ["bordered"] as const;
+  const [startTime, setStartTime] = useState<Time>(new Time(0, 0));
+  const [endTime, setEndTime] = useState<Time>(new Time(0, 0));
+  const [time, setTime] = useState<Date | undefined>(new Date());
+  const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const location = useLocation();
+  const email = location.state?.email;
 
   useEffect(() => {
     const fetchAkuariumData = async () => {
@@ -90,9 +85,20 @@ export default function WeekRow() {
       }
     };
     fetchUserData();
-  }, []);
 
-  
+    if (email) {
+      supabase
+        .from('users')
+        .select('user_id, username')
+        .eq('email', email)
+        .then(({ data, error }) => {
+          if (data?.[0]) {
+            setUserName(data[0].username);
+            setCurrentUserId(data[0].user_id);
+          }
+        });
+    }
+  }, [email]);
 
   const generateWeekDates = (weekOffset: number) => {
     return Array.from({ length: 7 }, (_, index) => {
@@ -108,49 +114,113 @@ export default function WeekRow() {
     setSelectedDay({ week: weekIndex, day: dayIndex });
   };
 
+  // Helper to get the selected date from the calendar week/day selection
+  const getSelectedDate = () => {
+    if (!selectedDay) return null;
+    // Calculate the base date for the first day (Sunday) of the selected week
+    const baseDate = new Date(today);
+    baseDate.setHours(0, 0, 0, 0);
+    // Move to the first day (Sunday) of the selected week
+    baseDate.setDate(today.getDate() - today.getDay() + (selectedDay.week - 5) * 7);
+    // Now move to the selected day in that week
+    baseDate.setDate(baseDate.getDate() + selectedDay.day);
+    return baseDate;
+  };
+
+  const handleSaveSchedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    alert('Save button pressed. Starting to process data...');
+    if (!selectedAkuarium || !selectedTugas || !selectedUser || !time || !userName || !selectedDay || !currentUserId) {
+      let missingFields = [];
+      if (!selectedAkuarium) missingFields.push('Aquarium');
+      if (!selectedTugas) missingFields.push('Tugas');
+      if (!selectedUser) missingFields.push('User');
+      if (!time) missingFields.push('Time');
+      if (!userName) missingFields.push('Current User');
+      if (!selectedDay) missingFields.push('Selected Day');
+      if (!currentUserId) missingFields.push('Current User ID');
+      alert('Some required fields are missing: ' + missingFields.join(', ') + '. Data not sent.');
+      return;
+    }
+    setLoading(true);
+    // Combine selected calendar date with selected time
+    const selectedDate = getSelectedDate();
+    if (!selectedDate) {
+      setLoading(false);
+      alert('Tanggal tidak valid. Data not sent.');
+      return;
+    }
+    // Set the time from TimePickerDemo
+    selectedDate.setHours(time.getHours());
+    selectedDate.setMinutes(time.getMinutes());
+    selectedDate.setSeconds(0);
+    selectedDate.setMilliseconds(0);
+    // Convert to Asia/Jakarta (WIB) timezone ISO string
+    const tanggalJakarta = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000) + (7 * 60 * 60000)).toISOString().replace('Z', '+07:00');
+    alert('DEBUG: tanggal (Asia/Jakarta) to be sent to Supabase: ' + tanggalJakarta); // Debug alert
+    const insertData = {
+      akuarium_id: selectedAkuarium,
+      tugas_id: selectedTugas.tugas_id,
+      user_id: selectedUser.user_id,
+      tanggal: tanggalJakarta,
+      created_by: currentUserId, // Use the user ID instead of userName
+    };
+    alert('Attempting to send data to Supabase: ' + JSON.stringify(insertData));
+    const { error } = await supabase.from('jadwal').insert([insertData]);
+    setLoading(false);
+    if (!error) {
+      alert('Data successfully sent to Supabase!');
+      setDialogOpen(false);
+      setSelectedAkuarium(null);
+      setSelectedTugas(null);
+      setSelectedUser(null);
+      setTime(new Date());
+    } else {
+      alert('Gagal menambah jadwal: ' + error.message);
+    }
+  };
+
   return (
     <div style={{ userSelect: 'none' }}>
       <div className="relative">
         <div className="w-full h-[1px] bg-black mb-2"></div>
-        <Carousel
-        >
+        <Carousel>
           <CarouselPrevious
             variant="ghost"
             className="focus:outline-none focus-visible:outline-none !bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
           />
-
-<CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[550px] lg:w-[500px] sm:w-[300px]">  {weeks.map((week, weekIndex) => (
-    <CarouselItem
-      key={weekIndex}
-      className="flex w-full justify-evenly items-center px-0 min-w-full shrink-0 grow-0 basis-full !pl-0"
-    >
-      {days.map((day, dayIndex) => (
-        <Card
-          key={dayIndex}
-          onClick={() => handleDayClick(weekIndex, dayIndex)}
-          className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
-            lg:h-16 lg:w-16 sm:h-14 sm:w-14 
-            transition-all duration-300 ease-in-out
-            ${
-              selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
-                ? "bg-white text-black opacity-100 " 
-                : weekIndex === 5 && currentDay === dayIndex
-                ? "bg-[#3443E9] text-white opacity-100"
-                : "bg-transparent text-black bg-opacity-50"
-            } cursor-pointer !pl-0`}
-        >
-          <CardContent className="text-sm font-semibold p-0 flex flex-col items-center justify-center lg:text-lg sm:text-md text-xs">
-            {day}
-            <div className="text-xs mt-1 sm:text-sm">
-              {week[dayIndex]}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </CarouselItem>
-  ))}
-</CarouselContent>
-
+          <CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[550px] lg:w-[500px] sm:w-[300px]">
+            {weeks.map((week, weekIndex) => (
+              <CarouselItem
+                key={weekIndex}
+                className="flex w-full justify-evenly items-center px-0 min-w-full shrink-0 grow-0 basis-full !pl-0"
+              >
+                {days.map((day, dayIndex) => (
+                  <Card
+                    key={dayIndex}
+                    onClick={() => handleDayClick(weekIndex, dayIndex)}
+                    className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
+                      lg:h-16 lg:w-16 sm:h-14 sm:w-14 
+                      transition-all duration-300 ease-in-out
+                      ${
+                        selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
+                          ? "bg-white text-black opacity-100 " 
+                          : weekIndex === 5 && currentDay === dayIndex
+                          ? "bg-[#3443E9] text-white opacity-100"
+                          : "bg-transparent text-black bg-opacity-50"
+                      } cursor-pointer !pl-0`}
+                  >
+                    <CardContent className="text-sm font-semibold p-0 flex flex-col items-center justify-center lg:text-lg sm:text-md text-xs">
+                      {day}
+                      <div className="text-xs mt-1 sm:text-sm">
+                        {week[dayIndex]}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CarouselItem>
+            ))}
+          </CarouselContent>
           <CarouselNext
             variant="ghost"
             className="focus:outline-none focus-visible:outline-none !bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
@@ -160,176 +230,148 @@ export default function WeekRow() {
       </div>
       <div className="relative mt-4 flex justify-center">
         <div className="relative w-3/4 h-40">
-         <div className="relative w-full h-4/4">
-  <div className="relative  border-gray-500 border-2 rounded-4xl px-6 p12-4 flex items-center justify-start w-full h-full bg-[#3443E9]/30 z-10 space-x-4">
-    {/* Blue box embedded inside card */}
-    <div
-      className="border-gray-500 border-2 rounded-xl w-24 h-24 flex items-center justify-center cursor-pointer bg-[#76cef9] transition-colors duration-150"
-      onClick={() => setDialogOpen(true)}
-      style={{ transition: 'background-color 0.15s, opacity 0.15s' }}
-      onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = 'white';
-      e.currentTarget.style.opacity = '0.8';
-      }}
-      onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = '#76cef9';
-      e.currentTarget.style.opacity = '1';
-      }}
-    >
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogTrigger asChild>
-        <span className="text-gray-500 text-2xl font-bold cursor-pointer">+</span>
-        </DialogTrigger>
-        <DialogContent className="w-1/3.5 sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Scheduler</DialogTitle>
-          <DialogDescription>
-        Tambahkan jadwal baru.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="dropdown" className="text-right">
-          Aquarium
-        </Label>
-        <div className="col-span-3">
-            {variants.map((variant) => (
-              <Dropdown key={variant}>
-                <DropdownTrigger>
-                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                    color={selectedColor}
-                    variant={variant}
-                  >
-                    {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="Aquarium List"
-                  color={selectedColor}
-                  variant={variant}
-                  className="!bg-white"
-                  onAction={(key) => setSelectedAkuarium(Number(key))}
-                >
-                  {akuariumOptions.map((option) => (
-                    <DropdownItem
-                      key={option.akuarium_id}
-                      className="!bg-white cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
-                    >
-                      Aquarium {option.akuarium_id}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-            ))}
+          <div className="relative w-full h-4/4">
+            <div className="relative border-gray-500 border-2 rounded-4xl px-6 p12-4 flex items-center justify-start w-full h-full bg-[#3443E9]/30 z-10 space-x-4">
+              <div
+                className="border-gray-500 border-2 rounded-xl w-24 h-24 flex items-center justify-center cursor-pointer bg-[#76cef9] transition-colors duration-150"
+                onClick={() => setDialogOpen(true)}
+                style={{ transition: 'background-color 0.15s, opacity 0.15s' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'white';
+                  e.currentTarget.style.opacity = '0.8';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#76cef9';
+                  e.currentTarget.style.opacity = '1';
+                }}
+              >
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <span className="text-gray-500 text-2xl font-bold cursor-pointer">+</span>
+                  </DialogTrigger>
+                  <DialogContent className="w-1/3.5 sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Scheduler</DialogTitle>
+                      <DialogDescription>
+                        Tambahkan jadwal baru.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSaveSchedule}>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="dropdown" className="text-right">
+                          Aquarium
+                        </Label>
+                        <div className="col-span-3">
+                          <DropdownMenu.Root>
+                            <DropdownMenu.Trigger asChild>
+                              <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150">
+                                {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
+                              </Button>
+                            </DropdownMenu.Trigger>
+                            <DropdownMenu.Portal>
+                              <DropdownMenu.Content className="!bg-white border rounded shadow-md p-2 z-50">
+                                {akuariumOptions.map((option) => (
+                                  <DropdownMenu.Item
+                                    key={option.akuarium_id}
+                                    onSelect={() => setSelectedAkuarium(option.akuarium_id)}
+                                    className="!bg-white cursor-pointer hover:!bg-gray-100 active:!bg-gray-300 focus:!bg-gray-100 transition-colors"
+                                  >
+                                    Aquarium {option.akuarium_id}
+                                  </DropdownMenu.Item>
+                                ))}
+                              </DropdownMenu.Content>
+                            </DropdownMenu.Portal>
+                          </DropdownMenu.Root>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="tugas-dropdown" className="text-right">
+                          Tugas
+                        </Label>
+                        <div className="col-span-3">
+                          <DropdownMenu.Root>
+                            <DropdownMenu.Trigger asChild>
+                              <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150">
+                                {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
+                              </Button>
+                            </DropdownMenu.Trigger>
+                            <DropdownMenu.Portal>
+                              <DropdownMenu.Content className="!bg-white border rounded shadow-md p-2 z-50">
+                                {tugasOptions.map((option) => (
+                                  <DropdownMenu.Item
+                                    key={option.tugas_id}
+                                    onSelect={() => setSelectedTugas(option)}
+                                    className="!bg-white cursor-pointer hover:!bg-gray-100 active:!bg-gray-300 focus:!bg-gray-100 transition-colors"
+                                  >
+                                    {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
+                                  </DropdownMenu.Item>
+                                ))}
+                              </DropdownMenu.Content>
+                            </DropdownMenu.Portal>
+                          </DropdownMenu.Root>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="user-dropdown" className="text-right">
+                          User
+                        </Label>
+                        <div className="col-span-3">
+                          <DropdownMenu.Root>
+                            <DropdownMenu.Trigger asChild>
+                              <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150">
+                                {selectedUser ? selectedUser.username : 'Pilih user'}
+                              </Button>
+                            </DropdownMenu.Trigger>
+                            <DropdownMenu.Portal>
+                              <DropdownMenu.Content className="!bg-white border rounded shadow-md p-2 z-50">
+                                {userOptions.map((option) => (
+                                  <DropdownMenu.Item
+                                    key={option.user_id}
+                                    onSelect={() => setSelectedUser(option)}
+                                    className="!bg-white cursor-pointer hover:!bg-gray-100 active:!bg-gray-300 focus:!bg-gray-100 transition-colors"
+                                  >
+                                    {option.username}
+                                  </DropdownMenu.Item>
+                                ))}
+                              </DropdownMenu.Content>
+                            </DropdownMenu.Portal>
+                          </DropdownMenu.Root>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="tanggal-picker" className="text-right">
+                          Jam
+                        </Label>
+                        <div className="col-span-3 flex justify-center">
+                          <TimePickerDemo date={time} setDate={setTime} />
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit" className="!bg-[#3443E9] text-white hover:bg-gray-800" disabled={loading}>
+                        {loading ? 'Saving...' : 'Save changes'}
+                      </Button>
+                    </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <div className="flex-1 font-semibold text-gray-700 text-lg text-center sm:text-left">
+                {"Tambah Jadwal Baru"}
+                {selectedDay && (
+                  <div className="text-sm text-gray-700 mt-1">
+                    {(() => {
+                      const selectedDate = getSelectedDate();
+                      return selectedDate ? selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-        {/* New Dropdown for Tugas */}
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="tugas-dropdown" className="text-right">
-            Tugas
-          </Label>
-          <div className="col-span-3">
-            {variants.map((variant) => (
-              <Dropdown key={variant}>
-                <DropdownTrigger>
-                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                    color={selectedColor}
-                    variant={variant}
-                  >
-                    {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="Tugas List"
-                  color={selectedColor}
-                  variant={variant}
-                  className="!bg-white"
-                  onAction={(key) => {
-                    const tugas = tugasOptions.find((t) => t.tugas_id === Number(key));
-                    if (tugas) setSelectedTugas(tugas);
-                  }}
-                >
-                  {tugasOptions.map((option) => (
-                    <DropdownItem
-                      key={option.tugas_id}
-                      className="!bg-white cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
-                    >
-                      {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-            ))}
-          </div>
-        </div>
-        {/* New Dropdown for Users */}
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="user-dropdown" className="text-right">
-            User
-          </Label>
-          <div className="col-span-3">
-            {variants.map((variant) => (
-              <Dropdown key={variant}>
-                <DropdownTrigger>
-                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                    color={selectedColor}
-                    variant={variant}
-                  >
-                    {selectedUser ? selectedUser.username : 'Pilih user'}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="User List"
-                  color={selectedColor}
-                  variant={variant}
-                  className="!bg-white"
-                  onAction={(key) => {
-                    const user = userOptions.find((u) => u.user_id === Number(key));
-                    if (user) setSelectedUser(user);
-                  }}
-                >
-                  {userOptions.map((option) => (
-                    <DropdownItem
-                      key={option.user_id}
-                      className="!bg-white cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
-                    >
-                      {option.username}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-            ))}
-          </div>
-        </div>
-        
-        {/* New Option for Tanggal */}
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="tanggal-picker" className="text-right">
-            Jam
-          </Label>
-          <div className="col-span-3">
-            <TimePickerOnly/>
-          </div>
-        </div>    
-        </div>
-        <DialogFooter>
-            <Button type="submit" className="!bg-[#3443E9] text-white hover:bg-gray-800">
-            Save changes
-            </Button>
-          
-        </DialogFooter>
-      </DialogContent>
-      </Dialog>
-    </div>
-    
-    {/* Text content beside the blue box */}
-    <div className="flex-1 font-semibold text-gray-600 text-lg text-center sm:text-left">
-      {"Tambah Jadwal Baru"}
-    </div>
-  </div>
-</div>
         </div>
       </div>
-    </div>  
-  )
+    </div>
+  );
 }

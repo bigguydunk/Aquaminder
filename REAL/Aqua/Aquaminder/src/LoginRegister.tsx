@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../supabaseClient';
+import Background from './components/background';
 
 const LoginRegister = () => {
   const navigate = useNavigate();
@@ -111,6 +112,7 @@ const LoginRegister = () => {
   };
 
   return (
+    
     <div className="container">
       <h1>Welcome to <span className="brand">Aquaminder</span></h1>
       <div className="form-container">

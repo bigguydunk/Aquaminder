@@ -35,13 +35,12 @@ function Homepage() {
   }, [email]);
 
   return (
-    <div style={{ userSelect: 'none' }} >
+    <div className="display-flex">
       <Background />
       <div className="header">
-        <h2> Welcome, {userName ?? 'Guest'}</h2>
-        <HomeData />
-        <WeekRow />
-        
+      <h2 className='text-2xl font-bold'> Welcome, {userName ?? 'Guest'}</h2>
+      <HomeData />
+      <WeekRow />
       </div>
       <FloatingButton />
     </div>
