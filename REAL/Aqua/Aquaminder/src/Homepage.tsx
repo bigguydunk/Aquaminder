@@ -5,6 +5,7 @@ import HomeData from './HomeData';
 import WeekRow from './components/ui/weekrow';
 import FloatingButton from './components/ui/FloatingButton';
 import AquariumTable from './components/AquariumTable';
+import Background from './components/background';
 
 import "./App.css";
 import { useEffect, useState } from 'react';
@@ -35,10 +36,12 @@ function Homepage() {
 
   return (
     <div style={{ userSelect: 'none' }} >
+      <Background />
       <div className="header">
         <h2> Welcome, {userName ?? 'Guest'}</h2>
         <HomeData />
         <WeekRow />
+        
       </div>
       <FloatingButton />
     </div>

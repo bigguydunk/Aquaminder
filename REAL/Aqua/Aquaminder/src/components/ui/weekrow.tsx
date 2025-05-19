@@ -1,5 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
+import React from "react";
+import { Button }from "@heroui/button"
 import { Card, CardContent } from "@/components/ui/card";
+
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownSection,
+  DropdownItem
+} from "@heroui/dropdown";
+
+import { Radio, RadioGroup } from "@heroui/radio";
+
 import {
   Carousel,
   CarouselContent,
@@ -7,7 +20,7 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogClose,
@@ -18,17 +31,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+
+import { Label } from "@/components/ui/label";
 
 import supabase from '../../../supabaseClient';
 
@@ -47,10 +53,11 @@ export default function WeekRow() {
   const [akuariumOptions, setAkuariumOptions] = useState<{ akuarium_id: number }[]>([]);
   const [tugasOptions, setTugasOptions] = useState<{ tugas_id: number; deskripsi_tugas: string | null }[]>([]);
   const [userOptions, setUserOptions] = useState<{ user_id: number; username: string }[]>([]);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedAkuarium, setSelectedAkuarium] = useState<number | null>(null);
   const [selectedTugas, setSelectedTugas] = useState<{ tugas_id: number; deskripsi_tugas: string | null } | null>(null);
   const [selectedUser, setSelectedUser] = useState<{ user_id: number; username: string } | null>(null);
+  const [selectedColor] = React.useState<'default'>('default');
+  const variants = ["bordered"] as const;
 
   useEffect(() => {
     const fetchAkuariumData = async () => {
@@ -84,6 +91,8 @@ export default function WeekRow() {
     };
     fetchUserData();
   }, []);
+
+  
 
   const generateWeekDates = (weekOffset: number) => {
     return Array.from({ length: 7 }, (_, index) => {
@@ -183,68 +192,116 @@ export default function WeekRow() {
         <Label htmlFor="dropdown" className="text-right">
           Aquarium
         </Label>
-        <DropdownMenu open={openDropdown === 'akuarium'} onOpenChange={(open) => setOpenDropdown(open ? 'akuarium' : null)}>
-          <DropdownMenuTrigger asChild>
-            <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'akuarium' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
-              {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {akuariumOptions.map((option) => (
-              <DropdownMenuItem key={option.akuarium_id} 
-              onClick={() => { setSelectedAkuarium(option.akuarium_id); setOpenDropdown(null); }}
-              className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200">
-                Aquarium {option.akuarium_id}
-              </DropdownMenuItem>
+        <div className="col-span-3">
+            {variants.map((variant) => (
+              <Dropdown key={variant}>
+                <DropdownTrigger>
+                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                    color={selectedColor}
+                    variant={variant}
+                  >
+                    {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Aquarium List"
+                  color={selectedColor}
+                  variant={variant}
+                  className="!bg-white"
+                  onAction={(key) => setSelectedAkuarium(Number(key))}
+                >
+                  {akuariumOptions.map((option) => (
+                    <DropdownItem
+                      key={option.akuarium_id}
+                      className="!bg-white cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
+                    >
+                      Aquarium {option.akuarium_id}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
             ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </div>
         </div>
         {/* New Dropdown for Tugas */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="tugas-dropdown" className="text-right">
             Tugas
           </Label>
-          <DropdownMenu open={openDropdown === 'tugas'} onOpenChange={(open) => setOpenDropdown(open ? 'tugas' : null)}>
-            <DropdownMenuTrigger asChild>
-              <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'tugas' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
-                {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {tugasOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.tugas_id}
-                  onClick={() => { setSelectedTugas(option); setOpenDropdown(null); }}
-                  className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
+          <div className="col-span-3">
+            {variants.map((variant) => (
+              <Dropdown key={variant}>
+                <DropdownTrigger>
+                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                    color={selectedColor}
+                    variant={variant}
+                  >
+                    {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Tugas List"
+                  color={selectedColor}
+                  variant={variant}
+                  className="!bg-white"
+                  onAction={(key) => {
+                    const tugas = tugasOptions.find((t) => t.tugas_id === Number(key));
+                    if (tugas) setSelectedTugas(tugas);
+                  }}
                 >
-                  {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
-                </DropdownMenuItem>
-              ))}
-              
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  {tugasOptions.map((option) => (
+                    <DropdownItem
+                      key={option.tugas_id}
+                      className="!bg-white cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
+                    >
+                      {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+            ))}
+          </div>
         </div>
         {/* New Dropdown for Users */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="user-dropdown" className="text-right">
             User
           </Label>
-          <DropdownMenu open={openDropdown === 'user'} onOpenChange={(open) => setOpenDropdown(open ? 'user' : null)}>
-            <DropdownMenuTrigger asChild>
-              <Button className={`col-span-3 w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150 ${openDropdown === 'user' ? '!border-black' : '!border-gray-300'}`} tabIndex={0}>
-                {selectedUser ? selectedUser.username : 'Pilih user'}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {userOptions.map((option) => (
-                <DropdownMenuItem key={option.user_id} onClick={() => { setSelectedUser(option); setOpenDropdown(null); }} className="cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200">
-                  {option.username}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="col-span-3">
+            {variants.map((variant) => (
+              <Dropdown key={variant}>
+                <DropdownTrigger>
+                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                    color={selectedColor}
+                    variant={variant}
+                  >
+                    {selectedUser ? selectedUser.username : 'Pilih user'}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="User List"
+                  color={selectedColor}
+                  variant={variant}
+                  className="!bg-white"
+                  onAction={(key) => {
+                    const user = userOptions.find((u) => u.user_id === Number(key));
+                    if (user) setSelectedUser(user);
+                  }}
+                >
+                  {userOptions.map((option) => (
+                    <DropdownItem
+                      key={option.user_id}
+                      className="!bg-white cursor-pointer hover:bg-gray-200 active:bg-gray-300 focus:bg-gray-200"
+                    >
+                      {option.username}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+            ))}
+          </div>
         </div>
+        
         {/* New Option for Tanggal */}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="tanggal-picker" className="text-right">
