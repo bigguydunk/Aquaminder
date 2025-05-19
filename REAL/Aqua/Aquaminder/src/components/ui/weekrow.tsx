@@ -228,8 +228,8 @@ export default function () {
         </Carousel>
         <div className="w-full h-[1px] bg-black mt-2"></div>
       </div>
-      <div className="relative mt-4 flex justify-center">
-        <div className="relative w-3/4 h-40">
+      <div className="relative mt-4 flex-row justify-center items-center">
+        <div className="relative w-3/4 h-40 justify-center items-center mx-auto">
           <div className="relative w-full h-4/4">
             <div className="relative border-gray-500 border-2 rounded-4xl px-6 p12-4 flex items-center justify-start w-full h-full bg-[#3443E9]/30 z-10 space-x-4">
               <div
@@ -371,6 +371,66 @@ export default function () {
             </div>
           </div>
         </div>
+        {/* New: Show box if user has a schedule on the selected day */}
+        {currentUserId && selectedDay && (
+          <ScheduleForUserBox
+            userId={currentUserId}
+            selectedDate={getSelectedDate()}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+import { useEffect as useEffectBox, useState as useStateBox } from 'react';
+
+function ScheduleForUserBox({ userId, selectedDate }: { userId: number, selectedDate: Date | null }) {
+  const [hasSchedule, setHasSchedule] = useStateBox(false);
+  const [loading, setLoading] = useStateBox(true);
+  const [schedule, setSchedule] = useStateBox<any>(null);
+
+  useEffectBox(() => {
+    if (!userId || !selectedDate) return;
+    setLoading(true);
+    // Format selectedDate to YYYY-MM-DD for comparison (ignore time)
+    const dayStringDate = new Date(selectedDate);
+    dayStringDate.setDate(dayStringDate.getDate() + 1); 
+    const dayString = dayStringDate.toISOString().slice(0, 10);
+    supabase
+      .from('jadwal')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('tanggal', dayString + 'T00:00:00+07:00')
+      .lte('tanggal', dayString + 'T23:59:59+07:00')
+      .then(({ data, error }) => {
+        if (data && data.length > 0) {
+          setHasSchedule(true);
+          setSchedule(data[0]);
+        } else {
+          setHasSchedule(false);
+          setSchedule(null);
+        }
+        setLoading(false);
+      });
+  }, [userId, selectedDate]);
+
+  if (loading || !selectedDate) return null;
+  if (!hasSchedule) return null;
+  return (
+    <div className="relative w-3/4  flex-row items-center justify-center mt-4 mx-auto">
+      <div className="relative border-green-600 border-2 rounded-4xl px-6 py-4 flex items-center justify-start w-full max-w-xl h-full bg-green-200/60 z-10 space-x-4">
+      <div className="border-green-600 border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-green-400 text-white text-3xl font-bold">
+        ✓
+      </div>
+      <div className="flex-1 font-semibold text-green-900 text-lg text-center sm:text-left">
+        {"Kamu punya jadwal hari ini!"}
+        {schedule && (
+        <div className="text-sm text-green-800 mt-1">
+          Jadwal: {new Date(schedule.tanggal).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+        </div>
+        )}
+      </div>
       </div>
     </div>
   );
