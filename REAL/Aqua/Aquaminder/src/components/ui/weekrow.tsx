@@ -37,7 +37,7 @@ const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function () {
   const today = new Date();
   const currentDay = today.getDay();
-  const [selectedDay, setSelectedDay] = useState<{ week: number; day: number } | null>(null);
+  const [selectedDay, setSelectedDay] = useState<{ week: number; day: number } | null>({ week: 5, day: currentDay });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [akuariumOptions, setAkuariumOptions] = useState<{ akuarium_id: number }[]>([]);
   const [tugasOptions, setTugasOptions] = useState<{ tugas_id: number; deskripsi_tugas: string | null }[]>([]);
