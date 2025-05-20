@@ -394,6 +394,18 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
   const [hasSchedule, setHasSchedule] = useStateBox(false);
   const [loading, setLoading] = useStateBox(true);
   const [schedules, setSchedules] = useStateBox<any[]>([]);
+  const [userMap, setUserMap] = useStateBox<{ [key: number]: string }>({});
+
+  useEffectBox(() => {
+    // Fetch all users for mapping user_id to username
+    supabase.from('users').select('user_id, username').then(({ data }) => {
+      if (data) {
+        const map: { [key: number]: string } = {};
+        data.forEach((u: { user_id: number; username: string }) => { map[u.user_id] = u.username; });
+        setUserMap(map);
+      }
+    });
+  }, []);
 
   useEffectBox(() => {
     if (!userId || !selectedDate) return;
@@ -425,6 +437,41 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
       {schedules.map((schedule, idx) => (
         <div key={schedule.jadwal_id || idx} className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
+          {/* X button for delete */}
+          <RadixDialog.Root>
+            <RadixDialog.Trigger asChild>
+              <button
+                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
+                title="Delete schedule"
+                type="button"
+              >
+                ×
+              </button>
+            </RadixDialog.Trigger>
+            <RadixDialog.Portal>
+              <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+              <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                <RadixDialog.Title className="text-lg font-bold mb-2">Delete Schedule</RadixDialog.Title>
+                <RadixDialog.Description className="mb-4 text-gray-600 text-center">
+                  Are you sure you want to delete this schedule?
+                </RadixDialog.Description>
+                <div className="flex gap-4 justify-center mt-2">
+                  <Button
+                    className="!bg-red-600 text-white hover:bg-red-700"
+                    onClick={async () => {
+                      await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
+                      setSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
+                    }}
+                  >
+                    Yes
+                  </Button>
+                  <RadixDialog.Close asChild>
+                    <Button className="!bg-gray-200 !text-black !hover:bg-gray-300">No</Button>
+                  </RadixDialog.Close>
+                </div>
+              </RadixDialog.Content>
+            </RadixDialog.Portal>
+          </RadixDialog.Root>
           <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold !border-1 !border-black">
             ✓
           </div>
@@ -439,6 +486,10 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
             )}
             <div className="text-sm text-black mt-1">
               {schedule.tanggal ? new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
+            </div>
+            {/* Created by info at bottom right */}
+            <div className="absolute right-4 bottom-2 text-xs text-gray-500 italic">
+              {schedule.created_by ? `created by: ${userMap[schedule.created_by] || 'user'} ` : ''}
             </div>
           </div>
         </div>
