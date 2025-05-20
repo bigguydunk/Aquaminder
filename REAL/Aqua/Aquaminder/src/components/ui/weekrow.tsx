@@ -172,7 +172,9 @@ export default function () {
   return (
     <div style={{ userSelect: 'none' }}>
       <div className="relative">
-        <div className="w-full h-[1px] bg-black mb-2"></div>
+        <div className="w-full h-[2px] bg-transparent mb-2"></div>
+        <div className="w-full h-[2px] bg-white mb-2 rounded-md shadow-lg"></div>
+        <div className="w-full h-[2px] bg-transparent mb-2"></div>
         <Carousel>
           <CarouselPrevious
             variant="ghost"
@@ -184,28 +186,29 @@ export default function () {
                 key={weekIndex}
                 className="flex w-full justify-evenly items-center px-0 min-w-full shrink-0 grow-0 basis-full !pl-0"
               >
-                {days.map((day, dayIndex) => (
-                  <Card
-                    key={dayIndex}
-                    onClick={() => handleDayClick(weekIndex, dayIndex)}
-                    className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
-                      lg:h-16 lg:w-16 sm:h-14 sm:w-14 
-                      transition-all duration-300 ease-in-out
-                      ${
-                        selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
-                          ? "bg-white text-gray-800 opacity-100 " 
-                          : weekIndex === 5 && currentDay === dayIndex
-                          ? "bg-[#3443E9] text-white opacity-100"
-                          : "bg-transparent text-gray-800 bg-opacity-50"
-                      } cursor-pointer !pl-0`}
-                  >
-                    <CardContent className="text-sm font-semibold p-0 flex flex-col items-center justify-center lg:text-lg sm:text-md text-xs">
-                      {day}
-                      <div className="text-xs mt-1 sm:text-sm">
-                        {week[dayIndex]}
-                      </div>
-                    </CardContent>
-                  </Card>
+                {week.map((dateNum, dayIndex) => (
+                  <div key={dayIndex} className="flex flex-col items-center">
+                    <div className="text-xs sm:text-sm lg:text-base text-gray-800 mb-1">
+                      {days[dayIndex]}
+                    </div>
+                    <Card
+                      onClick={() => handleDayClick(weekIndex, dayIndex)}
+                      className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
+                        lg:h-16 lg:w-16 sm:h-14 sm:w-14 
+                        transition-all duration-300 ease-in-out
+                        ${
+                          selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
+                            ? "bg-white text-gray-800 opacity-100 shadow-md" 
+                            : weekIndex === 5 && currentDay === dayIndex
+                            ? "bg-[#3443E9] text-white opacity-100 shadow-md"
+                            : "bg-transparent text-gray-800 bg-opacity-50"
+                        } cursor-pointer !pl-0`}
+                    >
+                      <CardContent className="text-lg font-semibold p-0 flex flex-col items-center justify-center">
+                        {dateNum}
+                      </CardContent>
+                    </Card>
+                  </div>
                 ))}
               </CarouselItem>
             ))}
@@ -236,7 +239,7 @@ export default function () {
                         e.currentTarget.style.opacity = '1';
                       }}
                     >
-                      <span className="text-black text-2xl cursor-pointer">+</span>
+                      <span className="text-gray-600 text-2xl cursor-pointer">+</span>
                     </div>
                   </RadixDialog.Trigger>
                   <RadixDialog.Portal>

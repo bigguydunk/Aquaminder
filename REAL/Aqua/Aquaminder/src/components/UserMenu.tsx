@@ -55,7 +55,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
                 className="bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer hover:bg-gray-100 text-center"
                 onClick={e => { e.preventDefault(); handlePegawaiClick(); }}
               >
-                Pegawai
+                All Users
               </DropdownMenu.DropdownMenuItem>
             </Dialog.Trigger>
             <Dialog.Portal>
