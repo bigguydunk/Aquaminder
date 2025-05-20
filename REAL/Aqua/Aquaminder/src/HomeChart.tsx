@@ -162,7 +162,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
                         <DialogTrigger asChild>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, minWidth: 250 }}>
                                 <span style={{ fontWeight: 'bold', color: 'gray-800', fontSize: 24 }}> Aquarium #{this.state.aquariumID}  </span>
-                                <Button variant="outline" onClick={this.handleDetailOpen} className='!bg-white text-gray-800'>
+                                <Button variant="outline" onClick={this.handleDetailOpen} className='!bg-white focus:outline-none focus-visible:outline-none text-gray-800'>
                                     Detail 🔍︎
                                 </Button>
                             </div>

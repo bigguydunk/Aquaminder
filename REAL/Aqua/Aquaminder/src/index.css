@@ -44,13 +44,14 @@ button {
   transition: border-color 0.25s;
   transition: transform 0.2s ease-in-out;
 }
+
 button:hover {
   border-color: #646cff;
   transform: scale(1.1);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px auto -webkit-focus-ring-color;
 }
 
 /* 
