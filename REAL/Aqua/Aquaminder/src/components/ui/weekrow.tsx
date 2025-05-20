@@ -193,10 +193,10 @@ export default function () {
                       transition-all duration-300 ease-in-out
                       ${
                         selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
-                          ? "bg-white text-black opacity-100 " 
+                          ? "bg-white text-gray-800 opacity-100 " 
                           : weekIndex === 5 && currentDay === dayIndex
                           ? "bg-[#3443E9] text-white opacity-100"
-                          : "bg-transparent text-black bg-opacity-50"
+                          : "bg-transparent text-gray-800 bg-opacity-50"
                       } cursor-pointer !pl-0`}
                   >
                     <CardContent className="text-sm font-semibold p-0 flex flex-col items-center justify-center lg:text-lg sm:text-md text-xs">
