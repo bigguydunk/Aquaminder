@@ -350,7 +350,7 @@ export default function () {
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="tanggal-picker" className="text-right">
-                              Jam
+                              Waktu
                             </Label>
                             <div className="col-span-3 flex justify-center">
                               <TimePickerDemo date={time} setDate={setTime} />
@@ -399,6 +399,7 @@ export default function () {
 }
 
 import { useEffect as useEffectBox, useState as useStateBox } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOptions, userRole }: {
   userId: number,
@@ -477,28 +478,135 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     }
   }, [userRole, selectedDate]);
 
-  if (loading || !selectedDate) return null;
-  if ((userRole === 1 || userRole === 2)) {
-    if (!allSchedules.length) return null;
+  // Skeleton loading UI
+  if (loading) {
     return (
       <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-        {[...allSchedules]
-          .sort((a, b) => {
-            const isOwnA = a.user_id === userId;
-            const isOwnB = b.user_id === userId;
-            if (isOwnA && !isOwnB) return -1;
-            if (!isOwnA && isOwnB) return 1;
-            // Both are isOwn or both are not, sort by earliest
-            return new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime();
-          })
-          .map((schedule, idx) => {
-            const isOwn = schedule.user_id === userId;
-            return (
-              <div
-                key={schedule.jadwal_id || idx}
-                className={`relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md ${!isOwn ? 'opacity-70 grayscale' : ''}`}
-              >
-                {/* X button for delete, only show if userRole is 1 or 2 */}
+        <div className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md opacity-70">
+          <Skeleton className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center !border-1 !border-black" />
+          <div className="flex-1">
+            <Skeleton className="h-6 w-1/2 mb-2" />
+            <Skeleton className="h-4 w-1/3 mb-1" />
+            <Skeleton className="h-4 w-1/4" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default: always show the 'No schedule for the day' box
+  let scheduleBox = (
+    <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
+      <div className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md opacity-70">
+        <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-gray-200 text-gray-400 text-3xl font-bold !border-1 !border-black">
+          –
+        </div>
+        <div className="flex-1 text-gray-500 text-lg text-left sm:text-left">
+          No schedule for the day
+          <div className="text-sm text-gray-400 mt-1">
+            {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (loading || !selectedDate) return null;
+  if ((userRole === 1 || userRole === 2)) {
+    if (allSchedules.length) {
+      scheduleBox = (
+        <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
+          {[...allSchedules]
+            .sort((a, b) => {
+              const isOwnA = a.user_id === userId;
+              const isOwnB = b.user_id === userId;
+              if (isOwnA && !isOwnB) return -1;
+              if (!isOwnA && isOwnB) return 1;
+              // Both are isOwn or both are not, sort by earliest
+              return new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime();
+            })
+            .map((schedule, idx) => {
+              const isOwn = schedule.user_id === userId;
+              return (
+                <div
+                  key={schedule.jadwal_id || idx}
+                  className={`relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md ${!isOwn ? 'opacity-70 grayscale' : ''}`}
+                >
+                  {/* X button for delete, only show if userRole is 1 or 2 */}
+                  <RadixDialog.Root>
+                    <RadixDialog.Trigger asChild>
+                      <button
+                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
+                        title="Delete schedule"
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </RadixDialog.Trigger>
+                    <RadixDialog.Portal>
+                      <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                        <RadixDialog.Title className="text-lg font-bold mb-2">Delete Schedule</RadixDialog.Title>
+                        <RadixDialog.Description className="mb-4 text-gray-600 text-center">
+                          Are you sure you want to delete this schedule?
+                        </RadixDialog.Description>
+                        <div className="flex gap-4 justify-center mt-2">
+                          <Button
+                            className="!bg-red-600 text-white hover:bg-red-700"
+                            onClick={async () => {
+                              await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
+                              setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
+                            }}
+                          >
+                            Yes
+                          </Button>
+                          <RadixDialog.Close asChild>
+                            <Button className="!bg-gray-200 !text-black !hover:bg-gray-300">No</Button>
+                          </RadixDialog.Close>
+                        </div>
+                      </RadixDialog.Content>
+                    </RadixDialog.Portal>
+                  </RadixDialog.Root>
+                  <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold !border-1 !border-black">
+                    ✓
+                  </div>
+                  <div className="flex-1 text-black text-lg text-left sm:text-left">
+                    {schedule.tugas_id && tugasOptions.length > 0
+                      ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                      : 'Tugas tidak ditemukan'}
+                    {schedule.akuarium_id && akuariumOptions.length > 0 && (
+                      <div className="text-sm text-black mt-1">
+                        Akuarium {schedule.akuarium_id}
+                      </div>
+                    )}
+                    <div className="text-sm text-black mt-1">
+                      {schedule.tanggal ? new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
+                    </div>
+                    {/* Created by/for info at bottom right */}
+                    <div className="absolute right-4 bottom-2 text-xs text-gray-500 italic">
+                      {isOwn
+                        ? (schedule.created_by ? `created by: ${allUserMap[schedule.created_by] || 'user'} ` : '')
+                        : (schedule.user_id ? `created for: ${allUserMap[schedule.user_id] || 'user'} ` : '')}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      );
+    }
+    return scheduleBox;
+  }
+  // ...existing code for normal user...
+  if (hasSchedule && schedules.length) {
+    scheduleBox = (
+      <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
+        {[...schedules]
+          .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
+          .map((schedule, idx) => (
+            <div key={schedule.jadwal_id || idx} className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
+              {/* X button for delete, only show if userRole is 1 or 2 */}
+              {(userRole === 1 || userRole === 2) && (
                 <RadixDialog.Root>
                   <RadixDialog.Trigger asChild>
                     <button
@@ -521,7 +629,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                           className="!bg-red-600 text-white hover:bg-red-700"
                           onClick={async () => {
                             await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
-                            setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
+                            setSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
                           }}
                         >
                           Yes
@@ -533,101 +641,31 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                     </RadixDialog.Content>
                   </RadixDialog.Portal>
                 </RadixDialog.Root>
-                <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold !border-1 !border-black">
-                  ✓
-                </div>
-                <div className="flex-1 text-black text-lg text-left sm:text-left">
-                  {schedule.tugas_id && tugasOptions.length > 0
-                    ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                    : 'Tugas tidak ditemukan'}
-                  {schedule.akuarium_id && akuariumOptions.length > 0 && (
-                    <div className="text-sm text-black mt-1">
-                      Akuarium {schedule.akuarium_id}
-                    </div>
-                  )}
+              )}
+              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold !border-1 !border-black">
+                ✓
+              </div>
+              <div className="flex-1 text-black text-lg text-left sm:text-left">
+                {schedule.tugas_id && tugasOptions.length > 0
+                  ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                  : 'Tugas tidak ditemukan'}
+                {schedule.akuarium_id && akuariumOptions.length > 0 && (
                   <div className="text-sm text-black mt-1">
-                    {schedule.tanggal ? new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
+                    Akuarium {schedule.akuarium_id}
                   </div>
-                  {/* Created by/for info at bottom right */}
-                  <div className="absolute right-4 bottom-2 text-xs text-gray-500 italic">
-                    {isOwn
-                      ? (schedule.created_by ? `created by: ${allUserMap[schedule.created_by] || 'user'} ` : '')
-                      : (schedule.user_id ? `created for: ${allUserMap[schedule.user_id] || 'user'} ` : '')}
-                  </div>
+                )}
+                <div className="text-sm text-black mt-1">
+                  {schedule.tanggal ? new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
+                </div>
+                {/* Created by info at bottom right */}
+                <div className="absolute right-4 bottom-2 text-xs text-gray-500 italic">
+                  {schedule.created_by ? `created by: ${userMap[schedule.created_by] || 'user'} ` : ''}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
       </div>
     );
   }
-  // ...existing code for normal user...
-  if (!hasSchedule) return null;
-  return (
-    <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-      {[...schedules]
-        .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
-        .map((schedule, idx) => (
-          <div key={schedule.jadwal_id || idx} className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
-            {/* X button for delete, only show if userRole is 1 or 2 */}
-            {(userRole === 1 || userRole === 2) && (
-              <RadixDialog.Root>
-                <RadixDialog.Trigger asChild>
-                  <button
-                    className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
-                    title="Delete schedule"
-                    type="button"
-                  >
-                    ×
-                  </button>
-                </RadixDialog.Trigger>
-                <RadixDialog.Portal>
-                  <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                  <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                    <RadixDialog.Title className="text-lg font-bold mb-2">Delete Schedule</RadixDialog.Title>
-                    <RadixDialog.Description className="mb-4 text-gray-600 text-center">
-                      Are you sure you want to delete this schedule?
-                    </RadixDialog.Description>
-                    <div className="flex gap-4 justify-center mt-2">
-                      <Button
-                        className="!bg-red-600 text-white hover:bg-red-700"
-                        onClick={async () => {
-                          await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
-                          setSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
-                        }}
-                      >
-                        Yes
-                      </Button>
-                      <RadixDialog.Close asChild>
-                        <Button className="!bg-gray-200 !text-black !hover:bg-gray-300">No</Button>
-                      </RadixDialog.Close>
-                    </div>
-                  </RadixDialog.Content>
-                </RadixDialog.Portal>
-              </RadixDialog.Root>
-            )}
-            <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold !border-1 !border-black">
-              ✓
-            </div>
-            <div className="flex-1 text-black text-lg text-left sm:text-left">
-              {schedule.tugas_id && tugasOptions.length > 0
-                ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                : 'Tugas tidak ditemukan'}
-              {schedule.akuarium_id && akuariumOptions.length > 0 && (
-                <div className="text-sm text-black mt-1">
-                  Akuarium {schedule.akuarium_id}
-                </div>
-              )}
-              <div className="text-sm text-black mt-1">
-                {schedule.tanggal ? new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
-              </div>
-              {/* Created by info at bottom right */}
-              <div className="absolute right-4 bottom-2 text-xs text-gray-500 italic">
-                {schedule.created_by ? `created by: ${userMap[schedule.created_by] || 'user'} ` : ''}
-              </div>
-            </div>
-          </div>
-        ))}
-    </div>
-  );
+  return scheduleBox;
 }
