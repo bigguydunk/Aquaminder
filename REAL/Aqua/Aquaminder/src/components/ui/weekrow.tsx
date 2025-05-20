@@ -201,7 +201,7 @@ export default function () {
                             ? "bg-white text-gray-800 opacity-100 shadow-md" 
                             : weekIndex === 5 && currentDay === dayIndex
                             ? "bg-[#3443E9] text-white opacity-100 shadow-md"
-                            : "bg-transparent text-gray-800 bg-opacity-50"
+                            : "!bg-transparent text-gray-800"
                         } cursor-pointer !pl-0`}
                     >
                       <CardContent className="text-lg font-semibold p-0 flex flex-col items-center justify-center">

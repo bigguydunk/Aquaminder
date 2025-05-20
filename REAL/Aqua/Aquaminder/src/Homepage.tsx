@@ -6,6 +6,8 @@ import WeekRow from './components/ui/weekrow';
 import FloatingButton from './components/ui/FloatingButton';
 import Background from './components/background';
 import UserMenu from './components/UserMenu';
+import React from 'react';
+import Header from './assets/Group 35.svg?react';
 
 import "./App.css";
 import { useEffect, useState } from 'react';
@@ -13,7 +15,27 @@ import supabase from '../supabaseClient';
 import { data } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 // import supabase from '../supabaseClient';
-import * as DropdownMenu from "./components/ui/dropdown-menu";
+
+
+// Simple error boundary for Header
+class HeaderErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: any, info: any) {
+    // You can log error or info here
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{ color: 'red', fontWeight: 'bold' }}>Failed to load header.</div>;
+    }
+    return this.props.children;
+  }
+}
 
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
