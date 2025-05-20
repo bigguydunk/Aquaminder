@@ -141,14 +141,14 @@ const DeleteUserDialog: React.FC<{ userId: number; userName: string; onDelete: (
             </Dialog.Description>
             <div className="flex gap-4 justify-center mt-2">
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none"
+                className="px-4 py-2 !bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none"
                 onClick={handleDelete}
                 disabled={loading}
               >
                 {loading ? 'Deleting...' : 'Yes'}
               </button>
               <Dialog.Close asChild>
-                <button className="px-4 py-2 bg-gray-200 text-black rounded hover:bg-gray-300 focus:outline-none">No</button>
+                <button className="px-4 py-2 !bg-gray-200 text-black rounded hover:bg-gray-300 focus:outline-none">No</button>
               </Dialog.Close>
             </div>
           </Dialog.Content>
@@ -245,14 +245,14 @@ const RoleChanger: React.FC<{
             </Dialog.Description>
             <div className="flex gap-4 justify-center mt-2">
               <button
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none"
+                className="px-4 py-2 !bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none"
                 onClick={handleConfirm}
                 disabled={loading}
               >
                 {loading ? 'Saving...' : 'Yes'}
               </button>
               <Dialog.Close asChild>
-                <button className="px-4 py-2 bg-gray-200 text-black rounded hover:bg-gray-300 focus:outline-none">No</button>
+                <button className="px-4 py-2 !bg-gray-200 text-black rounded hover:bg-gray-300 focus:outline-none">No</button>
               </Dialog.Close>
             </div>
           </Dialog.Content>
