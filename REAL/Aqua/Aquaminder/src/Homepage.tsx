@@ -35,7 +35,7 @@ function Homepage() {
   }, [email]);
 
   return (
-    <div className="display-flex">
+    <div className="display-flex !height-screen">
       <Background />
       <div className="header">
       <h2 className='text-2xl font-bold'> Welcome, {userName ?? 'Guest'}</h2>
