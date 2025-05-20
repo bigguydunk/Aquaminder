@@ -265,7 +265,10 @@ export default function () {
                             <div className="col-span-3">
                               <DropdownMenu.Root>
                                 <DropdownMenu.Trigger asChild>
-                                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150">
+                                  <Button
+                                    className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
+                                  >
                                     {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
                                   </Button>
                                 </DropdownMenu.Trigger>
@@ -292,7 +295,10 @@ export default function () {
                             <div className="col-span-3">
                               <DropdownMenu.Root>
                                 <DropdownMenu.Trigger asChild>
-                                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150">
+                                 <Button
+                                    className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
+                                  >
                                     {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
                                   </Button>
                                 </DropdownMenu.Trigger>
@@ -319,7 +325,10 @@ export default function () {
                             <div className="col-span-3">
                               <DropdownMenu.Root>
                                 <DropdownMenu.Trigger asChild>
-                                  <Button className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150">
+                                  <Button
+                                    className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
+                                  >
                                     {selectedUser ? selectedUser.username : 'Pilih user'}
                                   </Button>
                                 </DropdownMenu.Trigger>
@@ -348,9 +357,9 @@ export default function () {
                             </div>
                           </div>
                         </div>
-                        <div className="flex justify-center mt-4">
-                          <Button type="submit" className="!bg-[#3443E9] text-white hover:bg-gray-800" disabled={loading}>
-                            {loading ? 'Saving...' : 'Save changes'}
+                        <div className="flex justify-center w-full">
+                          <Button type="submit" className="w-full !bg-[#3443E9] text-white hover:bg-gray-800" disabled={loading}>
+                          {loading ? 'Saving...' : 'Save Changes'}
                           </Button>
                         </div>
                       </form>

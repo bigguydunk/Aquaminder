@@ -52,7 +52,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
           <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
             <Dialog.Trigger asChild>
               <DropdownMenu.DropdownMenuItem
-                className="!bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer hover:bg-gray-100 text-center"
+                className="bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer hover:bg-gray-100 text-center"
                 onClick={e => { e.preventDefault(); handlePegawaiClick(); }}
               >
                 Pegawai
@@ -98,7 +98,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
             </Dialog.Portal>
           </Dialog.Root>
           <DropdownMenu.DropdownMenuSeparator className="my-1 bg-transparent h-px" />
-          <DropdownMenu.DropdownMenuItem onClick={onLogout} className="!bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer text-red-600 hover:bg-gray-100 text-center">
+          <DropdownMenu.DropdownMenuItem onClick={onLogout} className="bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer text-red-600 hover:bg-gray-100 text-center">
             Log out
           </DropdownMenu.DropdownMenuItem>
         </DropdownMenu.DropdownMenuContent>
