@@ -213,7 +213,7 @@ export default function () {
             className="focus:outline-none focus-visible:outline-none !bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
           />
         </Carousel>
-        <div className="w-full h-[1px] bg-black mt-2"></div>
+        <div className="w-full h-[1px] bg-transparent mt-2"></div>
       </div>
       <div className="relative mt-4 flex-row justify-center items-center">
         <div className="relative w-3/4 h-30 justify-center items-center mx-auto">
