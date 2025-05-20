@@ -448,7 +448,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
           setHasSchedule(false);
           setSchedules([]);
         }
-        setLoading(false);
+        setTimeout(() => setLoading(false), 150); 
       });
   }, [userId, selectedDate]);
 
@@ -465,7 +465,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
         .lte('tanggal', dayString + 'T23:59:59+07:00')
         .then(({ data }) => {
           setAllSchedules(data || []);
-          setLoading(false);
+          setTimeout(() => setLoading(false), 200); // Delay loading state by 200ms
         });
       // Fetch all users for mapping user_id to username
       supabase.from('users').select('user_id, username').then(({ data }) => {

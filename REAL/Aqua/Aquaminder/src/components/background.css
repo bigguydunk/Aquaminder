@@ -5,7 +5,8 @@ body,html{
 body{
   margin:0;
   padding:0;
-  background:linear-gradient(to bottom, #28D0FF, #88D7FF)
+  background: linear-gradient(180deg, #28D0FF 0px, #88D7FF 100vh);
+  background-attachment: fixed;
 }
 .bubbles{
   position:absolute;
