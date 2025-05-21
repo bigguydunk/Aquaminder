@@ -135,7 +135,7 @@ const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: (
   return (
     <>
       <button
-        className="absolute right-2 top-1 text-red-500 hover:text-red-700 text-lg font-bold bg-transparent border-none cursor-pointer z-20"
+        className="absolute right-2 top-1 !text-red-500 !hover:text-red-700 text-lg font-bold !bg-transparent border-none cursor-pointer z-20"
         title="Delete user"
         type="button"
         onClick={() => setOpen(true)}
