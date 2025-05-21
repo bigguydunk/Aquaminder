@@ -38,10 +38,13 @@ export default function () {
   const [time, setTime] = useState<Date | undefined>(new Date());
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null); // user_id is string in your schema
   const [userRole, setUserRole] = useState<number | null>(null);
   const location = useLocation();
   const email = location.state?.email;
+
+  // Set your Supabase project ref here (from your Supabase URL, e.g. abcd1234)
+  const SUPABASE_PROJECT_REF = "your-project-ref"; // <-- CHANGE THIS to your actual project ref
 
   useEffect(() => {
     const fetchAkuariumData = async () => {
@@ -75,19 +78,38 @@ export default function () {
     };
     fetchUserData();
 
-    if (email) {
-      supabase
-        .from('users')
-        .select('user_id, username, role')
-        .eq('email', email)
-        .then(({ data, error }) => {
-          if (data?.[0]) {
-            setUserName(data[0].username);
-            setCurrentUserId(data[0].user_id);
-            setUserRole(typeof data[0].role === 'number' ? data[0].role : Number(data[0].role));
-          }
-        });
-    }
+    // Get current user from Supabase Auth, checking localStorage if needed
+    const fetchUserRole = async () => {
+      let userId = null;
+      // Try to get user from Supabase Auth
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        userId = user.id;
+      } else {
+        // Fallback: try to get user from localStorage (Supabase stores session here by default)
+        const sessionStr = localStorage.getItem('sb-' + SUPABASE_PROJECT_REF + '-auth-token');
+        if (sessionStr) {
+          try {
+            const session = JSON.parse(sessionStr);
+            userId = session?.user?.id;
+          } catch {}
+        }
+      }
+      if (userId) {
+        setCurrentUserId(userId);
+        // Fetch role from users table
+        const { data } = await supabase
+          .from('users')
+          .select('username, role')
+          .eq('user_id', userId)
+          .single();
+        if (data) {
+          setUserName(data.username);
+          setUserRole(typeof data.role === 'number' ? data.role : Number(data.role));
+        }
+      }
+    };
+    fetchUserRole();
   }, [email]);
 
   const generateWeekDates = (weekOffset: number) => {
@@ -404,8 +426,9 @@ export default function () {
 import { useEffect as useEffectBox, useState as useStateBox } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// Update ScheduleForUserBox to accept userId as string
 function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOptions, userRole }: {
-  userId: number,
+  userId: string,
   selectedDate: Date | null,
   tugasOptions: { tugas_id: number; deskripsi_tugas: string | null }[],
   akuariumOptions: { akuarium_id: number }[],

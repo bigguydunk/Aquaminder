@@ -24,90 +24,95 @@ const LoginRegister = () => {
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const form = event.currentTarget;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
-
     if (!email) {
       alert('Email tidak boleh kosong!');
       return;
     }
-
     if (!isValidEmail(email)) {
       alert('Harap masukkan email yang valid!');
       return;
     }
-
     if (!password) {
       alert('Password tidak boleh kosong!');
       return;
     }
-
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .eq('password', password)
-      .single();
-
-    if (error || !data) {
+    // Supabase Auth login
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error || !data.session) {
       alert('Login gagal: ' + (error?.message || 'Akun tidak ditemukan'));
       return;
     }
     alert('Login berhasil! Selamat datang');
-    navigate('/homepage', { state: { email: data.email } });
+    // Pass the session and user info to homepage
+    navigate('/homepage', { state: { session: data.session, user: data.user } });
   };
 
   const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const form = event.currentTarget;
     const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
     const confirmPassword = (form.elements.namedItem('confirmPassword') as HTMLInputElement).value;
-
     if (!name) {
       alert('Nama lengkap tidak boleh kosong!');
       return;
     }
-
     if (!email) {
       alert('Email tidak boleh kosong!');
       return;
     }
-
     if (!isValidEmail(email)) {
       alert('Harap masukkan email yang valid!');
       return;
     }
-
     if (!password) {
       alert('Password tidak boleh kosong!');
       return;
     }
-
     if (!isStrongPassword(password)) {
       alert('Password harus memiliki minimal 8 karakter, mengandung setidaknya 1 angka, dan 1 karakter spesial!');
       return;
     }
-
     if (password !== confirmPassword) {
       alert('Password dan Ulangi Password tidak sesuai!');
       return;
     }
-
-    const {data, error} = await supabase.from('users').insert([
-      { username: name, email, password}
-    ]);
-
+    // Supabase Auth registration
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+      },
+    });
     if (error) {
       alert(`Registrasi gagal: ${error.message}`);
       return;
     }
-
-    alert('Registrasi berhasil! Silakan login dengan akun Anda.');
+    // Insert into users table if signUp is successful and user exists
+    if (data && data.user) {
+      const { error: userInsertError } = await supabase
+        .from('users')
+        .insert([
+          {
+            user_id: data.user.id, // Auth UUID
+            username: name,
+            role: 0, // default role, change as needed
+          },
+        ]);
+      if (userInsertError) {
+        alert(`Gagal menambahkan ke tabel users: ${userInsertError.message}`);
+        return;
+      }
+    }
+    alert('Registrasi berhasil! Silakan cek email Anda untuk verifikasi, lalu login dengan akun Anda.');
     toggleTabs('login');
   };
 

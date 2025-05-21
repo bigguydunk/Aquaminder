@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import FloatingButton from '../components/ui/FloatingButton';
 
 const DatabaseSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -97,27 +98,7 @@ const DatabaseSearch = () => {
         </div>
       </main>
       <div className="fixed bottom-4 right-4 flex flex-col items-center gap-2">
-        <button
-          onClick={() => navigate("/")}
-          className="w-12 h-12 rounded-full bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
-          title="Home"
-        >
-          🏠
-        </button>
-        <button
-          onClick={() => navigate("/database-search")}
-          className="w-12 h-12 rounded-full bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
-          title="D-Database"
-        >
-          📝
-        </button>
-        <button
-          onClick={() => navigate("/foodstock")}
-          className="w-12 h-12 rounded-full bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
-          title="Foodstock"
-        >
-          🐟
-        </button>
+        <FloatingButton />
       </div>
     </div>
   );
