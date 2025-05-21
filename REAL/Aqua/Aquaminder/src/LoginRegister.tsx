@@ -172,8 +172,31 @@ const LoginRegister = () => {
 
   // Listen for session changes (including after Google OAuth)
   useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session && session.user) {
+        // Check if user exists in users table
+        const { data: userRows, error: userQueryError } = await supabase
+          .from('users')
+          .select('user_id')
+          .eq('user_id', session.user.id);
+        if (!userQueryError && (!userRows || userRows.length === 0)) {
+          // Insert new user with Google display name
+          const displayName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email;
+          const { error: insertError } = await supabase.from('users').insert([
+            {
+              user_id: session.user.id,
+              username: displayName,
+              role: 0, // default role
+            },
+          ]);
+          if (insertError) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to insert Google user:', insertError.message);
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('Google user inserted to users table:', displayName);
+          }
+        }
         navigate('/homepage', { state: { session, user: session.user } });
       }
     });
