@@ -5,7 +5,7 @@ import './Chart.css';
 import supabase from '../supabaseClient';
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from './components/ui/dialog';
 import { Button } from './components/ui/button';
-import { Card, CardContent, CardTitle } from './components/ui/card';
+import { Card, CardContent} from './components/ui/card';
 
 
 interface RadialBarState {

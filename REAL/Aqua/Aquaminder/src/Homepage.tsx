@@ -6,7 +6,6 @@ import WeekRow from './components/ui/weekrow';
 import FloatingButton from './components/ui/FloatingButton';
 import Background from './components/background';
 import UserMenu from './components/UserMenu';
-import React from 'react';
 
 import "./App.css";
 import { useEffect, useState } from 'react';

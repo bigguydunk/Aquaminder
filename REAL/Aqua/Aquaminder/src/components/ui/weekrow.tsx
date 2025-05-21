@@ -18,7 +18,6 @@ import { Label } from "@/components/ui/label";
 import supabase from '../../../supabaseClient';
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Time } from "@internationalized/date";
 import * as RadixDialog from '@radix-ui/react-dialog';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
