@@ -107,7 +107,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
             </Dialog.Portal>
           </Dialog.Root>
           <DropdownMenu.DropdownMenuSeparator className="my-1 bg-transparent h-px" />
-          <DropdownMenu.DropdownMenuItem onClick={onLogout} className="bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer text-red-600 hover:bg-gray-100 text-center">
+          <DropdownMenu.DropdownMenuItem
+            onClick={onLogout}
+            className="bg-red-300 rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer text-red-600 hover:!bg-red-600 hover:!text-black text-center"
+          >
             Log out
           </DropdownMenu.DropdownMenuItem>
         </DropdownMenu.DropdownMenuContent>
