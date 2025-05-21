@@ -150,9 +150,13 @@ const LoginRegister = () => {
           },
         ]);
       if (userInsertError) {
+        let errorMsg = userInsertError.message;
+        if (errorMsg && errorMsg.toLowerCase().includes('user_id')) {
+          errorMsg = 'Akun ini sudah terdaftar!';
+        }
         toastCtx?.showToast({
-          title: 'Gagal menambahkan ke tabel users',
-          description: userInsertError.message,
+          title: errorMsg,
+          description: "Silahkan login dengan akun Anda.",
           variant: 'error',
         });
         return;
