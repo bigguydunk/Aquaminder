@@ -1,0 +1,8 @@
+{
+  "redirects": [
+    { "source": "/:path*", "destination": "https://aquaminder.vercel.app", "statusCode": 302 }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}

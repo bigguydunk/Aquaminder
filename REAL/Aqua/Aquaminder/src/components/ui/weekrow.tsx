@@ -559,7 +559,8 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                   <RadixDialog.Root>
                     <RadixDialog.Trigger asChild>
                       <button
-                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
+                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent !bg-transparent border-none cursor-pointer z-20"
+                        style={{ background: 'transparent' }}
                         title="Delete schedule"
                         type="button"
                       >
