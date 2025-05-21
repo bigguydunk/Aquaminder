@@ -1,10 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FloatingButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleButtons = () => {
     setIsOpen(!isOpen);
+  };
+
+  const goToDatabase = () => {
+    navigate("/database-search");
   };
 
   return (
@@ -24,6 +30,7 @@ const FloatingButton = () => {
             🏠
           </button>
           <button
+            onClick={goToDatabase}
             className="focus:outline-none focus-visible:outline-none w-12 h-12 rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
             title="D-Database"
           >
