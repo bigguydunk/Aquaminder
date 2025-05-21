@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../supabaseClient';
@@ -170,6 +170,18 @@ const LoginRegister = () => {
     toggleTabs('login');
   };
 
+  // Listen for session changes (including after Google OAuth)
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session && session.user) {
+        navigate('/homepage', { state: { session, user: session.user } });
+      }
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, [navigate]);
+
   return (
     
     <div className="container">
@@ -200,6 +212,41 @@ const LoginRegister = () => {
             <input name="email" type="email" placeholder="Masukkan Email" required />
             <input name="password" type="password" placeholder="Masukkan Password" required />
             <button type="submit" className="btn">Login</button>
+            <button
+              type="button"
+              className="btn google-btn"
+              style={{ marginTop: '10px', background: '#fff', color: '#333', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              onClick={async () => {
+                try {
+                  const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+                  if (error) {
+                    toastCtx?.showToast({
+                      title: 'Login Google gagal',
+                      description: error.message,
+                      variant: 'error',
+                    });
+                  } else if (data && data.url) {
+                    // Supabase will redirect, but for SSR or custom flows, you can handle here
+                    // Optionally show a toast
+                    toastCtx?.showToast({
+                      title: 'Mengalihkan ke Google...',
+                      description: 'Silakan lanjutkan login dengan akun Google Anda.',
+                      variant: 'success',
+                    });
+                    // window.location.href = data.url; // Not needed, Supabase handles redirect
+                  }
+                } catch (err: any) {
+                  toastCtx?.showToast({
+                    title: 'Login Google gagal',
+                    description: err?.message || 'Terjadi kesalahan saat login dengan Google.',
+                    variant: 'error',
+                  });
+                }
+              }}
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width={20} height={20} style={{ background: 'transparent' }} />
+              Sign in with Google
+            </button>
           </form>
         )}
         {activeTab === 'register' && (
