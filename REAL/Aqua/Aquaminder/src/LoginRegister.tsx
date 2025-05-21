@@ -241,7 +241,11 @@ const LoginRegister = () => {
               style={{ marginTop: '10px', background: '#fff', color: '#333', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               onClick={async () => {
                 try {
-                  const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+                  const { data, error } = await supabase.auth.signInWithOAuth({ 
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin, // This will be http://localhost:5173 in dev, or your prod URL in prod
+                      },
+                   });
                   if (error) {
                     toastCtx?.showToast({
                       title: 'Login Google gagal',
