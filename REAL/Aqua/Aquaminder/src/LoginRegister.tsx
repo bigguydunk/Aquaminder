@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../supabaseClient';
+import { ToastContext } from './components/ui/toast';
 
 const LoginRegister = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const toastCtx = useContext(ToastContext);
 
   const toggleTabs = (tab: 'login' | 'register') => {
     setActiveTab(tab);
@@ -27,15 +29,24 @@ const LoginRegister = () => {
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
     if (!email) {
-      alert('Email tidak boleh kosong!');
+      toastCtx?.showToast({
+        title: 'Email tidak boleh kosong!',
+        variant: 'error',
+      });
       return;
     }
     if (!isValidEmail(email)) {
-      alert('Harap masukkan email yang valid!');
+      toastCtx?.showToast({
+        title: 'Harap masukkan email yang valid!',
+        variant: 'error',
+      });
       return;
     }
     if (!password) {
-      alert('Password tidak boleh kosong!');
+      toastCtx?.showToast({
+        title: 'Password tidak boleh kosong!',
+        variant: 'error',
+      });
       return;
     }
     // Supabase Auth login
@@ -44,10 +55,18 @@ const LoginRegister = () => {
       password,
     });
     if (error || !data.session) {
-      alert('Login gagal: ' + (error?.message || 'Akun tidak ditemukan'));
+      toastCtx?.showToast({
+        title: 'Login gagal',
+        description: error?.message || 'Akun tidak ditemukan',
+        variant: 'error',
+      });
       return;
     }
-    alert('Login berhasil! Selamat datang');
+    toastCtx?.showToast({
+      title: 'Login berhasil!',
+      description: 'Selamat datang',
+      variant: 'success',
+    });
     // Pass the session and user info to homepage
     navigate('/homepage', { state: { session: data.session, user: data.user } });
   };
@@ -60,27 +79,47 @@ const LoginRegister = () => {
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
     const confirmPassword = (form.elements.namedItem('confirmPassword') as HTMLInputElement).value;
     if (!name) {
-      alert('Nama lengkap tidak boleh kosong!');
+      toastCtx?.showToast({
+        title: 'Nama lengkap tidak boleh kosong!',
+        variant: 'error',
+      });
       return;
     }
     if (!email) {
-      alert('Email tidak boleh kosong!');
+      toastCtx?.showToast({
+        title: 'Email tidak boleh kosong!',
+        variant: 'error',
+      });
       return;
     }
     if (!isValidEmail(email)) {
-      alert('Harap masukkan email yang valid!');
+      toastCtx?.showToast({
+        title: 'Harap masukkan email yang valid!',
+        variant: 'error',
+      });
       return;
     }
     if (!password) {
-      alert('Password tidak boleh kosong!');
+      toastCtx?.showToast({
+        title: 'Password tidak boleh kosong!',
+        variant: 'error',
+      });
       return;
     }
     if (!isStrongPassword(password)) {
-      alert('Password harus memiliki minimal 8 karakter, mengandung setidaknya 1 angka, dan 1 karakter spesial!');
+      toastCtx?.showToast({
+        title: 'Password lemah!',
+        description: 'Password harus memiliki minimal 8 karakter, mengandung setidaknya 1 angka, dan 1 karakter spesial!',
+        variant: 'error',
+      });
       return;
     }
     if (password !== confirmPassword) {
-      alert('Password dan Ulangi Password tidak sesuai!');
+      toastCtx?.showToast({
+        title: 'Password tidak sesuai!',
+        description: 'Password dan Ulangi Password tidak sesuai!',
+        variant: 'error',
+      });
       return;
     }
     // Supabase Auth registration
@@ -92,7 +131,11 @@ const LoginRegister = () => {
       },
     });
     if (error) {
-      alert(`Registrasi gagal: ${error.message}`);
+      toastCtx?.showToast({
+        title: 'Registrasi gagal',
+        description: error.message,
+        variant: 'error',
+      });
       return;
     }
     // Insert into users table if signUp is successful and user exists
@@ -107,11 +150,19 @@ const LoginRegister = () => {
           },
         ]);
       if (userInsertError) {
-        alert(`Gagal menambahkan ke tabel users: ${userInsertError.message}`);
+        toastCtx?.showToast({
+          title: 'Gagal menambahkan ke tabel users',
+          description: userInsertError.message,
+          variant: 'error',
+        });
         return;
       }
     }
-    alert('Registrasi berhasil! Silakan cek email Anda untuk verifikasi, lalu login dengan akun Anda.');
+    toastCtx?.showToast({
+      title: 'Registrasi berhasil!',
+      description: 'Silakan cek email Anda untuk verifikasi, lalu login dengan akun Anda.',
+      variant: 'success',
+    });
     toggleTabs('login');
   };
 
