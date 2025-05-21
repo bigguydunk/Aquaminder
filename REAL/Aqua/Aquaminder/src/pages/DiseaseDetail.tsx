@@ -6,15 +6,13 @@ const DiseaseDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#28D0FF] to-[#88D7FF] text-gray-800">
-      <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
-        <button onClick={() => navigate(-1)} className="text-xl">
+      <main className="p-4">
+        <button onClick={() => navigate(-1)} className="text-xl mb-4 text-[#34e7ff] absolute top-4 left-4">
           ←
         </button>
-        <h1 className="text-xl font-bold">Aquaminder</h1>
-        <span>🐟</span>
-      </header>
-      <main className="p-4">
-        <h2 className="text-lg font-semibold mb-4">Iridovirus Dwarf Gourami Disease</h2>
+        
+        <h2 className="text-lg font-bold mb-4 mt-8">Iridovirus Dwarf Gourami Disease</h2>
+        
         <div className="mb-4">
           <img
             src="https://via.placeholder.com/300x150"

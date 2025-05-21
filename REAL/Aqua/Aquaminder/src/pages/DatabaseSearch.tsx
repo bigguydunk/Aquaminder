@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const DatabaseSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<string[]>([]);
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = () => {
     const mockResults = [
@@ -21,28 +22,58 @@ const DatabaseSearch = () => {
     navigate("/disease-detail");
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#28D0FF] to-[#88D7FF] text-gray-800">
-      <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">Aquaminder</h1>
-        <span>🐟</span>
-      </header>
-      <main className="p-4">
-        <h2 className="text-lg font-semibold mb-4">Searching Database Penyakit Ikan</h2>
-        <div className="mb-4">
+  const SearchBar = () => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        handleSearch();
+      }
+    };
+
+    return (
+      <div className="w-full mx-auto relative mt-4">
+        <div className="flex w-full">
           <input
+            ref={inputRef}
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search..."
-            className="w-full p-2 border border-gray-300 rounded"
+            onKeyDown={handleKeyDown}
+            className="w-full border border-white rounded-l-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="What are you looking for?"
           />
           <button
+            type="button"
             onClick={handleSearch}
-            className="mt-2 w-full bg-gray-800 text-white p-2 rounded hover:bg-gray-700"
+            className="bg-white border border-black rounded-r-md p-2 flex items-center justify-center"
+            aria-label="Search"
           >
-            Search
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="#34e7ff"
+              viewBox="0 0 16 16"
+            >
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.442 0a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+            </svg>
           </button>
+        </div>
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [searchTerm]);
+
+  return (
+    <div className="min-h-screen w-screen bg-gradient-to-b from-[#28D0FF] to-[#88D7FF] text-gray-800">
+      <main className="p-4">
+        <h2 className="text-lg font-bold mb-4">Cari Penyakit Ikan</h2>
+        <div className="mb-4">
+          <SearchBar />
         </div>
         <div>
           <h3 className="text-md font-semibold mb-2">
