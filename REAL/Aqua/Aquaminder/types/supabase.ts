@@ -15,30 +15,21 @@ export type Database = {
           ikan_id: number | null
           jumlah_ikan_sakit: number | null
           jumlah_ikan_total: number | null
-          pegawai_bertugas: number | null
           penyakit_id: number | null
-          reminder_cleaning: number | null
-          reminder_pakan: number | null
         }
         Insert: {
           akuarium_id?: number
           ikan_id?: number | null
           jumlah_ikan_sakit?: number | null
           jumlah_ikan_total?: number | null
-          pegawai_bertugas?: number | null
           penyakit_id?: number | null
-          reminder_cleaning?: number | null
-          reminder_pakan?: number | null
         }
         Update: {
           akuarium_id?: number
           ikan_id?: number | null
           jumlah_ikan_sakit?: number | null
           jumlah_ikan_total?: number | null
-          pegawai_bertugas?: number | null
           penyakit_id?: number | null
-          reminder_cleaning?: number | null
-          reminder_pakan?: number | null
         }
         Relationships: [
           {
@@ -49,32 +40,11 @@ export type Database = {
             referencedColumns: ["ikan_id"]
           },
           {
-            foreignKeyName: "akuarium_pegawai_bertugas_fkey"
-            columns: ["pegawai_bertugas"]
-            isOneToOne: false
-            referencedRelation: "employee"
-            referencedColumns: ["employee_id"]
-          },
-          {
             foreignKeyName: "akuarium_penyakit_id_fkey"
             columns: ["penyakit_id"]
             isOneToOne: false
             referencedRelation: "penyakit"
             referencedColumns: ["penyakit_id"]
-          },
-          {
-            foreignKeyName: "akuarium_reminder_cleaning_fkey"
-            columns: ["reminder_cleaning"]
-            isOneToOne: false
-            referencedRelation: "reminder"
-            referencedColumns: ["reminder_id"]
-          },
-          {
-            foreignKeyName: "akuarium_reminder_pakan_fkey"
-            columns: ["reminder_pakan"]
-            isOneToOne: false
-            referencedRelation: "reminder"
-            referencedColumns: ["reminder_id"]
           },
         ]
       }
@@ -108,39 +78,6 @@ export type Database = {
           },
         ]
       }
-      employee: {
-        Row: {
-          employee_id: number
-          tugas_id: number | null
-          user_id: number | null
-        }
-        Insert: {
-          employee_id?: number
-          tugas_id?: number | null
-          user_id?: number | null
-        }
-        Update: {
-          employee_id?: number
-          tugas_id?: number | null
-          user_id?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "employee_tugas_id_fkey"
-            columns: ["tugas_id"]
-            isOneToOne: false
-            referencedRelation: "tugas"
-            referencedColumns: ["tugas_id"]
-          },
-          {
-            foreignKeyName: "employee_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
       ikan: {
         Row: {
           deskripsi_spesies: string | null
@@ -165,27 +102,27 @@ export type Database = {
       jadwal: {
         Row: {
           akuarium_id: number | null
-          created_by: number | null
+          created_by: string | null
           jadwal_id: number
           tanggal: string | null
           tugas_id: number | null
-          user_id: number | null
+          user_id: string | null
         }
         Insert: {
           akuarium_id?: number | null
-          created_by?: number | null
+          created_by?: string | null
           jadwal_id?: number
           tanggal?: string | null
           tugas_id?: number | null
-          user_id?: number | null
+          user_id?: string | null
         }
         Update: {
           akuarium_id?: number | null
-          created_by?: number | null
+          created_by?: string | null
           jadwal_id?: number
           tanggal?: string | null
           tugas_id?: number | null
-          user_id?: number | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -260,29 +197,6 @@ export type Database = {
           },
         ]
       }
-      manager: {
-        Row: {
-          manager_id: number
-          user_id: number | null
-        }
-        Insert: {
-          manager_id?: number
-          user_id?: number | null
-        }
-        Update: {
-          manager_id?: number
-          user_id?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "manager_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
       pakan: {
         Row: {
           jenis_pakan: string | null
@@ -327,35 +241,6 @@ export type Database = {
           penyebab?: string | null
         }
         Relationships: []
-      }
-      reminder: {
-        Row: {
-          created_by: number | null
-          deskripsi_reminder: string | null
-          reminder_id: number
-          waktu: string | null
-        }
-        Insert: {
-          created_by?: number | null
-          deskripsi_reminder?: string | null
-          reminder_id?: number
-          waktu?: string | null
-        }
-        Update: {
-          created_by?: number | null
-          deskripsi_reminder?: string | null
-          reminder_id?: number
-          waktu?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reminder_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["user_id"]
-          },
-        ]
       }
       role: {
         Row: {
@@ -407,24 +292,18 @@ export type Database = {
       }
       users: {
         Row: {
-          email: string | null
-          password: string
           role: number
-          user_id: number
+          user_id: string
           username: string
         }
         Insert: {
-          email?: string | null
-          password: string
-          role?: number
-          user_id?: number
+          role: number
+          user_id: string
           username: string
         }
         Update: {
-          email?: string | null
-          password?: string
           role?: number
-          user_id?: number
+          user_id?: string
           username?: string
         }
         Relationships: []

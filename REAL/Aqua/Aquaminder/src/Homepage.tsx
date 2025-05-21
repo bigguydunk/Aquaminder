@@ -12,8 +12,7 @@ import Header from './assets/Group 35.svg?react';
 import "./App.css";
 import { useEffect, useState } from 'react';
 import supabase from '../supabaseClient';
-import { data } from 'react-router-dom';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // import supabase from '../supabaseClient';
 
 
@@ -39,27 +38,32 @@ class HeaderErrorBoundary extends React.Component<{ children: React.ReactNode },
 
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
-  const location = useLocation();
-  const email = location.state?.email;
+  const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (email) {
-      supabase
-        .from('users')
-        .select('username')
-        .eq('email', email)
-        .then(({ data, error }) => {
-          if (data?.[0].username) {
-            setUserName(data[0].username);
-          }
-        });
-    }
-  }, [email]);
+    // Get the current user from Supabase Auth
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (user) {
+        // Fetch username from users table using user_id
+        const { data, error } = await supabase
+          .from('users')
+          .select('username')
+          .eq('user_id', user.id)
+          .single();
+        if (data && data.username) {
+          setUserName(data.username);
+        }
+      }
+    };
+    getUser();
+  }, []);
 
-  const handleLogout = () => {
-    // Remove email from navigation state by redirecting without state
-    navigate('/', { replace: true, state: {} });
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/', { replace: true });
   };
 
   return (
@@ -70,7 +74,7 @@ function Homepage() {
         <HomeData />
         <WeekRow />
       </div>
-      <FloatingButton />
+      <FloatingButton email={user?.email} />
     </div>
   );
 }

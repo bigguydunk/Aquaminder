@@ -1,10 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const FloatingButton = () => {
+// Accept email as a prop
+const FloatingButton = ({ email }: { email?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleButtons = () => {
     setIsOpen(!isOpen);
+  };
+
+  const goToDatabase = () => {
+    navigate("/database-search", { state: { email } });
   };
 
   return (
@@ -12,18 +19,14 @@ const FloatingButton = () => {
       {isOpen && (
         <>
           <button
-            className="focus:outline-none focus-visible:outline-none w-12 h-12 rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
-            title="Foodstock"
-          >
-            🐟
-          </button>
-          <button
+            onClick={() => navigate("/homepage", { state: { email } })}
             className="focus:outline-none focus-visible:outline-none w-12 h-12 rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
             title="Home"
           >
             🏠
           </button>
           <button
+            onClick={goToDatabase}
             className="focus:outline-none focus-visible:outline-none w-12 h-12 rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
             title="D-Database"
           >

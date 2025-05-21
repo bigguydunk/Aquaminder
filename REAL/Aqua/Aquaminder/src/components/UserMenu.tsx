@@ -10,7 +10,7 @@ interface UserMenuProps {
 
 const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [users, setUsers] = useState<Array<{ user_id: number; username: string; email: string | null; role: string | null }>>([]);
+  const [users, setUsers] = useState<Array<{ user_id: string; username: string; role: string | null }>>([]);
   const [roles, setRoles] = useState<Array<{ role_id: number; description: string }>>([]);
   const [currentUserRole, setCurrentUserRole] = useState<number | null>(null);
 
@@ -18,7 +18,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
     setDialogOpen(true);
     // Fetch users and roles only when dialog opens
     const [{ data: usersData }, { data: rolesData }] = await Promise.all([
-      supabase.from('users').select('user_id, username, email, role'),
+      supabase.from('users').select('user_id, username, role'),
       supabase.from('role').select('role_id, description'),
     ]);
     setUsers(usersData || []);
@@ -73,7 +73,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
                       {users.map((user) => (
                         <li key={user.user_id} className="py-2 px-2 flex flex-col sm:flex-row sm:items-center justify-between relative group">
                           <span className="font-medium">{user.username}</span>
-                          <span className="text-xs text-gray-500">{user.email}</span>
                           {/* Role change logic */}
                           <RoleChanger
                             user={user}
@@ -107,11 +106,23 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
   );
 };
 
-const DeleteUserDialog: React.FC<{ userId: number; userName: string; onDelete: () => void }> = ({ userId, userName, onDelete }) => {
+const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: () => void }> = ({ userId, userName, onDelete }) => {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const handleDelete = async () => {
     setLoading(true);
+    // Call backend API to delete from Supabase Auth
+    const res = await fetch('/api/deleteUser', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    });
+    if (!res.ok) {
+      setLoading(false);
+      alert('Failed to delete user from Auth: ' + (await res.text()));
+      return;
+    }
+    // Delete from users table
     const { error } = await supabase.from('users').delete().eq('user_id', userId);
     setLoading(false);
     if (error) {
@@ -159,7 +170,7 @@ const DeleteUserDialog: React.FC<{ userId: number; userName: string; onDelete: (
 };
 
 const RoleChanger: React.FC<{
-  user: { user_id: number; username: string; email: string | null; role: string | null };
+  user: { user_id: string; username: string; role: string | null };
   roles: { role_id: number; description: string }[];
   currentUserRole: number | null;
   currentUserName: string | null;
