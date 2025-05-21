@@ -1,4 +1,3 @@
-import React from 'react';
 import './background.css';
 
 export default function Background() {

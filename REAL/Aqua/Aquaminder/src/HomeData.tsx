@@ -7,8 +7,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "./components/ui/carousel.tsx"
 import { useState, useEffect } from "react";
 import type { EmblaCarouselType } from "embla-carousel";

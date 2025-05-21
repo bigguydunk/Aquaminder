@@ -33,8 +33,6 @@ export default function () {
   const [selectedAkuarium, setSelectedAkuarium] = useState<number | null>(null);
   const [selectedTugas, setSelectedTugas] = useState<{ tugas_id: number; deskripsi_tugas: string | null } | null>(null);
   const [selectedUser, setSelectedUser] = useState<{ user_id: number; username: string } | null>(null);
-  const [startTime, setStartTime] = useState<Time>(new Time(0, 0));
-  const [endTime, setEndTime] = useState<Time>(new Time(0, 0));
   const [time, setTime] = useState<Date | undefined>(new Date());
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
