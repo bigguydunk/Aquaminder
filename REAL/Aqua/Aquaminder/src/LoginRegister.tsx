@@ -287,6 +287,41 @@ const LoginRegister = () => {
             <input name="password" type="password" placeholder="Masukkan Password" required />
             <input name="confirmPassword" type="password" placeholder="Ulangi Password" required />
             <button type="submit" className="btn">Register</button>
+            <button
+              type="button"
+              className="btn google-btn"
+              style={{ marginTop: '10px', background: '#fff', color: '#333', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              onClick={async () => {
+                try {
+                  const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin },
+                  });
+                  if (error) {
+                    toastCtx?.showToast({
+                      title: 'Sign up Google gagal',
+                      description: error.message,
+                      variant: 'error',
+                    });
+                  } else if (data && data.url) {
+                    toastCtx?.showToast({
+                      title: 'Mengalihkan ke Google...',
+                      description: 'Silakan lanjutkan sign up dengan akun Google Anda.',
+                      variant: 'success',
+                    });
+                  }
+                } catch (err: any) {
+                  toastCtx?.showToast({
+                    title: 'Sign up Google gagal',
+                    description: err?.message || 'Terjadi kesalahan saat sign up dengan Google.',
+                    variant: 'error',
+                  });
+                }
+              }}
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width={20} height={20} style={{ background: 'transparent' }} />
+              Sign up with Google
+            </button>
           </form>
         )}
       </div>
