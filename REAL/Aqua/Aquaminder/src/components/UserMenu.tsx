@@ -72,18 +72,23 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
                     <ul className="divide-y divide-gray-200">
                       {users.map((user) => (
                         <li key={user.user_id} className="py-2 px-2 flex flex-col sm:flex-row sm:items-center justify-between relative group">
-                          <span className="font-medium">{user.username}</span>
-                          {/* Role change logic */}
-                          <RoleChanger
-                            user={user}
-                            roles={roles}
-                            currentUserRole={currentUserRole}
-                            currentUserName={userName}
-                            onRoleChange={newRole => setUsers(users => users.map(u => u.user_id === user.user_id ? { ...u, role: String(newRole) } : u))}
-                          />
+                          <div className="flex items-center">
+                            <span className="font-medium">{user.username}</span>
+                            <span className="ml-2">
+                              <RoleChanger
+                                user={user}
+                                roles={roles}
+                                currentUserRole={currentUserRole}
+                                currentUserName={userName}
+                                onRoleChange={newRole => setUsers(users => users.map(u => u.user_id === user.user_id ? { ...u, role: String(newRole) } : u))}
+                              />
+                            </span>
+                          </div>
                           {/* Show delete button if current user is manager (role 2) and not deleting self */}
                           {currentUserRole === 2 && userName !== user.username && (
-                            <DeleteUserDialog userId={user.user_id} userName={user.username} onDelete={() => setUsers(users.filter(u => u.user_id !== user.user_id))} />
+                            <div className="ml-2 flex-shrink-0">
+                              <DeleteUserDialog userId={user.user_id} userName={user.username} onDelete={() => setUsers(users.filter(u => u.user_id !== user.user_id))} />
+                            </div>
                           )}
                         </li>
                       ))}
