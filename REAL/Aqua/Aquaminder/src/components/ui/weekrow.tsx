@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@heroui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import supabase from '../../../supabaseClient';
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as RadixDialog from '@radix-ui/react-dialog';
+import { ToastContext } from '@/components/ui/toast';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -39,6 +40,7 @@ export default function () {
   const [userRole, setUserRole] = useState<number | null>(null);
   const location = useLocation();
   const email = location.state?.email;
+  const toastCtx = useContext(ToastContext);
 
   // Set your Supabase project ref here (from your Supabase URL, e.g. abcd1234)
   const SUPABASE_PROJECT_REF = "your-project-ref"; // <-- CHANGE THIS to your actual project ref
@@ -138,7 +140,6 @@ export default function () {
 
   const handleSaveSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Save button pressed. Starting to process data...');
     if (!selectedAkuarium || !selectedTugas || !selectedUser || !time || !userName || !selectedDay || !currentUserId) {
       let missingFields = [];
       if (!selectedAkuarium) missingFields.push('Aquarium');
@@ -148,7 +149,11 @@ export default function () {
       if (!userName) missingFields.push('Current User');
       if (!selectedDay) missingFields.push('Selected Day');
       if (!currentUserId) missingFields.push('Current User ID');
-      alert('Some required fields are missing: ' + missingFields.join(', ') + '. Data not sent.');
+      toastCtx?.showToast({
+        title: 'Missing Fields',
+        description: 'Some required fields are missing: ' + missingFields.join(', ') + '. Data not sent.',
+        variant: 'error',
+      });
       return;
     }
     setLoading(true);
@@ -156,7 +161,11 @@ export default function () {
     const selectedDate = getSelectedDate();
     if (!selectedDate) {
       setLoading(false);
-      alert('Tanggal tidak valid. Data not sent.');
+      toastCtx?.showToast({
+        title: 'Tanggal tidak valid',
+        description: 'Tanggal tidak valid. Data not sent.',
+        variant: 'error',
+      });
       return;
     }
     // Set the time from TimePickerDemo
@@ -166,7 +175,6 @@ export default function () {
     selectedDate.setMilliseconds(0);
     // Convert to Asia/Jakarta (WIB) timezone ISO string
     const tanggalJakarta = selectedDate.toISOString();
-    alert('DEBUG: tanggal (Asia/Jakarta) to be sent to Supabase: ' + tanggalJakarta); // Debug alert
     const insertData = {
       akuarium_id: selectedAkuarium,
       tugas_id: selectedTugas.tugas_id,
@@ -174,17 +182,24 @@ export default function () {
       tanggal: tanggalJakarta,
       created_by: currentUserId, // Use the user ID instead of userName
     };
-    alert('Attempting to send data to Supabase: ' + JSON.stringify(insertData));
     const { error } = await supabase.from('jadwal').insert([insertData]);
     setLoading(false);
     if (!error) {
-      alert('Data successfully sent to Supabase!');
+      toastCtx?.showToast({
+        title: 'Success',
+        description: 'Data successfully sent to Supabase!',
+        variant: 'success',
+      });
       setSelectedAkuarium(null);
       setSelectedTugas(null);
       setSelectedUser(null);
       setTime(new Date());
     } else {
-      alert('Gagal menambah jadwal: ' + error.message);
+      toastCtx?.showToast({
+        title: 'Gagal menambah jadwal',
+        description: error.message,
+        variant: 'error',
+      });
     }
   };
 

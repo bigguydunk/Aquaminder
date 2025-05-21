@@ -13,6 +13,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
   const [users, setUsers] = useState<Array<{ user_id: string; username: string; role: string | null }>>([]);
   const [roles, setRoles] = useState<Array<{ role_id: number; description: string }>>([]);
   const [currentUserRole, setCurrentUserRole] = useState<number | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const handlePegawaiClick = async () => {
     setDialogOpen(true);
@@ -25,16 +26,20 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
     setRoles(rolesData || []);
   };
 
-  // Fetch current user's role on mount (if email is available)
+  // Fetch current user's role and user_id on mount
   React.useEffect(() => {
     const fetchRole = async () => {
-      if (!userName) return;
-      // Try to get the user's role by username (since only username is passed)
-      const { data } = await supabase.from('users').select('role').eq('username', userName).single();
+      // Get the current user's user_id from Supabase Auth
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !user.id) return;
+      const userId = user.id;
+      // Get the user's role and user_id by user_id
+      const { data } = await supabase.from('users').select('role, user_id').eq('user_id', userId).single();
       if (data && data.role !== undefined) setCurrentUserRole(data.role);
+      if (data && data.user_id) setCurrentUserId(data.user_id);
     };
     fetchRole();
-  }, [userName]);
+  }, []);
 
   return (
     <div className="absolute top-6 right-8 z-10">
@@ -84,8 +89,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
                               />
                             </span>
                           </div>
-                          {/* Show delete button if current user is manager (role 2) and not deleting self */}
-                          {currentUserRole === 2 && userName !== user.username && (
+                          {/* Show delete button if current user is manager (role 2) and not deleting self (by user_id, not username) */}
+                          {currentUserRole === 2 && currentUserId && currentUserId !== user.user_id && (
                             <div className="ml-2 flex-shrink-0">
                               <DeleteUserDialog userId={user.user_id} userName={user.username} onDelete={() => setUsers(users.filter(u => u.user_id !== user.user_id))} />
                             </div>
