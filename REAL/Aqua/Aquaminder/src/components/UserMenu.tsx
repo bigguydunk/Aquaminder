@@ -40,7 +40,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
     <div className="absolute top-6 right-8 z-10">
       <DropdownMenu.DropdownMenu>
         <DropdownMenu.DropdownMenuTrigger asChild>
-          <button className="!bg-white rounded-full shadow-md px-6 py-4 inline-block font-semibold focus:outline-none">
+          <button className="!bg-white !rounded-full shadow-md px-6 py-4 inline-block font-semibold focus:outline-none">
             <h2 className="text-2xl">☰</h2>
           </button>
         </DropdownMenu.DropdownMenuTrigger>

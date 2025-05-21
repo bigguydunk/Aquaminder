@@ -20,14 +20,14 @@ const FloatingButton = ({ email }: { email?: string }) => {
         <>
           <button
             onClick={() => navigate("/homepage", { state: { email } })}
-            className="focus:outline-none focus-visible:outline-none w-12 h-12 rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
+            className="focus:outline-none focus-visible:outline-none w-12 h-12 !rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
             title="Home"
           >
             🏠
           </button>
           <button
             onClick={goToDatabase}
-            className="focus:outline-none focus-visible:outline-none w-12 h-12 rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
+            className="focus:outline-none focus-visible:outline-none w-12 h-12 !rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
             title="D-Database"
           >
             📝
@@ -36,7 +36,7 @@ const FloatingButton = ({ email }: { email?: string }) => {
       )}
       <button
         onClick={toggleButtons}
-        className="focus:outline-none focus-visible:outline-none w-14 h-14 rounded-full !bg-white text-white shadow-lg hover:bg-gray-900 flex items-center justify-center"
+        className="focus:outline-none focus-visible:outline-none w-14 h-14 !rounded-full !bg-white text-white shadow-lg hover:bg-gray-900 flex items-center justify-center"
         title="Toggle"
       >
         {isOpen ? "⬇️" : "⬆️"}
