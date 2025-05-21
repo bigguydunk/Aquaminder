@@ -1,43 +1,41 @@
 import { createClient } from '@supabase/supabase-js';
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-export default async function handler(req: IncomingMessage & { body?: any }, res: ServerResponse) {
+// Vercel API handler signature
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader('Content-Type', 'application/json');
+
   if (req.method !== 'POST') {
-    res.statusCode = 405;
-    res.end();
+    res.status(405).json({ error: 'Method not allowed' });
     return;
   }
-  let body = req.body;
-  if (!body) {
-    let data = '';
-    req.on('data', chunk => { data += chunk; });
-    await new Promise(resolve => req.on('end', resolve));
-    body = JSON.parse(data);
+
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    res.status(500).json({ error: 'Missing Supabase environment variables' });
+    return;
   }
-  const { user_id } = body;
+
+  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+
+  const { user_id } = req.body || {};
   if (!user_id) {
-    res.statusCode = 400;
-    res.end(JSON.stringify({ error: 'Missing user_id' }));
+    res.status(400).json({ error: 'Missing user_id' });
     return;
   }
+
   try {
     const { error } = await supabase.auth.admin.deleteUser(user_id);
     if (error) {
       console.error('Supabase Auth error:', error);
-      res.statusCode = 500;
-      res.end(JSON.stringify({ error: error.message, details: error }));
+      res.status(500).json({ error: error.message, details: error });
       return;
     }
-    res.statusCode = 200;
-    res.end(JSON.stringify({ success: true }));
+    res.status(200).json({ success: true });
   } catch (e) {
     console.error('Unexpected error:', e);
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: 'Unexpected error', details: e instanceof Error ? e.message : e }));
+    res.status(500).json({ error: 'Unexpected error', details: e instanceof Error ? e.message : e });
   }
 }
