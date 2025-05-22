@@ -37,7 +37,7 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                     height: 280,
                     type: "radialBar",
                 },
-                colors: ["#3443E9"], // Updated color
+                colors: ["#007bff"], // Updated color
                 plotOptions: {
                     radialBar: {
                         hollow: {
@@ -161,7 +161,7 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                         <DialogTrigger asChild>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, minWidth: 250 }}>
                                 <span style={{ fontWeight: 'bold', color: '#181619', fontSize: 24 }}> Aquarium #{this.state.aquariumID}  </span>
-                                <Button variant="outline" onClick={this.handleDetailOpen} className='!bg-white focus:outline-none focus-visible:outline-none'>
+                                <Button variant="outline" onClick={this.handleDetailOpen} className='!bg-[#007bff] focus:outline-none text-white focus-visible:outline-none'>
                                     Detail 🔍︎ 
                                 </Button>
                             </div>

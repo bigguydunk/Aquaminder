@@ -22,6 +22,7 @@ import * as RadixDialog from '@radix-ui/react-dialog';
 import { ToastContext } from '@/components/ui/toast';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+import "../../styles.css";
 
 export default function () {
   const today = new Date();
@@ -234,7 +235,7 @@ export default function () {
                           selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
                             ? "bg-white text-gray-800 opacity-100 shadow-md" 
                             : weekIndex === 5 && currentDay === dayIndex
-                            ? "bg-[#3443E9] text-white opacity-100 shadow-md"
+                            ? "bg-[#007bff] text-white opacity-100 shadow-md"
                             : "!bg-transparent text-gray-800"
                         } cursor-pointer !pl-0`}
                     >
@@ -259,21 +260,21 @@ export default function () {
         {(userRole === 1 || userRole === 2) && (
           <div className="relative w-3/4 h-30 justify-center items-center mx-auto">
             <div className="relative w-full h-4/4">
-              <div className="relative border-black border-1 border-dashed rounded-4xl px-6 p12-4 flex items-center justify-start w-full h-full bg-white z-10 space-x-4">
+              <div className="relative rounded-[15px] px-6 p12-4 flex items-center justify-start w-full h-full shadow-lg bg-white z-10 space-x-4">
                 <RadixDialog.Root>
                   <RadixDialog.Trigger asChild>
-                    <div className="border-black border-1 border-dashed rounded-xl w-20 h-20 flex items-center justify-center cursor-pointer bg-[#76cef9] transition-colors duration-150"
+                    <div className="rounded-md w-16 h-16 flex items-center justify-center cursor-pointer bg-[#007bff] transition-colors duration-150"
                       style={{ transition: 'background-color 0.15s, opacity 0.15s' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.backgroundColor = '#76cef9';
                         e.currentTarget.style.opacity = '0.8';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#76cef9';
+                        e.currentTarget.style.backgroundColor = '#007bff';
                         e.currentTarget.style.opacity = '1';
                       }}
                     >
-                      <span className="text-gray-600 text-2xl cursor-pointer">+</span>
+                      <span className="text-white text-2xl font-bold cursor-pointer">+</span>
                     </div>
                   </RadixDialog.Trigger>
                   <RadixDialog.Portal>
@@ -403,10 +404,10 @@ export default function () {
                     </RadixDialog.Content>
                   </RadixDialog.Portal>
                 </RadixDialog.Root>
-                <div className="flex-1 text-gray-500 text-lg text-center sm:text-left">
+                <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-center sm:text-left ">
                   {"Tambah Jadwal Baru"}
                   {selectedDay && (
-                    <div className="text-sm mt-1">
+                    <div className="text-sm mt-1 font-normal">
                       {(() => {
                         const selectedDate = getSelectedDate();
                         return selectedDate ? selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
@@ -520,12 +521,17 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
   if (loading) {
     return (
       <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-        <div className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md opacity-70">
-          <Skeleton className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center !border-1 !border-black" />
-          <div className="flex-1">
-            <Skeleton className="h-6 w-1/2 mb-2" />
-            <Skeleton className="h-4 w-1/3 mb-1" />
-            <Skeleton className="h-4 w-1/4" />
+        <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
+          <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-400 text-3xl font-bold">
+            –
+          </div>
+          <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-left sm:text-left">
+            <div className="h-6 w-1/2 mb-2 bg-gray-200 rounded animate-pulse" />
+ 
+            <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
+          </div>
+          <div className="absolute right-4 bottom-2 text-xs text-gray-300 italic">
+            <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
           </div>
         </div>
       </div>
@@ -535,13 +541,13 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
   // Default: always show the 'No schedule for the day' box
   let scheduleBox = (
     <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-      <div className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md opacity-70">
-        <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-gray-200 text-gray-400 text-3xl font-bold !border-1 !border-black">
+      <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
+        <div className=" rounded-xl w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-400 text-3xl font-bold">
           –
         </div>
-        <div className="flex-1 text-gray-500 text-lg text-left sm:text-left">
-          No schedule for the day
-          <div className="text-sm text-gray-400 mt-1">
+        <div className="flex-1 text-[#0C0C0C] text-lg text-left sm:text-left font-bold">
+          Tidak ada jadwal
+          <div className="text-sm text-[#0C0C0C] mt-1 font-normal">
             {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
           </div>
         </div>
@@ -568,7 +574,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
               return (
                 <div
                   key={schedule.jadwal_id || idx}
-                  className={`relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md ${!isOwn ? 'opacity-70 grayscale' : ''}`}
+                  className={` rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md ${!isOwn ? 'opacity-70 grayscale' : ''}`}
                 >
                   {/* X button for delete, only show if userRole is 1 or 2 */}
                   <RadixDialog.Root>
@@ -606,27 +612,26 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                       </RadixDialog.Content>
                     </RadixDialog.Portal>
                   </RadixDialog.Root>
-                  <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold !border-1 !border-black">
+                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#007bff] text-white text-3xl font-bold ">
                     ✓
                   </div>
-                  <div className="flex-1 text-black text-lg text-left sm:text-left">
+                  <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-left sm:text-left relative">
                     {schedule.tugas_id && tugasOptions.length > 0
                       ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
                       : 'Tugas tidak ditemukan'}
-                    {schedule.akuarium_id && akuariumOptions.length > 0 && (
-                      <div className="text-sm text-black mt-1">
-                        Akuarium {schedule.akuarium_id}
+                    {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
+                      <div className="text-sm font-normal text-black mt-1">
+                        <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
                       </div>
                     )}
-                    <div className="text-sm text-black mt-1">
-                      {schedule.tanggal ? new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
-                    </div>
                     {/* Created by/for info at bottom right */}
-                    <div className="absolute right-4 bottom-2 text-xs text-gray-500 italic">
-                      {isOwn
-                        ? (schedule.created_by ? `created by: ${allUserMap[schedule.created_by] || 'user'} ` : '')
-                        : (schedule.user_id ? `created for: ${allUserMap[schedule.user_id] || 'user'} ` : '')}
-                    </div>
+                    {!loading && (
+                      <div className="mt-2 text-xs text-gray-500 italic">
+                        {typeof isOwn !== 'undefined' && isOwn
+                          ? (schedule.created_by ? `created by: ${(allUserMap && allUserMap[schedule.created_by]) || userMap[schedule.created_by] || 'user'} ` : '')
+                          : (schedule.user_id ? `created for: ${(allUserMap && allUserMap[schedule.user_id]) || userMap[schedule.user_id] || 'user'} ` : '')}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -681,25 +686,24 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                   </RadixDialog.Portal>
                 </RadixDialog.Root>
               )}
-              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold !border-1 !border-black">
+              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold">
                 ✓
               </div>
-              <div className="flex-1 text-black text-lg text-left sm:text-left">
+              <div className="flex-1 text-black text-lg text-left sm:text-left relative">
                 {schedule.tugas_id && tugasOptions.length > 0
                   ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
                   : 'Tugas tidak ditemukan'}
-                {schedule.akuarium_id && akuariumOptions.length > 0 && (
-                  <div className="text-sm text-black mt-1">
-                    Akuarium {schedule.akuarium_id}
+                {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
+                  <div className="text-sm font-normal text-black mt-1">
+                    <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` @ Akuarium ${schedule.akuarium_id}`}
                   </div>
                 )}
-                <div className="text-sm text-black mt-1">
-                  {schedule.tanggal ? new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
-                </div>
                 {/* Created by info at bottom right */}
-                <div className="absolute right-4 bottom-2 text-xs text-gray-500 italic">
-                  {schedule.created_by ? `created by: ${userMap[schedule.created_by] || 'user'} ` : ''}
-                </div>
+                {!loading && (
+                  <div className="mt-2 text-xs text-gray-500 italic">
+                    {schedule.created_by ? `created by: ${(allUserMap && allUserMap[schedule.created_by]) || userMap[schedule.created_by] || 'user'} ` : ''}
+                  </div>
+                )}
               </div>
             </div>
           ))}

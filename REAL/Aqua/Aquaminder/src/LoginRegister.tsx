@@ -3,6 +3,7 @@ import './styles.css';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../supabaseClient';
 import { ToastContext } from './components/ui/toast';
+//import Background2 from './components/background2';
 
 const LoginRegister = () => {
   const navigate = useNavigate();
@@ -206,9 +207,14 @@ const LoginRegister = () => {
   }, [navigate]);
 
   return (
-    
-    <div className="container">
-      <h1>Welcome to <span className="brand">Aquaminder</span></h1>
+  <div className="display-flex !height-screen">
+    {/*<Background2 />*/}
+    <div className="container ">
+      <h1 className='display-flex flex-column'>
+        Welcome to
+        <br />
+        <span className="brand" style={{ fontSize: '2.5rem', fontWeight: 700 }}>Aquaminder</span>
+      </h1>
       <div className="form-container">
         <div className="tab">
           <button
@@ -234,7 +240,7 @@ const LoginRegister = () => {
             >
             <input name="email" type="email" placeholder="Masukkan Email" required />
             <input name="password" type="password" placeholder="Masukkan Password" required />
-            <button type="submit" className="btn">Login</button>
+            <button type="submit" className="btn !rounded-full">Login</button>
             <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0' }}>
               <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
               <span style={{ color: '#888', fontSize: '0.9em', margin: '0 8px', whiteSpace: 'nowrap' }}>or</span>
@@ -242,7 +248,7 @@ const LoginRegister = () => {
             </div>
             <button
               type="button"
-              className="btn google-btn"
+              className="btn !rounded-full google-btn"
               style={{ marginTop: '0', background: '#fff', color: '#333', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               onClick={async () => {
               try {
@@ -287,7 +293,7 @@ const LoginRegister = () => {
             <input name="email" type="email" placeholder="Masukkan Email" required />
             <input name="password" type="password" placeholder="Masukkan Password" required />
             <input name="confirmPassword" type="password" placeholder="Ulangi Password" required />
-            <button type="submit" className="btn">Register</button>
+            <button type="submit" className="btn !rounded-full">Register</button>
             <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0' }}>
               <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
               <span style={{ color: '#888', fontSize: '0.9em', margin: '0 8px', whiteSpace: 'nowrap' }}>or</span>
@@ -295,7 +301,7 @@ const LoginRegister = () => {
             </div>
             <button
               type="button"
-              className="btn google-btn"
+              className="btn !rounded-full google-btn"
               style={{ marginTop: '0', background: '#fff', color: '#333', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               onClick={async () => {
                 try {
@@ -332,6 +338,7 @@ const LoginRegister = () => {
         )}
       </div>
     </div>
+  </div>
   );
 };
 

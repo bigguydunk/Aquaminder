@@ -7,6 +7,7 @@ import FloatingButton from './components/ui/FloatingButton';
 import Background from './components/background';
 import UserMenu from './components/UserMenu';
 
+
 import "./App.css";
 import { useEffect, useState } from 'react';
 import supabase from '../supabaseClient';
