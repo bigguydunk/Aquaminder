@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@heroui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge"
 
 import { TimePickerDemo } from "@/components/ui/timePicker";
 
@@ -23,6 +24,7 @@ import { ToastContext } from '@/components/ui/toast';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 import "../../styles.css";
+import SimplificationSVG from "../../assets/Simplification.svg?react";
 
 export default function () {
   const today = new Date();
@@ -529,9 +531,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
  
             <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
           </div>
-          <div className="absolute right-4 bottom-2 text-xs text-gray-300 italic">
-            <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
-          </div>
+         
         </div>
       </div>
     );
@@ -573,13 +573,13 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
               return (
                 <div
                   key={schedule.jadwal_id || idx}
-                  className={` rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md ${!isOwn ? 'opacity-70 grayscale' : ''}`}
+                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md ${!isOwn ? 'opacity-70 grayscale' : ''}`}
                 >
                   {/* X button for delete, only show if userRole is 1 or 2 */}
                   <RadixDialog.Root>
                     <RadixDialog.Trigger asChild>
                       <button
-                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent !bg-transparent border-none cursor-pointer z-20"
+                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
                         style={{ background: 'transparent' }}
                         title="Delete schedule"
                         type="button"
@@ -611,26 +611,25 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                       </RadixDialog.Content>
                     </RadixDialog.Portal>
                   </RadixDialog.Root>
-                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#007bff] text-white text-3xl font-bold ">
-                    ✓
-                  </div>
-                  <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-left sm:text-left relative">
-                    {schedule.tugas_id && tugasOptions.length > 0
-                      ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                      : 'Tugas tidak ditemukan'}
+                    <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#88D7FF] text-white text-3xl font-bold ">
+                    <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
+                    </div>
+                  <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-left sm:text-left relative flex flex-col">
+                    <div>
+                      {schedule.tugas_id && tugasOptions.length > 0
+                        ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                        : 'Tugas tidak ditemukan'}
+                    </div>
                     {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                      <div className="text-sm font-normal text-black mt-1">
+                      <div className="text-sm font-normal text-black mt-1 flex items-center gap-2">
                         <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
+                        {schedule.user_id && allUserMap[schedule.user_id] && (
+                          <Badge variant="outline">{allUserMap[schedule.user_id]}</Badge>
+                        )}
                       </div>
+                    
                     )}
-                    {/* Created by/for info at bottom right */}
-                    {!loading && (
-                      <div className="mt-2 text-xs text-gray-500 italic">
-                        {typeof isOwn !== 'undefined' && isOwn
-                          ? (schedule.created_by ? `created by: ${(allUserMap && allUserMap[schedule.created_by]) || userMap[schedule.created_by] || 'user'} ` : '')
-                          : (schedule.user_id ? `created for: ${(allUserMap && allUserMap[schedule.user_id]) || userMap[schedule.user_id] || 'user'} ` : '')}
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               );
@@ -648,18 +647,21 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
           .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
           .map((schedule, idx) => (
             <div key={schedule.jadwal_id || idx} className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
+              
               {/* X button for delete, only show if userRole is 1 or 2 */}
               {(userRole === 1 || userRole === 2) && (
                 <RadixDialog.Root>
+                  
                   <RadixDialog.Trigger asChild>
                     <button
-                      className="absolute top-2 right-2 !text-red-500 !hover:text-red-700 text-lg font-bold !bg-transparent border-none cursor-pointer z-20"
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-lg font-bold bg-transparent border-none cursor-pointer z-20"
                       title="Delete schedule"
                       type="button"
                     >
                       ×
                     </button>
                   </RadixDialog.Trigger>
+                  
                   <RadixDialog.Portal>
                     <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
                     <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
@@ -685,28 +687,35 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                   </RadixDialog.Portal>
                 </RadixDialog.Root>
               )}
-              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#76cef9] text-white text-3xl font-bold">
-                ✓
+              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#4ED4FF] text-white text-3xl font-bold">
+                <SimplificationSVG style={{ width: 48, height: 48 }} />
               </div>
-              <div className="flex-1 text-black text-lg text-left sm:text-left relative">
-                {schedule.tugas_id && tugasOptions.length > 0
-                  ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                  : 'Tugas tidak ditemukan'}
+              
+              <div className="flex-1 text-black text-lg text-left sm:text-left flex flex-col">
+                <div>
+                  {schedule.tugas_id && tugasOptions.length > 0
+                    ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                    : 'Tugas tidak ditemukan'}
+                </div>
                 {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                  <div className="text-sm font-normal text-black mt-1">
+                  <div className="text-sm font-normal text-black mt-1 flex items-center gap-2">
                     <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` @ Akuarium ${schedule.akuarium_id}`}
+                    {schedule.user_id && userMap[schedule.user_id] && (
+                      <Badge variant="outline">{userMap[schedule.user_id]}</Badge>
+                    )}
                   </div>
+                  
                 )}
-                {/* Created by info at bottom right */}
-                {!loading && (
-                  <div className="mt-2 text-xs text-gray-500 italic">
-                    {schedule.created_by ? `created by: ${(allUserMap && allUserMap[schedule.created_by]) || userMap[schedule.created_by] || 'user'} ` : ''}
-                  </div>
-                )}
+                {/* Created for section */}
+                
               </div>
+             
             </div>
+            
           ))}
+          
       </div>
+      
     );
   }
   return scheduleBox;

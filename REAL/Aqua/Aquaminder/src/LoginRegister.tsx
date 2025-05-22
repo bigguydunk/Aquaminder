@@ -215,13 +215,13 @@ const LoginRegister = () => {
         <br />
         <span className="brand" style={{ fontSize: '2.5rem', fontWeight: 700 }}>Aquaminder</span>
       </h1>
-      <div className="form-container">
+      <div className="form-container w-[350px]">
         <div className="tab">
           <button
             id="loginTab"
             className={`tab-btn ${activeTab === 'login' ? 'active' : ''}`}
             onClick={() => toggleTabs('login')}
-          >
+          > 
             Login
           </button>
           <button
