@@ -31,7 +31,6 @@
   margin: auto; /* Center the container within its parent */
   padding: 1rem;
   text-align: center; /* Center text inside the container */
-  gap: 0.5rem; /* Reduce the gap between items in the row direction */
 }
 
 .chart-title {
