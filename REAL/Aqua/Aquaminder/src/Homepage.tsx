@@ -45,7 +45,7 @@ function Homepage() {
   };
 
   return (
-    <div className="display-flex !height-screen">
+    <div className="display flex flex-col h-screen">
       <Background />
       <div className="header">
         <UserMenu userName={userName} onLogout={handleLogout} />
