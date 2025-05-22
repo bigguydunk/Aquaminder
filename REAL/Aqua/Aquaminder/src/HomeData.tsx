@@ -44,8 +44,8 @@ function HomeData() {
   };
 
   return (
-    <div>
-      <Carousel setApi={handleSetApi}>
+    <div className='sm:h-[30vh] h-[25vh]'>
+      <Carousel setApi={handleSetApi} className='h-full'>
         
         <CarouselContent>
           <CarouselItem><RadialBar /></CarouselItem>
