@@ -437,7 +437,6 @@ export default function () {
 }
 
 import { useEffect as useEffectBox, useState as useStateBox } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 // Update ScheduleForUserBox to accept userId as string
 function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOptions, userRole }: {
