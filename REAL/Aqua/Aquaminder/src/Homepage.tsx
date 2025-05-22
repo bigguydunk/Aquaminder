@@ -38,7 +38,7 @@ function Homepage() {
   };
 
   return (
-  <div className="display flex flex-col h-screen overflow-x-hidden max-w-screen">
+  <div className="display flex flex-col overflow-x-hidden">
     <Background />
     <div className="relative z-10 w-full flex flex-col justify-center items-center text-center mt-4 gap-4">
       {/* Decorative header background */}

@@ -1,7 +1,3 @@
-
-
-
-
 a {
   font-weight: 500;
   color: #646cff;
@@ -15,13 +11,16 @@ a:hover {
   height: 400px; /* Adjust as needed */
 }
 
+
 body {
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: auto;
+  min-height: 100vh;
   background: linear-gradient(to bottom,#28D0FF, #88D7FF);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 h1 {
