@@ -23,7 +23,6 @@ import * as RadixDialog from '@radix-ui/react-dialog';
 import { ToastContext } from '@/components/ui/toast';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-import "../../styles.css";
 import SimplificationSVG from "../../assets/Simplification.svg?react";
 
 export default function () {
@@ -207,17 +206,17 @@ export default function () {
   };
 
   return (
-    <div style={{ userSelect: 'none' }}>
+    <div className="select-none">
       <div className="relative">
         <div className="w-full h-[2px] bg-transparent mb-2"></div>
-        <div className="w-full h-[2px] bg-white mb-2 rounded-md shadow-lg"></div>
+        <div className="w-full h-[2px]  mb-2 rounded-md shadow-lg"></div>
         <div className="w-full h-[2px] bg-transparent mb-2"></div>
-        <Carousel>
+        <Carousel >
           <CarouselPrevious
             variant="ghost"
             className="focus:outline-none focus-visible:outline-none !bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
           />
-          <CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[550px] lg:w-[500px] sm:w-[300px]">
+          <CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[500px] lg:w-[500px] sm:w-[500px] w-[100vw]">
             {weeks.map((week, weekIndex) => (
               <CarouselItem
                 key={weekIndex}
@@ -231,7 +230,7 @@ export default function () {
                     <Card
                       onClick={() => handleDayClick(weekIndex, dayIndex)}
                       className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
-                        lg:h-16 lg:w-16 sm:h-14 sm:w-14 
+                         h-14 w-14 
                         transition-all duration-300 ease-in-out
                         ${
                           selectedDay?.week === weekIndex && selectedDay?.day === dayIndex

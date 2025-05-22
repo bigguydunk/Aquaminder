@@ -1,18 +1,11 @@
-import './Homepage.css';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { useEffect, useState } from 'react';
 import HomeData from './HomeData';
 import WeekRow from './components/ui/weekrow';
 import FloatingButton from './components/ui/FloatingButton';
 import Background from './components/background';
 import UserMenu from './components/UserMenu';
-
-
-import "./App.css";
-import { useEffect, useState } from 'react';
 import supabase from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-// import supabase from '../supabaseClient';
 
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -45,18 +38,18 @@ function Homepage() {
   };
 
   return (
-    <div className="display flex flex-col h-screen">
-      <Background />
-      <div className="header">
-        <UserMenu userName={userName} onLogout={handleLogout} />
-        <HomeData />
-        <WeekRow />
-      </div>
-      <FloatingButton email={user?.email} />
+  <div className="display flex flex-col h-screen overflow-x-hidden max-w-screen">
+    <Background />
+    <div className="relative z-10 w-full flex flex-col justify-center items-center text-center mt-4 gap-4">
+      {/* Decorative header background */}
+      <UserMenu userName={userName} onLogout={handleLogout} />
+      <HomeData />
+      <div className="h-4" />
+      <WeekRow />
     </div>
-  );
+    <FloatingButton email={user?.email} />
+  </div>
+);
 }
-
-// Added necessary logic from script.js to Homepage.tsx.
 
 export default Homepage;

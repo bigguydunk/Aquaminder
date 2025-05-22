@@ -31,6 +31,7 @@
   margin: auto; /* Center the container within its parent */
   padding: 1rem;
   text-align: center; /* Center text inside the container */
+  gap: 0.5rem; /* Reduce the gap between items in the row direction */
 }
 
 .chart-title {
@@ -45,7 +46,8 @@
 @media (max-width: 768px) {
   .donut {
       max-width: 300px; /* Reduce the maximum width for tablets */
-      flex-direction: column; /* Stack items vertically for smaller screens */
+      flex-direction: row; /* Stack items vertically for smaller screens */
+      padding-left: 50px;
   }
 
   .chart-title {
