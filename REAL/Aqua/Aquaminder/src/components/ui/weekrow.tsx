@@ -264,13 +264,13 @@ export default function () {
                 <RadixDialog.Root>
                   <RadixDialog.Trigger asChild>
                     <div className="rounded-md w-16 h-16 flex items-center justify-center cursor-pointer bg-[#007bff] transition-colors duration-150"
-                      style={{ transition: 'background-color 0.15s, opacity 0.15s' }}
+                      style={{ transition: 'transform 0.15s, opacity 0.15s' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#76cef9';
+                        e.currentTarget.style.transform = 'scale(1.1)';
                         e.currentTarget.style.opacity = '0.8';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#007bff';
+                        e.currentTarget.style.transform = 'scale(1)';
                         e.currentTarget.style.opacity = '1';
                       }}
                     >

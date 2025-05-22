@@ -60,7 +60,7 @@ function HomeData() {
           <button
             key={index}
             onClick={() => scrollToIndex(index)}
-            className={`rounded-full focus:outline-none focus-visible:outline-none ${
+            className={`rounded-full focus:outline-none focus-visible:outline-none hover:scale-110 ${
               currentIndex === index ? "w-3 h-3 !bg-white" : "w-2 h-2 !bg-gray-300"
             }`}
           />

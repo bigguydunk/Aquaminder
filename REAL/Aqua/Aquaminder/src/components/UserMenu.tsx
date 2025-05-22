@@ -50,14 +50,14 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
           </button>
         </DropdownMenu.DropdownMenuTrigger>
         <DropdownMenu.DropdownMenuContent align="center" className="bg-transparent border-transparent shadow-none py-2 min-w-[140px] flex flex-col items-center">
-          <DropdownMenu.DropdownMenuItem className="!bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none  hover:bg-gray-100 text-center">
+          <DropdownMenu.DropdownMenuItem className="!bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none text-center">
             User: {userName}
           </DropdownMenu.DropdownMenuItem>
           <DropdownMenu.DropdownMenuSeparator className="my-1 bg-transparent h-px" />
           <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
             <Dialog.Trigger asChild>
               <DropdownMenu.DropdownMenuItem
-                className="bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer hover:bg-gray-100 text-center"
+                className="bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer hover:scale-110  text-center"
                 onClick={e => { e.preventDefault(); handlePegawaiClick(); }}
               >
                 All Users
@@ -109,7 +109,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
           <DropdownMenu.DropdownMenuSeparator className="my-1 bg-transparent h-px" />
           <DropdownMenu.DropdownMenuItem
             onClick={onLogout}
-            className="bg-red-300 rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer text-red-600 hover:!bg-red-600 hover:!text-black text-center"
+            className="bg-red-300 rounded-full shadow-md px-6 py-4 inline-block focus:outline-none cursor-pointer text-red-600 hover:!bg-red-300 hover:!text-red-600 hover:scale-110 transition-transform duration-150 text-center"
           >
             Log out
           </DropdownMenu.DropdownMenuItem>
