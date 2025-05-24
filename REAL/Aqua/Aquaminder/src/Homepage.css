@@ -208,3 +208,59 @@ body{
     padding: 0.75em; /* Adjust padding for mobile */
   }
 }
+
+/* Dot navigation positioning for HomeData */
+.homepage-dot-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 1.5rem; /* default top spacing */
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .homepage-dot-nav {
+    top: 1rem;
+  }
+}
+@media (max-width: 480px) {
+  .homepage-dot-nav {
+    top: 0.5rem;
+  }
+}
+
+/* Responsive container for homepage */
+@media (max-width: 1024px) {
+  header, main, footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+@media (max-width: 768px) {
+  header, main, footer {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .homepage-dot-nav {
+    top: 0.5rem;
+  }
+}
+@media (max-width: 480px) {
+  header, main, footer {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+  .homepage-dot-nav {
+    top: 0.25rem;
+  }
+}
+
+/* Ensure HomeData and WeekRow are always centered and responsive */
+main > section {
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}

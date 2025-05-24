@@ -149,14 +149,17 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
     render() {
         const { akuariumDetail, detailOpen } = this.state;
         return (
-            <div className="donut">
-                <Chart
-                    options={this.state.options}
-                    series={this.state.series}
-                    type="radialBar"
-                    width="100%"
-                />
-                <div style={{ marginTop: 16, marginBottom: 8 }}>
+            <div className="donut flex flex-col items-center justify-center w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-2 bg-transparent rounded-xl shadow transition-all">
+                <div className="w-full flex flex-col items-center">
+                    <Chart
+                        options={this.state.options}
+                        series={this.state.series}
+                        type="radialBar"
+                        width="100%"
+                        height="100%"
+                    />
+                </div>
+                <div className="w-full flex flex-col items-start mt-4 mb-2">
                     <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) this.handleDetailClose(); }}>
                         <DialogTrigger asChild>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, minWidth: 250 }}>

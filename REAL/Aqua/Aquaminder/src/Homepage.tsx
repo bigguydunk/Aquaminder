@@ -38,18 +38,27 @@ function Homepage() {
   };
 
   return (
-  <div className="display flex flex-col overflow-x-hidden">
-    <Background />
-    <div className="relative z-10 w-full flex flex-col justify-center items-center text-center mt-4 gap-4">
-      {/* Decorative header background */}
-      <UserMenu userName={userName} onLogout={handleLogout} />
-      <HomeData />
-      <div className="h-4" />
-      <WeekRow />
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#28D0FF] to-[#88D7FF]">
+      <Background />
+      <header className="w-full flex flex-col items-center py-4 px-2 bg-white/80 shadow-md sticky top-0 z-20">
+        <div className="w-full max-w-4xl flex flex-row items-center justify-between">
+          <span className="text-2xl font-bold text-[#3443E9]">Aquaminder</span>
+          <UserMenu userName={userName} onLogout={handleLogout} />
+        </div>
+      </header>
+      <main className="flex-1 w-full flex flex-col items-center px-2 py-4">
+        <section className="w-full max-w-2xl flex flex-col items-center">
+          <HomeData />
+        </section>
+        <section className="w-full max-w-3xl flex flex-col items-center mt-4">
+          <WeekRow />
+        </section>
+      </main>
+      <footer className="w-full flex justify-center items-center py-4 bg-transparent">
+        <FloatingButton email={user?.email} />
+      </footer>
     </div>
-    <FloatingButton email={user?.email} />
-  </div>
-);
+  );
 }
 
 export default Homepage;
