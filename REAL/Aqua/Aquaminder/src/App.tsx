@@ -13,7 +13,7 @@ function App() {
           <Route path="/" element={<LoginRegister/>} />
           <Route path="/homepage" element={<Homepage />}/>
           <Route path="/database-search" element={<DatabaseSearch />} />
-          <Route path="/disease-detail" element={<DiseaseDetail />} />
+          <Route path="/disease-detail/:id" element={<DiseaseDetail />} />
         </Routes>
       </Router>
     </ToastProviderWithContext>

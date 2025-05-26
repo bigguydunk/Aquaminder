@@ -4,8 +4,7 @@ html, body, #root {
     height: auto;
     min-height: auto;
     min-width: auto;
-    width: auto;
-    border-radius: 15px;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
