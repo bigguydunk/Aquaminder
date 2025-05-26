@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import supabase from '../../supabaseClient';
-import UserMenu from "@/components/UserMenu";
 import FloatingButton from "@/components/ui/FloatingButton";
 
 const DiseaseDetail = () => {
