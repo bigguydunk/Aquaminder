@@ -44,18 +44,15 @@ function HomeData() {
   };
 
   return (
-    <div className='sm:h-[30vh] h-[30vh]'>
-      <Carousel setApi={handleSetApi} className='h-full'>
-        
-        <CarouselContent>
-          <CarouselItem><RadialBar /></CarouselItem>
-          <CarouselItem><RadialBar2 /></CarouselItem>
-        </CarouselContent>
-        
-      </Carousel>
-
-      {/* Navigation Dots */}
-      <div className="flex justify-center space-x-2 mt-4">
+    <div className='sm:h-[30vh] h-[30vh] relative'>
+      {/* Navigation Dots moved to top center, with extra spacing to avoid overlap */}
+      <div
+        className="absolute left-1/2 z-20 flex justify-center space-x-2"
+        style={{
+          top: '1.5rem', // Increase top spacing to avoid overlap with chart
+          transform: 'translateX(-50%)',
+        }}
+      >
         {Array.from({ length: totalItems }).map((_, index) => (
           <button
             key={index}
@@ -66,6 +63,12 @@ function HomeData() {
           />
         ))}
       </div>
+      <Carousel setApi={handleSetApi} className='h-full'>
+        <CarouselContent>
+          <CarouselItem><RadialBar /></CarouselItem>
+          <CarouselItem><RadialBar2 /></CarouselItem>
+        </CarouselContent>
+      </Carousel>
     </div>
   );
 }

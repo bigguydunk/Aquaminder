@@ -150,37 +150,34 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
     render() {
         const { akuariumDetail, detailOpen } = this.state;
         return (
-            <div className="donut">
-                <Chart
-                    options={this.state.options}
-                    series={this.state.series}
-                    type="radialBar"
-                    width="100%"
-                />
-                <div style={{ marginTop: 16, marginBottom: 8 }}>
+            <div className="donut flex flex-col items-center justify-center w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-2 bg-transparent rounded-xl shadow transition-all">
+                <div className="w-full flex flex-col items-center">
+                    <Chart
+                        options={this.state.options}
+                        series={this.state.series}
+                        type="radialBar"
+                        width="100%"
+                        height="100%"
+                    />
+                </div>
+                <div className="w-full flex flex-col items-start mt-4 mb-2">
                     <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) this.handleDetailClose(); }}>
                         <DialogTrigger asChild>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, minWidth: 250 }}>
-                                <span style={{ fontWeight: 'bold', color: 'gray-800', fontSize: 24 }}> Aquarium {this.state.aquariumID}  </span>
-                                <Button variant="outline" onClick={this.handleDetailOpen} className='!bg-[#007bff] focus:outline-none shadow-md focus-visible:outline-none hover:!text-white text-white'>
+                            <div className="flex flex-col items-start gap-2 min-w-[250px]">
+                                <span className="font-bold text-[#181619] text-2xl">Aquarium {this.state.aquariumID}</span>
+                                <Button
+                                    variant="outline"
+                                    onClick={this.handleDetailOpen}
+                                    className="!bg-[#007bff] focus:outline-none shadow-md focus-visible:outline-none hover:!text-white text-white"
+                                >
                                     Detail 🔍︎
                                 </Button>
                             </div>
                         </DialogTrigger>
-                        <DialogContent style={{ maxWidth: '350px', width: '90vw', minWidth: 'unset' }}>
+                        <DialogContent className="max-w-xs w-[90vw] min-w-0">
                             <button
                                 onClick={this.handleDetailClose}
-                                style={{
-                                    position: 'absolute',
-                                    top: 10,
-                                    right: 10,
-                                    background: 'transparent',
-                                    border: 'none',
-                                    fontSize: 15, 
-                                    cursor: 'pointer',
-                                    color: '#888',
-                                    zIndex: 10
-                                }}
+                                className="absolute top-2 right-2 bg-transparent border-none text-lg text-gray-500 hover:text-gray-800 font-bold focus:outline-none z-10"
                                 aria-label="Close"
                             >
                                 ×
@@ -190,7 +187,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
                             {akuariumDetail ? (
                                 <Card>
                                     <CardContent>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                        <div className="flex flex-col gap-2">
                                             <div>
                                                 <b>Ikan Sehat:</b>{" "}
                                                 {akuariumDetail.jumlah_ikan_total != null && akuariumDetail.jumlah_ikan_sakit != null
