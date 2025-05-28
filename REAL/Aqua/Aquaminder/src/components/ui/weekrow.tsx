@@ -487,10 +487,10 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
   akuariumOptions: { akuarium_id: number }[],
   userRole?: number, // Add userRole as optional prop
 }) {
-  const [hasSchedule, setHasSchedule] = useStateBox(false);
+  const [_hasSchedule, setHasSchedule] = useStateBox(false);
   const [loading, setLoading] = useStateBox(true);
-  const [schedules, setSchedules] = useStateBox<any[]>([]);
-  const [userMap, setUserMap] = useStateBox<{ [key: number]: string }>({});
+  const [_schedules, setSchedules] = useStateBox<any[]>([]);
+  const [_userMap, setUserMap] = useStateBox<{ [key: number]: string }>({});
   // Always fetch all schedules for the day, but for employees only show their own
   const [allSchedules, setAllSchedules] = useStateBox<any[]>([]);
   const [allUserMap, setAllUserMap] = useStateBox<{ [key: number]: string }>({});
