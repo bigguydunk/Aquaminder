@@ -156,7 +156,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
         }
       }      
 
-    componentDidUpdate(prevProps: {}, prevState: RadialBarState) {
+    componentDidUpdate(_prevProps: {}, prevState: RadialBarState) {
         // If screen size changes to md+ or aquariumID changes, fetch detail data
         if ((this.state.isMdOrAbove && !prevState.isMdOrAbove) ||
             (this.state.isMdOrAbove && this.state.aquariumID !== prevState.aquariumID)) {
