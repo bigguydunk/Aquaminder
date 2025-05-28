@@ -63,7 +63,7 @@ function HomeData() {
           />
         ))}
       </div>
-      <div className="h-6 sm:h-10" /> {/* Add extra vertical space between nav dots and radial bar */}
+      <div className="h-6 " /> {/* Add extra vertical space between nav dots and radial bar */}
       <Carousel setApi={handleSetApi} className='h-full'>
         <CarouselContent>
           <CarouselItem><RadialBar /></CarouselItem>

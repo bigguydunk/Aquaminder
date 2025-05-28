@@ -223,7 +223,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
                         // Dialog popup for mobile
                         <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) this.handleDetailClose(); }}>
                             <DialogTrigger asChild>
-                                <div className="flex flex-col items-center gap-2 min-w-[250px]">
+                                <div className="flex flex-col items-start gap-2 min-w-[250px]">
                                     <span className="font-bold text-[#FFE3B3] text-2xl">Aquarium {this.state.aquariumID}</span>
                                     <Button
                                         variant="outline"

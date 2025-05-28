@@ -221,11 +221,11 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
         {/* Calendar (left) */}
         {!onlyAddScheduleBox && (
           <div className=" flex flex-col md:items-start items-center order-1 md:order-1">
-            <div className="relative lg:max-w-[470px] md:w-full !h-auto ">
+            <div className="relative lg:max-w-[470px] w-[90%] md:w-full !h-auto ">
               {/* Calendar Section */}
               {!onlyAddScheduleBox && (
                 <div className="relative  bg-[#26648B] px-2 rounded-md h-full shadow-lg py-2">
-                  <div className="w-full h-[2px] bg-transparent mb-2"></div>
+                  <div className="w-full md:h-[2px] bg-transparent mb-2"></div>
                   <div className="w-full flex text-[#FFE3B3] items-start mb-0 pl-2 text-base leading-tight">
                     {(() => {
                       const selectedDate = getSelectedDate();
@@ -255,7 +255,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                         className="focus:outline-none focus-visible:outline-none !bg-transparent text-[#FFE3B3] hover:!text-[#FFE3B3] hover:bg-gray-100 w-10 h-10 rounded-full"
                       />
                     </div>
-                    <CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[450px] lg:w-[450px] w-[450px]">
+                    <CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[450px] lg:w-[450px] sm:w-[450px]">
                       {weeks.map((week, weekIndex) => (
                         <CarouselItem
                           key={weekIndex}
@@ -266,7 +266,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                               <Card
                                 onClick={() => handleDayClick(weekIndex, dayIndex)}
                                 className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
-                                   h-14 w-14 md:h-14 md:w-13
+                                   !h-10 w-10 md:!h-14 md:w-14
                                   transition-all duration-300 ease-in-out
                                   ${
                                     selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
@@ -295,10 +295,10 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
         )}
         {/* Add Schedule Box (right) */}
         {!onlyCalendar && (
-          <div className="w-full flex flex-col items-center items-center md:items-start order-2 md:order-2 ">
+          <div className="w-full flex flex-col items-center md:items-start order-2 md:order-2 ">
             {(userRole === 1 || userRole === 2) && (
-              <div className="relative w-full max-w-[470px] h-30 items-center items-center md:items-start">
-                <div className="relative w-full max-w-[470px] h-4/4">
+              <div className="relative w-full max-w-[470px] h-30 items-center md:items-start">
+                <div className="relative md:w-full w-[95%] max-w-[470px] h-4/4 pl-[5%]">
                   <div className="relative rounded-[15px] px-6 py-4 flex items-center justify-start w-full h-full shadow-lg bg-[#FFE3B3] z-10 space-x-4">
                     <RadixDialog.Root>
                       <RadixDialog.Trigger asChild>
@@ -562,7 +562,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     return (
       <div className="relative w-full flex flex-col lg:flex-row items-center md:items-start mt-4 mx-auto gap-6">
         <div className="w-full lg:w-[470px] flex flex-col items-center md:items-start">
-          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-[470px] h-full bg-[#4F8FBF] z-10 mb-2 shadow-md">
+          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-[90%] md:w-full max-w-[470px] h-full bg-[#4F8FBF] z-10 mb-2 shadow-md">
             <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
               –
             </div>
@@ -603,7 +603,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
               return (
                 <div
                   key={schedule.jadwal_id || `left-${idx}`}
-                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
                 >
                   {/* X button for delete, only show if userRole is 1 or 2 */}
                   <RadixDialog.Root>
@@ -671,7 +671,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
               return (
                 <div
                   key={schedule.jadwal_id || `right-${idx}`}
-                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
                 >
                   {/* X button for delete, only show if userRole is 1 or 2 */}
                   <RadixDialog.Root>
@@ -740,7 +740,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     return (
       <div className="relative w-full flex flex-col lg:flex-row items-start mt-4 mx-auto gap-6">
         <div className="w-full lg:w-[470px] flex flex-col md:items-start items-center">
-          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-[470px] h-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
+          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
             <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
               –
             </div>

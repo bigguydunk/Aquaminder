@@ -42,21 +42,21 @@ function Homepage() {
     <div className="min-h-screen w-full flex flex-col">
       <Background />
       <header>
-        <div className="w-full flex flex-row items-center justify-between pt-6 md:h-20">
+        <div className="w-full flex flex-row items-center justify-between pt-6 h-20">
           <UserMenu userName={userName} onLogout={handleLogout} />
         </div>
       </header>
       <main className="flex-1 w-full flex flex-col min-h-screen py-0">
-        <section className="flex flex-1 w-full min-h-screen flex-col md:flex-row items-start justify-between gap-2">
+        <section className="flex flex-1 w-full min-h-screen flex-col md:flex-row items-start  gap-2">
           {/* HomeData on the far left (1/3) */}
-          <div className="relative lg:w-[25%] md:w-[35%] w-full flex flex-col h-full items-stretch">
+          <div className="relative lg:w-[25%] md:w-[35%] w-full flex flex-col h-auto md:h-full md:pl-0 pl-5 items-stretch">
             {/* White box behind, slightly offset */}
             <div
-              className="hidden md:block absolute right-[-16px] w-full h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0"
+              className="hidden md:block absolute right-[-16px] w-full  md:h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0"
               style={{ filter: 'blur(0.5px)' }}
             />
             {/* Main colored box */}
-            <div className="relative z-10 flex flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow md:h-full md:min-h-screen">
+            <div className="relative z-10 flex flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow  md:h-full md:min-h-screen">
               <HomeData />
             </div>
           </div>

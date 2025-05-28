@@ -176,7 +176,7 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
     render() {
         const { akuariumDetail, detailOpen, isMdOrAbove } = this.state;
         return (
-            <div className="flex flex-col items-center justify-center w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-2 bg-transparent rounded-xl shadow transition-all">
+            <div className="flex md:flex-col flex-row items-center justify-center w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-2 bg-transparent rounded-xl  transition-all">
                 <div className="w-full flex flex-col items-center">
                     <Chart
                         options={this.state.options}
@@ -219,7 +219,7 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                     ) : (
                         <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) this.handleDetailClose(); }}>
                             <DialogTrigger asChild>
-                                <div className="flex flex-col items-center gap-2 min-w-[250px]">
+                                <div className="flex flex-col items-start gap-2 min-w-[250px]">
                                     <span className="font-bold text-[#FFE3B3] text-2xl">Aquarium {this.state.aquariumID}</span>
                                     <Button
                                         variant="outline"
