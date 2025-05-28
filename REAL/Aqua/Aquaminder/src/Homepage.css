@@ -235,13 +235,11 @@ body{
 /* Responsive container for homepage */
 @media (max-width: 1024px) {
   header, main, footer {
-    padding-left: 1rem;
     padding-right: 1rem;
   }
 }
 @media (max-width: 768px) {
   header, main, footer {
-    padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
   .homepage-dot-nav {
@@ -250,7 +248,7 @@ body{
 }
 @media (max-width: 480px) {
   header, main, footer {
-    padding-left: 0.25rem;
+
     padding-right: 0.25rem;
   }
   .homepage-dot-nav {

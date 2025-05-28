@@ -5,7 +5,7 @@ body,html{
 body{
   margin:0;
   padding:0;
-  background: linear-gradient(180deg, #28D0FF 0px, #88D7FF 100vh);
+  background: #53D2DB;
   background-attachment: fixed;
 }
 .bubbles{
@@ -22,7 +22,7 @@ body{
   bottom:-100px;
   width:40px;
   height: 40px;
-  background:#f1f1f1;
+  background:#FFE3B3;
   border-radius:50%;
   opacity:0.5;
   animation: rise 10s infinite ease-in;

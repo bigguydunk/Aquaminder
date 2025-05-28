@@ -49,7 +49,7 @@ function HomeData() {
       <div
         className="absolute left-1/2 z-20 flex justify-center space-x-2"
         style={{
-          top: '1.5rem', // Increase top spacing to avoid overlap with chart
+          top: '1rem', // Move nav dots even further up
           transform: 'translateX(-50%)',
         }}
       >
@@ -58,11 +58,12 @@ function HomeData() {
             key={index}
             onClick={() => scrollToIndex(index)}
             className={`rounded-full focus:outline-none focus-visible:outline-none hover:scale-110 ${
-              currentIndex === index ? "w-3 h-3 !bg-white" : "w-2 h-2 !bg-gray-300"
+              currentIndex === index ? "w-3 h-3 !bg-[#FFE3B3]" : "!w-1 !h-1 !bg-[#0F354D] "
             }`}
           />
         ))}
       </div>
+      <div className="h-6 sm:h-10" /> {/* Add extra vertical space between nav dots and radial bar */}
       <Carousel setApi={handleSetApi} className='h-full'>
         <CarouselContent>
           <CarouselItem><RadialBar /></CarouselItem>

@@ -22,11 +22,11 @@
 
 .donut {
   display: flex;
-  flex-direction: row; /* Change to row layout */
+  flex-direction: column; /* Change to row layout */
   align-items: center; /* Center items vertically */
   justify-content: center; /* Center items horizontally */
   width: 100%; /* Make the container responsive */
-  max-width: 400px; /* Limit the maximum width */
+  max-width: 500px; /* Limit the maximum width */
   height: 100%; /* Ensure it takes full height of the parent */
   margin: auto; /* Center the container within its parent */
   padding: 1rem;

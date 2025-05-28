@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [selectedDay, setSelectedDay] = useState<{ week: number; day: number } | null>({ week: 5, day: new Date().getDay() });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,25 +39,37 @@ function Homepage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#28D0FF] to-[#88D7FF]">
+    <div className="min-h-screen w-full flex flex-col">
       <Background />
-      <header className="w-full flex flex-col items-center py-4 px-2 bg-white/80 shadow-md sticky top-0 z-20">
-        <div className="w-full max-w-4xl flex flex-row items-center justify-between">
-          <span className="text-2xl font-bold text-[#3443E9]">Aquaminder</span>
+      <header>
+        <div className="w-full flex flex-row items-center justify-between pt-6 md:h-20">
           <UserMenu userName={userName} onLogout={handleLogout} />
         </div>
       </header>
-      <main className="flex-1 w-full flex flex-col items-center px-2 py-4">
-        <section className="w-full max-w-2xl flex flex-col items-center">
-          <HomeData />
+      <main className="flex-1 w-full flex flex-col min-h-screen py-0">
+        <section className="flex flex-1 w-full min-h-screen flex-col md:flex-row items-start justify-between gap-2">
+          {/* HomeData on the far left (1/3) */}
+          <div className="relative lg:w-[25%] md:w-[35%] w-full flex flex-col h-full items-stretch">
+            {/* White box behind, slightly offset */}
+            <div
+              className="hidden md:block absolute right-[-16px] w-full h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0"
+              style={{ filter: 'blur(0.5px)' }}
+            />
+            {/* Main colored box */}
+            <div className="relative z-10 flex flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow md:h-full md:min-h-screen">
+              <HomeData />
+            </div>
+          </div>
+          {/* WeekRow (add schedule + calendar) on the right (2/3) */}
+          <div className="w-full  flex flex-col items-center md:overflow-y-auto lg:pt-20 md:h-screen md:max-h-screen md:min-h-screen">
+            <WeekRow selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
+          </div>
         </section>
-        <section className="w-full max-w-3xl flex flex-col items-center mt-4">
-          <WeekRow />
-        </section>
-      </main>
-      <footer className="w-full flex justify-center items-center py-4 bg-transparent">
         <FloatingButton email={user?.email} />
-      </footer>
+      </main>
+
+        
+
     </div>
   );
 }
