@@ -25,10 +25,19 @@ import { ToastContext } from '@/components/ui/toast';
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 import SimplificationSVG from "../../assets/Simplification.svg?react";
 
-export default function () {
+// Add props for conditional rendering
+export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = false, selectedDay: externalSelectedDay, setSelectedDay: externalSetSelectedDay }: {
+  onlyAddScheduleBox?: boolean,
+  onlyCalendar?: boolean,
+  selectedDay?: { week: number; day: number } | null,
+  setSelectedDay?: React.Dispatch<React.SetStateAction<{ week: number; day: number } | null>>
+} = {}) {
   const today = new Date();
   const currentDay = today.getDay();
-  const [selectedDay, setSelectedDay] = useState<{ week: number; day: number } | null>({ week: 5, day: currentDay });
+  // Use external state if provided, otherwise use internal state
+  const [internalSelectedDay, internalSetSelectedDay] = useState<{ week: number; day: number } | null>({ week: 5, day: currentDay });
+  const selectedDay = externalSelectedDay !== undefined ? externalSelectedDay : internalSelectedDay;
+  const setSelectedDay = externalSetSelectedDay !== undefined ? externalSetSelectedDay : internalSetSelectedDay;
   const [akuariumOptions, setAkuariumOptions] = useState<{ akuarium_id: number }[]>([]);
   const [tugasOptions, setTugasOptions] = useState<{ tugas_id: number; deskripsi_tugas: string | null }[]>([]);
   const [userOptions, setUserOptions] = useState<{ user_id: number; username: string }[]>([]);
@@ -206,230 +215,261 @@ export default function () {
   };
 
   return (
-    <div className="select-none">
-      <div className="relative">
-        <div className="w-full h-[2px] bg-transparent mb-2"></div>
-        <div className="w-full h-[2px]  mb-2 rounded-md shadow-lg"></div>
-        <div className="w-full h-[2px] bg-transparent mb-2"></div>
-        <Carousel >
-          <CarouselPrevious
-            variant="ghost"
-            className="focus:outline-none focus-visible:outline-none !bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
-          />
-          <CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[500px] lg:w-[500px] sm:w-[500px] w-[100vw]">
-            {weeks.map((week, weekIndex) => (
-              <CarouselItem
-                key={weekIndex}
-                className="flex w-full justify-evenly items-center px-0 min-w-full shrink-0 grow-0 basis-full !pl-0"
-              >
-                {week.map((dateNum, dayIndex) => (
-                  <div key={dayIndex} className="flex flex-col items-center">
-                    <div className="text-xs sm:text-sm lg:text-base text-gray-800 mb-1">
-                      {days[dayIndex]}
-                    </div>
-                    <Card
-                      onClick={() => handleDayClick(weekIndex, dayIndex)}
-                      className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
-                         h-14 w-14 
-                        transition-all duration-300 ease-in-out
-                        ${
-                          selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
-                            ? "bg-white text-gray-800 opacity-100 shadow-md" 
-                            : weekIndex === 5 && currentDay === dayIndex
-                            ? "bg-[#007bff] text-white opacity-100 shadow-md"
-                            : "!bg-transparent text-gray-800"
-                        } cursor-pointer !pl-0`}
-                    >
-                      <CardContent className="text-lg font-semibold p-0 flex flex-col items-center justify-center">
-                        {dateNum}
-                      </CardContent>
-                    </Card>
+    <div className="w-full flex flex-col  md:flex-col lg:pl-10 md:pl-20 lg:-pl-0" >
+      {/* Desktop: Two columns for Add Schedule and Calendar, schedule list below in two columns */}
+      <div className="w-full flex flex-col  lg:flex-row  md:items-start gap-5">
+        {/* Calendar (left) */}
+        {!onlyAddScheduleBox && (
+          <div className=" flex flex-col md:items-start items-center order-1 md:order-1">
+            <div className="relative lg:max-w-[470px] w-[90%] md:w-full !h-auto ">
+              {/* Calendar Section */}
+              {!onlyAddScheduleBox && (
+                <div className="relative  bg-[#26648B] px-2 rounded-md h-full shadow-lg py-2">
+                  <div className="w-full md:h-[2px] bg-transparent mb-2"></div>
+                  <div className="w-full flex text-[#FFE3B3] items-start mb-0 pl-2 text-base leading-tight">
+                    {(() => {
+                      const selectedDate = getSelectedDate();
+                      if (!selectedDate) return null;
+                      const month = selectedDate.toLocaleString('en-US', { month: 'long' });
+                      const day = selectedDate.getDate();
+                      const weekday = selectedDate.toLocaleString('en-US', { weekday: 'long' });
+                      return (
+                        <span className="text-lg">
+                          <span className="font-bold">{month}</span>
+                          {`, ${day} `}
+                          <span>{weekday}</span>
+                        </span>
+                      );
+                    })()}
                   </div>
-                ))}
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselNext
-            variant="ghost"
-            className="focus:outline-none focus-visible:outline-none !bg-transparent text-black hover:bg-gray-100 w-10 h-10 rounded-full"
-          />
-        </Carousel>
-        <div className="w-full h-[1px] bg-transparent mt-2"></div>
-      </div>
-      <div className="relative mt-4 flex-row justify-center items-center">
-        {/* Only render the parent container and box if userRole is 1 or 2 */}
-        {(userRole === 1 || userRole === 2) && (
-          <div className="relative w-3/4 h-30 justify-center items-center mx-auto">
-            <div className="relative w-full h-4/4">
-              <div className="relative rounded-[15px] px-6 p12-4 flex items-center justify-start w-full h-full shadow-lg bg-white z-10 space-x-4">
-                <RadixDialog.Root>
-                  <RadixDialog.Trigger asChild>
-                    <div className="rounded-md w-16 h-16 flex items-center justify-center cursor-pointer bg-[#007bff] transition-colors duration-150"
-                      style={{ transition: 'transform 0.15s, opacity 0.15s' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.1)';
-                        e.currentTarget.style.opacity = '0.8';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.opacity = '1';
-                      }}
-                    >
-                      <span className="text-white text-2xl font-bold cursor-pointer">+</span>
+
+                  <Carousel>
+                    {/* Carousel navigation buttons at top right, but inside Carousel for context */}
+                    <div className="absolute -top-5 right-11 flex gap-2 z-20">
+                      <CarouselPrevious
+                        variant="ghost"
+                        className="focus:outline-none focus-visible:outline-none !bg-[transparent] text-[#FFE3B3] focus:!outline-none hover:!text-[#FFE3B3] hover:bg-gray-100 w-10 h-10 rounded-md"
+                      />
+                      <CarouselNext
+                        variant="ghost"
+                        className="focus:outline-none focus-visible:outline-none !bg-transparent text-[#FFE3B3] hover:!text-[#FFE3B3] hover:bg-gray-100 w-10 h-10 rounded-full"
+                      />
                     </div>
-                  </RadixDialog.Trigger>
-                  <RadixDialog.Portal>
-                    <RadixDialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-                    <RadixDialog.Content className="fixed left-1/2 top-1/2 w-1/3.5 sm:max-w-[425px] -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50">
-                      <RadixDialog.Close asChild>
-                        <button
-                          type="button"
-                          aria-label="Close"
-                          className="absolute top-2 right-2 !bg-white text-gray-500 hover:text-gray-800 text-2xl font-bold focus:outline-none"
-                          style={{ zIndex: 100 }}
+                    <CarouselContent className="relative flex mx-auto justify-center p-0 xl:w-[450px] lg:w-[450px] sm:w-[450px]">
+                      {weeks.map((week, weekIndex) => (
+                        <CarouselItem
+                          key={weekIndex}
+                          className="flex w-full justify-evenly items-center px-0 min-w-full shrink-1 grow-0 basis-full !pl-0"
                         >
-                          ×
-                        </button>
-                      </RadixDialog.Close>
-                      <RadixDialog.Title className="text-xl font-bold mb-2">Scheduler</RadixDialog.Title>
-                      <RadixDialog.Description className="mb-4 text-gray-600">
-                        Tambahkan jadwal baru.
-                      </RadixDialog.Description>
-                      <form onSubmit={handleSaveSchedule}>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="dropdown" className="text-right">
-                              Aquarium
-                            </Label>
-                            <div className="col-span-3">
-                              <DropdownMenu.Root>
-                                <DropdownMenu.Trigger asChild>
-                                  <Button
-                                    className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
-                                  >
-                                    {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
-                                  </Button>
-                                </DropdownMenu.Trigger>
-                                <DropdownMenu.Portal>
-                                  <DropdownMenu.Content className="!bg-white border rounded shadow-md p-2 z-50">
-                                    {akuariumOptions.map((option) => (
-                                      <DropdownMenu.Item
-                                        key={option.akuarium_id}
-                                        onSelect={() => setSelectedAkuarium(option.akuarium_id)}
-                                        className="!bg-white cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
-                                      >
-                                        Aquarium {option.akuarium_id}
-                                      </DropdownMenu.Item>
-                                    ))}
-                                  </DropdownMenu.Content>
-                                </DropdownMenu.Portal>
-                              </DropdownMenu.Root>
+                          {week.map((dateNum, dayIndex) => (
+                            <div key={dayIndex} className="flex flex-col items-center">
+                              <Card
+                                onClick={() => handleDayClick(weekIndex, dayIndex)}
+                                className={`text-center flex flex-col items-center justify-center border-none shadow-none relative z-10
+                                   !h-10 w-10 md:!h-14 md:w-14
+                                  transition-all duration-300 ease-in-out
+                                  ${
+                                    selectedDay?.week === weekIndex && selectedDay?.day === dayIndex
+                                      ? "bg-[#0F354D] text-[#FFE3B3] shadow-md rounded-md h-16" 
+                                      : weekIndex === 5 && currentDay === dayIndex
+                                      ? "bg-[#4F8FBF] text-[#FFE3B3] shadow-md rounded-md h-16"
+                                      : "!bg-[#FFE3B3] text-[#26648B] rounded-md h-16"
+                                  } cursor-pointer !pl-0`}
+                              >
+                                <CardContent className="flex flex-col items-center justify-center p-0">
+                                  <span className="text-lg font-semibold mb-0.5">{dateNum}</span>
+                                  <span className="text-xs sm:text-sm lg:text-base mt-0">{days[dayIndex]}</span>
+                                </CardContent>
+                              </Card>
                             </div>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="tugas-dropdown" className="text-right">
-                              Tugas
-                            </Label>
-                            <div className="col-span-3">
-                              <DropdownMenu.Root>
-                                <DropdownMenu.Trigger asChild>
-                                 <Button
-                                    className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
-                                  >
-                                    {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
-                                  </Button>
-                                </DropdownMenu.Trigger>
-                                <DropdownMenu.Portal>
-                                  <DropdownMenu.Content className="!bg-white border rounded shadow-md p-2 z-50">
-                                    {tugasOptions.map((option) => (
-                                      <DropdownMenu.Item
-                                        key={option.tugas_id}
-                                        onSelect={() => setSelectedTugas(option)}
-                                        className="!bg-white cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
-                                      >
-                                        {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
-                                      </DropdownMenu.Item>
-                                    ))}
-                                  </DropdownMenu.Content>
-                                </DropdownMenu.Portal>
-                              </DropdownMenu.Root>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="user-dropdown" className="text-right">
-                              User
-                            </Label>
-                            <div className="col-span-3">
-                              <DropdownMenu.Root>
-                                <DropdownMenu.Trigger asChild>
-                                  <Button
-                                    className="capitalize w-full text-left !bg-white !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
-                                  >
-                                    {selectedUser ? selectedUser.username : 'Pilih user'}
-                                  </Button>
-                                </DropdownMenu.Trigger>
-                                <DropdownMenu.Portal>
-                                  <DropdownMenu.Content className="!bg-white border rounded shadow-md p-2 z-50">
-                                    {userOptions.map((option) => (
-                                      <DropdownMenu.Item
-                                        key={option.user_id}
-                                        onSelect={() => setSelectedUser(option)}
-                                        className="!bg-white cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
-                                      >
-                                        {option.username}
-                                      </DropdownMenu.Item>
-                                    ))}
-                                  </DropdownMenu.Content>
-                                </DropdownMenu.Portal>
-                              </DropdownMenu.Root>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="tanggal-picker" className="text-right">
-                              Waktu
-                            </Label>
-                            <div className="col-span-3 flex justify-center">
-                              <TimePickerDemo date={time} setDate={setTime} />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex justify-center w-full">
-                          <Button type="submit" className="w-full !bg-[#3443E9] text-white hover:bg-gray-800" disabled={loading}>
-                          {loading ? 'Saving...' : 'Save Changes'}
-                          </Button>
-                        </div>
-                      </form>
-                    </RadixDialog.Content>
-                  </RadixDialog.Portal>
-                </RadixDialog.Root>
-                <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-center sm:text-left ">
-                  {"Tambah Jadwal Baru"}
-                  {selectedDay && (
-                    <div className="text-sm mt-1 font-normal">
-                      {(() => {
-                        const selectedDate = getSelectedDate();
-                        return selectedDate ? selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
-                      })()}
-                    </div>
-                  )}
+                          ))}
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </Carousel>
+                  <div className="w-full h-[1px] bg-transparent mt-2"></div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
-        {/* Add margin between add-schedule box and schedule list */}
-        <div className="my-10" />
-        {/* New: Show box if user has a schedule on the selected day */}
+        {/* Add Schedule Box (right) */}
+        {!onlyCalendar && (
+          <div className="w-full flex flex-col items-center md:items-start order-2 md:order-2 ">
+            {(userRole === 1 || userRole === 2) && (
+              <div className="relative w-full max-w-[470px] h-30 items-center md:items-start">
+                <div className="relative md:w-full w-[95%] max-w-[470px] h-4/4 pl-[5%]">
+                  <div className="relative rounded-[15px] px-6 py-4 flex items-center justify-start w-full h-full shadow-lg bg-[#FFE3B3] z-10 space-x-4">
+                    <RadixDialog.Root>
+                      <RadixDialog.Trigger asChild>
+                        <div className="rounded-md w-16 h-16 flex items-center justify-center cursor-pointer bg-[#26648B] transition-colors duration-150"
+                          style={{ transition: 'transform 0.15s, opacity 0.15s' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                            e.currentTarget.style.opacity = '0.8';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.opacity = '1';
+                          }}
+                        >
+                          <span className="text-[#FFE3B3] text-2xl font-bold cursor-pointer">+</span>
+                        </div>
+                      </RadixDialog.Trigger>
+                      <RadixDialog.Portal>
+                        <RadixDialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
+                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-1/3.5 sm:max-w-[425px] -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50">
+                          <RadixDialog.Close asChild>
+                            <button
+                              type="button"
+                              aria-label="Close"
+                              className="absolute top-2 right-2 !bg-[#FFE3B3] text-gray-500 hover:text-gray-800 text-2xl font-bold focus:outline-none"
+                              style={{ zIndex: 100 }}
+                            >
+                              ×
+                            </button>
+                          </RadixDialog.Close>
+                          <RadixDialog.Title className="text-xl font-bold mb-2">Scheduler</RadixDialog.Title>
+                          <RadixDialog.Description className="mb-4 text-gray-600">
+                            Tambahkan jadwal baru.
+                          </RadixDialog.Description>
+                          <form onSubmit={handleSaveSchedule}>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="dropdown" className="text-right">
+                                  Aquarium
+                                </Label>
+                                <div className="col-span-3">
+                                  <DropdownMenu.Root>
+                                    <DropdownMenu.Trigger asChild>
+                                      <Button
+                                        className="capitalize w-full text-left !bg-[#FFE3B3] !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                                        style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
+                                      >
+                                        {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
+                                      </Button>
+                                    </DropdownMenu.Trigger>
+                                    <DropdownMenu.Portal>
+                                      <DropdownMenu.Content className="!bg-[#FFE3B3] border rounded shadow-lg p-2 z-50">
+                                        {akuariumOptions.map((option) => (
+                                          <DropdownMenu.Item
+                                            key={option.akuarium_id}
+                                            onSelect={() => setSelectedAkuarium(option.akuarium_id)}
+                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
+                                          >
+                                            Aquarium {option.akuarium_id}
+                                          </DropdownMenu.Item>
+                                        ))}
+                                      </DropdownMenu.Content>
+                                    </DropdownMenu.Portal>
+                                  </DropdownMenu.Root>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="tugas-dropdown" className="text-right">
+                                  Tugas
+                                </Label>
+                                <div className="col-span-3">
+                                  <DropdownMenu.Root>
+                                    <DropdownMenu.Trigger asChild>
+                                     <Button
+                                        className="capitalize w-full text-left !bg-[#FFE3B3] !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                                        style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
+                                      >
+                                        {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
+                                      </Button>
+                                    </DropdownMenu.Trigger>
+                                    <DropdownMenu.Portal>
+                                      <DropdownMenu.Content className="!bg-[#FFE3B3] border rounded shadow-lg p-2 z-50">
+                                        {tugasOptions.map((option) => (
+                                          <DropdownMenu.Item
+                                            key={option.tugas_id}
+                                            onSelect={() => setSelectedTugas(option)}
+                                          className="!bg-#FFE3B3 cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
+                                          >
+                                            {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
+                                          </DropdownMenu.Item>
+                                        ))}
+                                      </DropdownMenu.Content>
+                                    </DropdownMenu.Portal>
+                                  </DropdownMenu.Root>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="user-dropdown" className="text-right">
+                                  User
+                                </Label>
+                                <div className="col-span-3">
+                                  <DropdownMenu.Root>
+                                    <DropdownMenu.Trigger asChild>
+                                      <Button
+                                        className="capitalize w-full text-left !bg-[#FFE3B3] !text-black !hover:bg-gray-200 !border rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                                        style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
+                                      >
+                                        {selectedUser ? selectedUser.username : 'Pilih user'}
+                                      </Button>
+                                    </DropdownMenu.Trigger>
+                                    <DropdownMenu.Portal>
+                                      <DropdownMenu.Content className="!bg-[#FFE3B3] border rounded shadow-lg p-2 z-50">
+                                        {userOptions.map((option) => (
+                                          <DropdownMenu.Item
+                                            key={option.user_id}
+                                            onSelect={() => setSelectedUser(option)}
+                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
+                                          >
+                                            {option.username}
+                                          </DropdownMenu.Item>
+                                        ))}
+                                      </DropdownMenu.Content>
+                                    </DropdownMenu.Portal>
+                                  </DropdownMenu.Root>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="tanggal-picker" className="text-right">
+                                  Waktu
+                                </Label>
+                                <div className="col-span-3 flex justify-center">
+                                  <TimePickerDemo date={time} setDate={setTime} />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex justify-center w-full">
+                              <Button type="submit" className="w-full !bg-[#3443E9] text-white hover:bg-gray-800" disabled={loading}>
+                              {loading ? 'Saving...' : 'Save Changes'}
+                              </Button>
+                            </div>
+                          </form>
+                        </RadixDialog.Content>
+                      </RadixDialog.Portal>
+                    </RadixDialog.Root>
+                    <div className="flex-1 text-[#26648B] font-bold text-lg text-center sm:text-left ">
+                      {"Tambah Jadwal Baru"}
+                      {selectedDay && (
+                        <div className="text-sm mt-1 font-normal">
+                          {(() => {
+                            const selectedDate = getSelectedDate();
+                            return selectedDate ? selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {/* Schedule List: below, in one column on desktop */}
+      <div className="w-full flex flex-col items-center mt-8">
         {currentUserId && selectedDay && (
           <ScheduleForUserBox
             userId={currentUserId}
             selectedDate={getSelectedDate()}
             tugasOptions={tugasOptions}
             akuariumOptions={akuariumOptions}
-            userRole={userRole ?? undefined} // Ensure userRole is number or undefined
+            userRole={userRole ?? undefined}
           />
         )}
       </div>
@@ -445,7 +485,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
   selectedDate: Date | null,
   tugasOptions: { tugas_id: number; deskripsi_tugas: string | null }[],
   akuariumOptions: { akuarium_id: number }[],
-  userRole?: number // Add userRole as optional prop
+  userRole?: number, // Add userRole as optional prop
 }) {
   const [hasSchedule, setHasSchedule] = useStateBox(false);
   const [loading, setLoading] = useStateBox(true);
@@ -520,65 +560,56 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
   // Skeleton loading UI
   if (loading) {
     return (
-      <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-        <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
-          <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-400 text-3xl font-bold">
-            –
+      <div className="relative w-full flex flex-col lg:flex-row items-center md:items-start mt-4 mx-auto gap-6">
+        <div className="w-full lg:w-[470px] flex flex-col items-center md:items-start">
+          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-[90%] md:w-full max-w-[470px] h-full bg-[#4F8FBF] z-10 mb-2 shadow-md">
+            <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
+              –
+            </div>
+            <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left">
+              <div className="h-6 w-1/2 mb-2 bg-[#FFE3B3] rounded animate-pulse" />
+              <div className="h-4 w-1/4 bg-[#FFE3B3] rounded animate-pulse" />
+            </div>
           </div>
-          <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-left sm:text-left">
-            <div className="h-6 w-1/2 mb-2 bg-gray-200 rounded animate-pulse" />
- 
-            <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
-          </div>
-         
         </div>
+        <div className="flex-1 flex flex-col"></div>
       </div>
     );
   }
 
-  // Default: always show the 'No schedule for the day' box
-  let scheduleBox = (
-    <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-      <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
-        <div className=" rounded-xl w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-400 text-3xl font-bold">
-          –
-        </div>
-        <div className="flex-1 text-[#0C0C0C] text-lg text-left sm:text-left font-bold">
-          Tidak ada jadwal
-          <div className="text-sm text-[#0C0C0C] mt-1 font-normal">
-            {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (loading || !selectedDate) return null;
-  if ((userRole === 1 || userRole === 2)) {
+  // If manager/supervisor, show all users' schedules in two columns
+  if (userRole === 1 || userRole === 2) {
     if (allSchedules.length) {
-      scheduleBox = (
-        <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-          {[...allSchedules]
-            .sort((a, b) => {
-              const isOwnA = a.user_id === userId;
-              const isOwnB = b.user_id === userId;
-              if (isOwnA && !isOwnB) return -1;
-              if (!isOwnA && isOwnB) return 1;
-              // Both are isOwn or both are not, sort by earliest
-              return new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime();
-            })
-            .map((schedule, idx) => {
+      // Split schedules into two columns for desktop
+      const leftCol: any[] = [];
+      const rightCol: any[] = [];
+      allSchedules
+        .sort((a, b) => {
+          const isOwnA = a.user_id === userId;
+          const isOwnB = b.user_id === userId;
+          if (isOwnA && !isOwnB) return -1;
+          if (!isOwnA && isOwnB) return 1;
+          // Both are isOwn or both are not, sort by earliest
+          return new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime();
+        })
+        .forEach((schedule, idx) => {
+          (idx % 2 === 0 ? leftCol : rightCol).push(schedule);
+        });
+      return (
+        <div className="relative w-full flex flex-col lg:flex-row items-start lg:gap-5 gap-0 justify-center mt-4 mx-auto ">
+          <div className="w-full flex flex-col md:items-start items-center">
+            {leftCol.map((schedule, idx) => {
               const isOwn = schedule.user_id === userId;
               return (
                 <div
-                  key={schedule.jadwal_id || idx}
-                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md ${!isOwn ? 'opacity-70 grayscale' : ''}`}
+                  key={schedule.jadwal_id || `left-${idx}`}
+                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
                 >
                   {/* X button for delete, only show if userRole is 1 or 2 */}
                   <RadixDialog.Root>
                     <RadixDialog.Trigger asChild>
                       <button
-                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
+                        className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red text-xl font-bold bg-transparent border-none cursor-pointer z-20"
                         style={{ background: 'transparent' }}
                         title="Delete schedule"
                         type="button"
@@ -588,9 +619,9 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                     </RadixDialog.Trigger>
                     <RadixDialog.Portal>
                       <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                        <RadixDialog.Title className="text-lg font-bold mb-2">Delete Schedule</RadixDialog.Title>
-                        <RadixDialog.Description className="mb-4 text-gray-600 text-center">
+                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                        <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
+                        <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
                           Are you sure you want to delete this schedule?
                         </RadixDialog.Description>
                         <div className="flex gap-4 justify-center mt-2">
@@ -604,68 +635,152 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                             Yes
                           </Button>
                           <RadixDialog.Close asChild>
-                            <Button className="!bg-gray-200 !text-black !hover:bg-gray-300">No</Button>
+                            <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
                           </RadixDialog.Close>
                         </div>
                       </RadixDialog.Content>
                     </RadixDialog.Portal>
                   </RadixDialog.Root>
-                    <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#88D7FF] text-white text-3xl font-bold ">
+                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
                     <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
-                    </div>
-                  <div className="flex-1 text-[#0C0C0C] font-bold text-lg text-left sm:text-left relative flex flex-col">
+                  </div>
+                  <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
                     <div>
                       {schedule.tugas_id && tugasOptions.length > 0
                         ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
                         : 'Tugas tidak ditemukan'}
                     </div>
                     {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                      <div className="text-sm font-normal text-black mt-1 flex items-center gap-2">
+                      <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
                         <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
-                        {schedule.user_id && allUserMap[schedule.user_id] && (
-                          <Badge variant="outline">{allUserMap[schedule.user_id]}</Badge>
+                        {!isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
+                          <span className="absolute -bottom-4 -right-4">
+                            <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
+                          </span>
                         )}
                       </div>
-                    
                     )}
-                    
                   </div>
                 </div>
               );
             })}
+          </div>
+          <div className="w-full flex flex-col md:items-start items-center">
+            {rightCol.map((schedule, idx) => {
+              const isOwn = schedule.user_id === userId;
+              return (
+                <div
+                  key={schedule.jadwal_id || `right-${idx}`}
+                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                >
+                  {/* X button for delete, only show if userRole is 1 or 2 */}
+                  <RadixDialog.Root>
+                    <RadixDialog.Trigger asChild>
+                      <button
+                        className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
+                        style={{ background: 'transparent' }}
+                        title="Delete schedule"
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </RadixDialog.Trigger>
+                    <RadixDialog.Portal>
+                      <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                        <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
+                        <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
+                          Are you sure you want to delete this schedule?
+                        </RadixDialog.Description>
+                        <div className="flex gap-4 justify-center mt-2">
+                          <Button
+                            className="!bg-red-600 text-white hover:bg-red-700"
+                            onClick={async () => {
+                              await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
+                              setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
+                            }}
+                          >
+                            Yes
+                          </Button>
+                          <RadixDialog.Close asChild>
+                            <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
+                          </RadixDialog.Close>
+                        </div>
+                      </RadixDialog.Content>
+                    </RadixDialog.Portal>
+                  </RadixDialog.Root>
+                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
+                    <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
+                  </div>
+                  <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
+                    <div>
+                      {schedule.tugas_id && tugasOptions.length > 0
+                        ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                        : 'Tugas tidak ditemukan'}
+                    </div>
+                    {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
+                      <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
+                        <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
+                        {!isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
+                          <span className="absolute -bottom-4 -right-4">
+                            <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       );
     }
-    return scheduleBox;
+    // No schedules: show 'Tidak ada jadwal' in left column, left-aligned
+    return (
+      <div className="relative w-full flex flex-col lg:flex-row items-start mt-4 mx-auto gap-6">
+        <div className="w-full lg:w-[470px] flex flex-col md:items-start items-center">
+          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
+            <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
+              –
+            </div>
+            <div className="flex-1 text-[#FFE3B3] text-lg text-left font-bold">
+              Tidak ada jadwal
+              <div className="text-sm text-[#FFE3B3] mt-1 font-normal">
+                {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 flex flex-col"></div>
+      </div>
+    );
   }
-  // ...existing code for normal user...
+  // Always show normal user's own schedule regardless of role
   if (hasSchedule && schedules.length) {
-    scheduleBox = (
-      <div className="relative w-3/4 flex flex-col items-center justify-center mt-4 mx-auto gap-2">
+    return (
+      <div className="relative w-full flex flex-col items-center justify-center mt-4 mx-auto gap-2">
         {[...schedules]
           .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
           .map((schedule, idx) => (
-            <div key={schedule.jadwal_id || idx} className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 w-full max-w-xl h-full bg-white z-10 mb-2 shadow-md">
-              
+            <div key={schedule.jadwal_id || idx} className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 max-w-[470px] w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
               {/* X button for delete, only show if userRole is 1 or 2 */}
               {(userRole === 1 || userRole === 2) && (
                 <RadixDialog.Root>
-                  
                   <RadixDialog.Trigger asChild>
                     <button
-                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-lg font-bold bg-transparent border-none cursor-pointer z-20"
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-70  0 text-lg font-bold bg-transparent border-none cursor-pointer z-20"
                       title="Delete schedule"
                       type="button"
                     >
                       ×
                     </button>
                   </RadixDialog.Trigger>
-                  
                   <RadixDialog.Portal>
                     <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                    <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                      <RadixDialog.Title className="text-lg font-bold mb-2">Delete Schedule</RadixDialog.Title>
-                      <RadixDialog.Description className="mb-4 text-gray-600 text-center">
+                    <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                      <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
+                      <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
                         Are you sure you want to delete this schedule?
                       </RadixDialog.Description>
                       <div className="flex gap-4 justify-center mt-2">
@@ -679,43 +794,51 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                           Yes
                         </Button>
                         <RadixDialog.Close asChild>
-                          <Button className="!bg-gray-200 !text-black !hover:bg-gray-300">No</Button>
+                          <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
                         </RadixDialog.Close>
                       </div>
                     </RadixDialog.Content>
                   </RadixDialog.Portal>
                 </RadixDialog.Root>
               )}
-              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#4ED4FF] text-white text-3xl font-bold">
+              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#26648B] text-[#FFE3B3] text-3xl font-bold">
                 <SimplificationSVG style={{ width: 48, height: 48 }} />
               </div>
-              
-              <div className="flex-1 text-black text-lg text-left sm:text-left flex flex-col">
+              <div className="flex-1 text-[#FFE3B3] text-lg text-left sm:text-left flex flex-col">
                 <div>
                   {schedule.tugas_id && tugasOptions.length > 0
                     ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
                     : 'Tugas tidak ditemukan'}
                 </div>
                 {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                  <div className="text-sm font-normal text-black mt-1 flex items-center gap-2">
+                  <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2">
                     <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` @ Akuarium ${schedule.akuarium_id}`}
                     {schedule.user_id && userMap[schedule.user_id] && (
-                      <Badge variant="outline">{userMap[schedule.user_id]}</Badge>
+                      <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{userMap[schedule.user_id]}</Badge>
                     )}
                   </div>
-                  
                 )}
-                {/* Created for section */}
-                
               </div>
-             
             </div>
-            
           ))}
-          
       </div>
-      
     );
   }
-  return scheduleBox;
+
+  // If no schedules, show centered 'Tidak ada jadwal' for normal user
+  return (
+    <div className="relative w-full flex flex-col items-center justify-center mt-4 mx-auto gap-2">
+      <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
+        <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#26648B] text-[#FFE3B3] text-3xl font-bold">
+          –
+        </div>
+        <div className="flex-1 text-[#FFE3B3] text-lg text-left sm:text-left font-bold">
+          Tidak ada jadwal
+          <div className="text-sm text-[#FFE3B3] mt-1 font-normal">
+            {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

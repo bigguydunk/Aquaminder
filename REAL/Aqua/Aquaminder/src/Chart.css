@@ -22,11 +22,11 @@
 
 .donut {
   display: flex;
-  flex-direction: row; /* Change to row layout */
+  flex-direction: column; /* Change to row layout */
   align-items: center; /* Center items vertically */
   justify-content: center; /* Center items horizontally */
   width: 100%; /* Make the container responsive */
-  max-width: 400px; /* Limit the maximum width */
+  max-width: 500px; /* Limit the maximum width */
   height: 100%; /* Ensure it takes full height of the parent */
   margin: auto; /* Center the container within its parent */
   padding: 1rem;
@@ -63,6 +63,72 @@
 
   .chart-title {
       font-size: 1.25rem; /* Adjust font size for mobile */
+  }
+}
+
+/* Add responsive style for ApexCharts SVG and foreignObject */
+@media (max-width: 425px) {
+  .donut,
+  .apexcharts-canvas,
+  .apexcharts-svg {
+    max-width: 98vw !important;
+    width: 98vw !important;
+    min-width: 0 !important;
+  }
+  .apexcharts-canvas,
+  .apexcharts-svg {
+    height: auto !important;
+  }
+  .apexcharts-svg foreignObject {
+    width: 98vw !important;
+    min-width: 0 !important;
+    max-width: 98vw !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 424px) {
+  .apexcharts-canvas,
+  .apexcharts-svg,
+  .apexcharts-svg foreignObject {
+    width: 68.6vw !important; /* 98vw * 0.7 = 68.6vw, shrink by 30% */
+    max-width: 68.6vw !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Make donut/chart and apexcharts responsive and larger on laptop/tablet */
+@media (min-width: 768px) {
+  .donut,
+  .apexcharts-canvas,
+  .apexcharts-svg {
+    max-width: 300px !important; /* 500px * 0.6 = 300px */
+    width: 300px !important;
+    min-width: 0 !important;
+    height: 210px !important; /* 350px * 0.6 = 210px */
+  }
+  .apexcharts-svg foreignObject {
+    width: 300px !important;
+    max-width: 300px !important;
+    min-width: 0 !important;
+    height: 210px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .donut,
+  .apexcharts-canvas,
+  .apexcharts-svg {
+    max-width: 360px !important; /* 600px * 0.6 = 360px */
+    width: 360px !important;
+    min-width: 0 !important;
+    height: 240px !important; /* 400px * 0.6 = 240px */
+  }
+  .apexcharts-svg foreignObject {
+    width: 360px !important;
+    max-width: 360px !important;
+    min-width: 0 !important;
+    height: 240px !important;
   }
 }
 

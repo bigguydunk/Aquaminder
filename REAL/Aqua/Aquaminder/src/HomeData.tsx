@@ -44,28 +44,32 @@ function HomeData() {
   };
 
   return (
-    <div className='sm:h-[30vh] h-[30vh]'>
-      <Carousel setApi={handleSetApi} className='h-full'>
-        
-        <CarouselContent>
-          <CarouselItem><RadialBar /></CarouselItem>
-          <CarouselItem><RadialBar2 /></CarouselItem>
-        </CarouselContent>
-        
-      </Carousel>
-
-      {/* Navigation Dots */}
-      <div className="flex justify-center space-x-2 mt-4">
+    <div className='sm:h-[30vh] h-[30vh] relative'>
+      {/* Navigation Dots moved to top center, with extra spacing to avoid overlap */}
+      <div
+        className="absolute left-1/2 z-20 flex justify-center space-x-2"
+        style={{
+          top: '1rem', // Move nav dots even further up
+          transform: 'translateX(-50%)',
+        }}
+      >
         {Array.from({ length: totalItems }).map((_, index) => (
           <button
             key={index}
             onClick={() => scrollToIndex(index)}
             className={`rounded-full focus:outline-none focus-visible:outline-none hover:scale-110 ${
-              currentIndex === index ? "w-3 h-3 !bg-white" : "w-2 h-2 !bg-gray-300"
+              currentIndex === index ? "w-3 h-3 !bg-[#FFE3B3]" : "!w-1 !h-1 !bg-[#0F354D] "
             }`}
           />
         ))}
       </div>
+      <div className="h-6 " /> {/* Add extra vertical space between nav dots and radial bar */}
+      <Carousel setApi={handleSetApi} className='h-full'>
+        <CarouselContent>
+          <CarouselItem><RadialBar /></CarouselItem>
+          <CarouselItem><RadialBar2 /></CarouselItem>
+        </CarouselContent>
+      </Carousel>
     </div>
   );
 }

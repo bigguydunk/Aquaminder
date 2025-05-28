@@ -25,6 +25,7 @@ interface RadialBarState {
     detailOpen?: boolean;
     penyakitName?: string | null;
     penyakitNames?: string[] | null;
+    isMdOrAbove: boolean;
 }
 
 class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; series: number[]; aquariumID: number }> {
@@ -37,16 +38,18 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                     height: 280,
                     type: "radialBar",
                 },
-                colors: ["#007bff"], // Updated color
+                colors: ["#4F8FBF"], // Updated color
                 plotOptions: {
                     radialBar: {
                         hollow: {
                             margin: 0,
-                            size: "50%",
+                            size: "70%",
                             background: "transparent", // Set to transparent
                         },
                         track: {
-    
+                            background: '#FFE3B3',
+                            strokeWidth: '100%',
+                            margin: 0,
                             dropShadow: {
                                 enabled: true,
                                 top: 2,
@@ -77,7 +80,7 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                     gradient: {
                         shade: "dark",
                         type: "vertical",
-                        gradientToColors: ["#3443E9"], // Updated gradient color
+                        gradientToColors: ["#4F8FBF"], // Updated gradient color
                         stops: [0, 100],
                     },
                 },
@@ -91,27 +94,15 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
             detailOpen: false,
             penyakitName: null,
             penyakitNames: null,
+            isMdOrAbove: window.innerWidth >= 768, // md breakpoint
         };
     }
-    async componentDidMount() {
-        try {
-          const { data, error } = await supabase
-            .from('akuarium')
-            .select('akuarium_id, jumlah_ikan_sakit, jumlah_ikan_total')
-            .eq('akuarium_id', this.state.aquariumID);
-          if (error) throw error;
 
-          if (data && data.length > 0) {
-          const { akuarium_id, jumlah_ikan_sakit: s, jumlah_ikan_total: t } = data[0];
-          const persen     = t > 0 ? ((t-s) / t) * 100 : 0;
-          this.setState({ aquariumID: akuarium_id, series: [parseFloat(persen.toFixed(2))] });
-        }
-        } catch (err) {
-          console.error('Gagal fetch persentase:', err);
-        }
-      }      
+    updateIsMdOrAbove = () => {
+        this.setState({ isMdOrAbove: window.innerWidth >= 768 });
+    };
 
-    handleDetailOpen = async () => {
+    async fetchDetailData() {
         try {
             const { data, error } = await supabase
                 .from('akuarium')
@@ -136,10 +127,46 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                     }
                 }
             }
-            this.setState({ akuariumDetail: data, detailOpen: true, penyakitNames });
+            this.setState({ akuariumDetail: data, penyakitNames });
         } catch (err) {
             console.error('Gagal fetch detail akuarium:', err);
         }
+    }
+
+    async componentDidMount() {
+        window.addEventListener('resize', this.updateIsMdOrAbove);
+        try {
+            const { data, error } = await supabase
+                .from('akuarium')
+                .select('akuarium_id, jumlah_ikan_sakit, jumlah_ikan_total')
+                .eq('akuarium_id', this.state.aquariumID);
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                const { akuarium_id, jumlah_ikan_sakit: s, jumlah_ikan_total: t } = data[0];
+                const persen = t > 0 ? ((t - s) / t) * 100 : 0;
+                this.setState({ aquariumID: akuarium_id, series: [parseFloat(persen.toFixed(2))] });
+            }
+        } catch (err) {
+            console.error('Gagal fetch persentase:', err);
+        }
+        if (this.state.isMdOrAbove) {
+            this.fetchDetailData();
+        }
+    }
+
+    componentDidUpdate(_prevProps: {}, prevState: RadialBarState) {
+        if ((this.state.isMdOrAbove && !prevState.isMdOrAbove) ||
+            (this.state.isMdOrAbove && this.state.aquariumID !== prevState.aquariumID)) {
+            this.fetchDetailData();
+        }
+    }
+
+    handleDetailOpen = async () => {
+        if (!this.state.akuariumDetail || !this.state.isMdOrAbove) {
+            await this.fetchDetailData();
+        }
+        this.setState({ detailOpen: true });
     };
 
     handleDetailClose = () => {
@@ -147,70 +174,98 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
     };
 
     render() {
-        const { akuariumDetail, detailOpen } = this.state;
+        const { akuariumDetail, detailOpen, isMdOrAbove } = this.state;
         return (
-            <div className="donut">
-                <Chart
-                    options={this.state.options}
-                    series={this.state.series}
-                    type="radialBar"
-                    width="100%"
-                />
-                <div style={{ marginTop: 16, marginBottom: 8 }}>
-                    <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) this.handleDetailClose(); }}>
-                        <DialogTrigger asChild>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, minWidth: 250 }}>
-                                <span style={{ fontWeight: 'bold', color: '#181619', fontSize: 24 }}> Aquarium #{this.state.aquariumID}  </span>
-                                <Button variant="outline" onClick={this.handleDetailOpen} className='!bg-[#007bff] focus:outline-none text-white hover:!text-white focus-visible:outline-none'>
-                                    Detail 🔍︎ 
-                                </Button>
+            <div className="flex md:flex-col flex-row items-center justify-center w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-2 bg-transparent rounded-xl  transition-all">
+                <div className="w-full flex flex-col items-center">
+                    <Chart
+                        options={this.state.options}
+                        series={this.state.series}
+                        type="radialBar"
+                        width="100%"
+                        height="100%"
+                    />
+                </div>
+                <div className="w-full flex flex-col items-cente mt-4 mb-2">
+                    {isMdOrAbove ? (
+                        <div className="flex flex-col items-center gap-2 min-w-[250px]">
+                            <span className="font-bold text-[#FFE3B3] text-2xl">Aquarium {this.state.aquariumID}</span>
+                            <div className="max-w-xs w-[90vw] min-w-0 relative">
+                                {akuariumDetail ? (
+                                    <Card className="bg-[#FFE3B3] text-[#26648B] shadow-md">
+                                        <CardContent>
+                                            <div className="flex flex-col gap-2">
+                                                <div>
+                                                    <b>Ikan Sehat:</b>{' '}
+                                                    {akuariumDetail.jumlah_ikan_total != null && akuariumDetail.jumlah_ikan_sakit != null
+                                                        ? `${akuariumDetail.jumlah_ikan_total - akuariumDetail.jumlah_ikan_sakit} / ${akuariumDetail.jumlah_ikan_total}`
+                                                        : '-'}
+                                                </div>
+                                                <div><b>Ikan Sakit:</b> {akuariumDetail.jumlah_ikan_sakit ?? '-'}</div>
+                                                <div>
+                                                    <b>Penyakit:</b>{' '}
+                                                    {this.state.penyakitNames && this.state.penyakitNames.length > 0
+                                                        ? this.state.penyakitNames.join(', ')
+                                                        : '-'}
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ) : (
+                                    <div>Loading...</div>
+                                )}
                             </div>
-                        </DialogTrigger>
-                        <DialogContent style={{ maxWidth: '350px', width: '90vw', minWidth: 'unset' }}>
-                            <button
-                                onClick={this.handleDetailClose}
-                                style={{
-                                    position: 'absolute',
-                                    top: 10,
-                                    right: 10,
-                                    background: 'transparent',
-                                    border: 'none',
-                                    fontSize: 15, 
-                                    cursor: 'pointer',
-                                    color: '#888',
-                                    zIndex: 10
-                                }}
-                                aria-label="Close"
-                            >
-                                ×
-                            </button>
-                            <DialogTitle>Detail Akuarium #{this.state.aquariumID}</DialogTitle>
-                            <DialogDescription>Semua data dari tabel akuarium untuk ID ini.</DialogDescription>
-                            {akuariumDetail ? (
-                                <Card>
-                                    <CardContent>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                            <div>
-                                                <b>Ikan Sehat:</b>{' '}
-                                                {akuariumDetail.jumlah_ikan_total != null && akuariumDetail.jumlah_ikan_sakit != null
-                                                    ? `${akuariumDetail.jumlah_ikan_total - akuariumDetail.jumlah_ikan_sakit} / ${akuariumDetail.jumlah_ikan_total}`
-                                                    : '-'}
+                        </div>
+                    ) : (
+                        <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) this.handleDetailClose(); }}>
+                            <DialogTrigger asChild>
+                                <div className="flex flex-col items-start gap-2 min-w-[250px]">
+                                    <span className="font-bold text-[#FFE3B3] text-2xl">Aquarium {this.state.aquariumID}</span>
+                                    <Button
+                                        variant="outline"
+                                        onClick={this.handleDetailOpen}
+                                        className="!bg-[#4F8FBF] focus:outline-none shadow-md focus-visible:outline-none hover:!text-white text-[#FFE3B3]"
+                                    >
+                                        Detail 🔍︎
+                                    </Button>
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-xs w-[90vw] min-w-0">
+                                <button
+                                    onClick={this.handleDetailClose}
+                                    className="absolute top-2 right-2 bg-transparent border-none text-lg text-gray-500 hover:text-gray-800 font-bold focus:outline-none z-10"
+                                    aria-label="Close"
+                                >
+                                    ×
+                                </button>
+                                <DialogTitle>Detail Akuarium #{this.state.aquariumID}</DialogTitle>
+                                <DialogDescription>Semua data dari tabel akuarium untuk ID ini.</DialogDescription>
+                                {akuariumDetail ? (
+                                    <Card>
+                                        <CardContent>
+                                            <div className="flex flex-col gap-2">
+                                                <div>
+                                                    <b>Ikan Sehat:</b>{' '}
+                                                    {akuariumDetail.jumlah_ikan_total != null && akuariumDetail.jumlah_ikan_sakit != null
+                                                        ? `${akuariumDetail.jumlah_ikan_total - akuariumDetail.jumlah_ikan_sakit} / ${akuariumDetail.jumlah_ikan_total}`
+                                                        : '-'}
+                                                </div>
+                                                <div><b>Ikan Sakit:</b> {akuariumDetail.jumlah_ikan_sakit ?? '-'}</div>
+                                                <div>
+                                                    <b>Penyakit:</b>{' '}
+                                                    {this.state.penyakitNames && this.state.penyakitNames.length > 0
+                                                        ? this.state.penyakitNames.join(', ')
+                                                        : '-'}
+                                                </div>
                                             </div>
-                                            <div><b>Ikan Sakit:</b> {akuariumDetail.jumlah_ikan_sakit ?? '-'}</div>
-                                            <div>
-                                                <b>Penyakit:</b>{' '}
-                                                {this.state.penyakitNames && this.state.penyakitNames.length > 0
-                                                    ? this.state.penyakitNames.join(', ')
-                                                    : '-'}
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ) : (
-                                <div>Loading...</div>
-                            )}
-                        </DialogContent>
-                    </Dialog>
+                                        </CardContent>
+                                    </Card>
+                                ) : (
+                                    <div>Loading...</div>
+                                )}
+                            </DialogContent>
+                        </Dialog>
+                    )}
                 </div>
             </div>
         );

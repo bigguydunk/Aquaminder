@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [selectedDay, setSelectedDay] = useState<{ week: number; day: number } | null>({ week: 5, day: new Date().getDay() });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,18 +39,39 @@ function Homepage() {
   };
 
   return (
-  <div className="display flex flex-col overflow-x-hidden">
-    <Background />
-    <div className="relative z-10 w-full flex flex-col justify-center items-center text-center mt-4 gap-4">
-      {/* Decorative header background */}
-      <UserMenu userName={userName} onLogout={handleLogout} />
-      <HomeData />
-      <div className="h-4" />
-      <WeekRow />
+    <div className="min-h-screen w-full flex flex-col">
+      <Background />
+      <header>
+        <div className="w-full flex flex-row items-center justify-between pt-6 h-20">
+          <UserMenu userName={userName} onLogout={handleLogout} />
+        </div>
+      </header>
+      <main className="flex-1 w-full flex flex-col min-h-screen py-0">
+        <section className="flex flex-1 w-full min-h-screen flex-col md:flex-row items-start  gap-2">
+          {/* HomeData on the far left (1/3) */}
+          <div className="relative lg:w-[25%] md:w-[35%] w-full flex flex-col h-auto md:h-full md:pl-0 pl-5 items-stretch">
+            {/* White box behind, slightly offset */}
+            <div
+              className="hidden md:block absolute right-[-16px] w-full  md:h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0"
+              style={{ filter: 'blur(0.5px)' }}
+            />
+            {/* Main colored box */}
+            <div className="relative z-10 flex flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow  md:h-full md:min-h-screen">
+              <HomeData />
+            </div>
+          </div>
+          {/* WeekRow (add schedule + calendar) on the right (2/3) */}
+          <div className="w-full  flex flex-col items-center md:overflow-y-auto lg:pt-20 md:h-screen md:max-h-screen md:min-h-screen">
+            <WeekRow selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
+          </div>
+        </section>
+        <FloatingButton email={user?.email} />
+      </main>
+
+        
+
     </div>
-    <FloatingButton email={user?.email} />
-  </div>
-);
+  );
 }
 
 export default Homepage;
