@@ -479,7 +479,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
 
 import { useEffect as useEffectBox, useState as useStateBox } from 'react';
 
-// Update ScheduleForUserBox to accept userId as string
+// Update ScheduleForUserBox to always use two-column layout for all users
 function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOptions, userRole }: {
   userId: string,
   selectedDate: Date | null,
@@ -487,22 +487,21 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
   akuariumOptions: { akuarium_id: number }[],
   userRole?: number, // Add userRole as optional prop
 }) {
-  const [hasSchedule, setHasSchedule] = useStateBox(false);
+  const [_hasSchedule, setHasSchedule] = useStateBox(false);
   const [loading, setLoading] = useStateBox(true);
-  const [schedules, setSchedules] = useStateBox<any[]>([]);
-  const [userMap, setUserMap] = useStateBox<{ [key: number]: string }>({});
-
-  // If manager/supervisor, show all users' schedules for the day
+  const [_schedules, setSchedules] = useStateBox<any[]>([]);
+  const [_userMap, setUserMap] = useStateBox<{ [key: number]: string }>({});
+  // Always fetch all schedules for the day, but for employees only show their own
   const [allSchedules, setAllSchedules] = useStateBox<any[]>([]);
   const [allUserMap, setAllUserMap] = useStateBox<{ [key: number]: string }>({});
 
   useEffectBox(() => {
-    // Fetch all users for mapping user_id to username
     supabase.from('users').select('user_id, username').then(({ data }) => {
       if (data) {
         const map: { [key: number]: string } = {};
         data.forEach((u: { user_id: number; username: string }) => { map[u.user_id] = u.username; });
         setUserMap(map);
+        setAllUserMap(map);
       }
     });
   }, []);
@@ -513,49 +512,25 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     const dayStringDate = new Date(selectedDate);
     dayStringDate.setDate(dayStringDate.getDate() + 1);
     const dayString = dayStringDate.toISOString().slice(0, 10);
+    // Always fetch all schedules for the day
     supabase
       .from('jadwal')
       .select('*')
-      .eq('user_id', userId)
       .gte('tanggal', dayString + 'T00:00:00+07:00')
       .lte('tanggal', dayString + 'T23:59:59+07:00')
       .then(({ data }) => {
-        if (data && data.length > 0) {
-          setHasSchedule(true);
-          setSchedules(data);
+        setAllSchedules(data || []);
+        // For employees, filter only their own
+        if (userRole !== 1 && userRole !== 2) {
+          const own = (data || []).filter((s: any) => s.user_id === userId);
+          setSchedules(own);
+          setHasSchedule(own.length > 0);
         } else {
-          setHasSchedule(false);
-          setSchedules([]);
+          setHasSchedule(false); // not used for manager layout
         }
-        setTimeout(() => setLoading(false), 150); 
+        setTimeout(() => setLoading(false), 200);
       });
-  }, [userId, selectedDate]);
-
-  useEffectBox(() => {
-    if ((userRole === 1 || userRole === 2) && selectedDate) {
-      setLoading(true);
-      const dayStringDate = new Date(selectedDate);
-      dayStringDate.setDate(dayStringDate.getDate() + 1);
-      const dayString = dayStringDate.toISOString().slice(0, 10);
-      supabase
-        .from('jadwal')
-        .select('*')
-        .gte('tanggal', dayString + 'T00:00:00+07:00')
-        .lte('tanggal', dayString + 'T23:59:59+07:00')
-        .then(({ data }) => {
-          setAllSchedules(data || []);
-          setTimeout(() => setLoading(false), 200); // Delay loading state by 200ms
-        });
-      // Fetch all users for mapping user_id to username
-      supabase.from('users').select('user_id, username').then(({ data }) => {
-        if (data) {
-          const map: { [key: number]: string } = {};
-          data.forEach((u: { user_id: number; username: string }) => { map[u.user_id] = u.username; });
-          setAllUserMap(map);
-        }
-      });
-    }
-  }, [userRole, selectedDate]);
+  }, [userId, selectedDate, userRole]);
 
   // Skeleton loading UI
   if (loading) {
@@ -577,35 +552,34 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     );
   }
 
-  // If manager/supervisor, show all users' schedules in two columns
-  if (userRole === 1 || userRole === 2) {
-    if (allSchedules.length) {
-      // Split schedules into two columns for desktop
-      const leftCol: any[] = [];
-      const rightCol: any[] = [];
-      allSchedules
-        .sort((a, b) => {
-          const isOwnA = a.user_id === userId;
-          const isOwnB = b.user_id === userId;
-          if (isOwnA && !isOwnB) return -1;
-          if (!isOwnA && isOwnB) return 1;
-          // Both are isOwn or both are not, sort by earliest
-          return new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime();
-        })
-        .forEach((schedule, idx) => {
-          (idx % 2 === 0 ? leftCol : rightCol).push(schedule);
-        });
-      return (
-        <div className="relative w-full flex flex-col lg:flex-row items-start lg:gap-5 gap-0 justify-center mt-4 mx-auto ">
-          <div className="w-full flex flex-col md:items-start items-center">
-            {leftCol.map((schedule, idx) => {
-              const isOwn = schedule.user_id === userId;
-              return (
-                <div
-                  key={schedule.jadwal_id || `left-${idx}`}
-                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
-                >
-                  {/* X button for delete, only show if userRole is 1 or 2 */}
+  // Always use two-column layout for all users
+  const leftCol: any[] = [];
+  const rightCol: any[] = [];
+  let displaySchedules = allSchedules;
+  if (userRole !== 1 && userRole !== 2) {
+    // For employees, only show their own schedules
+    displaySchedules = allSchedules.filter((s: any) => s.user_id === userId);
+  }
+  displaySchedules
+    .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
+    .forEach((schedule, idx) => {
+      (idx % 2 === 0 ? leftCol : rightCol).push(schedule);
+    });
+
+  // If there are schedules, show them in two columns
+  if (displaySchedules.length) {
+    return (
+      <div className="relative w-full flex flex-col lg:flex-row items-start lg:gap-5 gap-0 justify-center mt-4 mx-auto ">
+        <div className="w-full flex flex-col md:items-start items-center">
+          {leftCol.map((schedule, idx) => {
+            const isOwn = schedule.user_id === userId;
+            return (
+              <div
+                key={schedule.jadwal_id || `left-${idx}`}
+                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+              >
+                {/* X button for delete, only show if userRole is 1 or 2 */}
+                {(userRole === 1 || userRole === 2) && (
                   <RadixDialog.Root>
                     <RadixDialog.Trigger asChild>
                       <button
@@ -641,39 +615,40 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                       </RadixDialog.Content>
                     </RadixDialog.Portal>
                   </RadixDialog.Root>
-                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
-                    <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
-                  </div>
-                  <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
-                    <div>
-                      {schedule.tugas_id && tugasOptions.length > 0
-                        ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                        : 'Tugas tidak ditemukan'}
-                    </div>
-                    {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                      <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
-                        <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
-                        {!isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
-                          <span className="absolute -bottom-4 -right-4">
-                            <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                )}
+                <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
+                  <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
                 </div>
-              );
-            })}
-          </div>
-          <div className="w-full flex flex-col md:items-start items-center">
-            {rightCol.map((schedule, idx) => {
-              const isOwn = schedule.user_id === userId;
-              return (
-                <div
-                  key={schedule.jadwal_id || `right-${idx}`}
-                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
-                >
-                  {/* X button for delete, only show if userRole is 1 or 2 */}
+                <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
+                  <div>
+                    {schedule.tugas_id && tugasOptions.length > 0
+                      ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                      : 'Tugas tidak ditemukan'}
+                  </div>
+                  {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
+                    <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
+                      <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
+                      {(userRole === 1 || userRole === 2) && !isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
+                        <span className="absolute -bottom-4 -right-4">
+                          <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="w-full flex flex-col md:items-start items-center">
+          {rightCol.map((schedule, idx) => {
+            const isOwn = schedule.user_id === userId;
+            return (
+              <div
+                key={schedule.jadwal_id || `right-${idx}`}
+                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+              >
+                {(userRole === 1 || userRole === 2) && (
                   <RadixDialog.Root>
                     <RadixDialog.Trigger asChild>
                       <button
@@ -709,136 +684,52 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                       </RadixDialog.Content>
                     </RadixDialog.Portal>
                   </RadixDialog.Root>
-                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
-                    <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
-                  </div>
-                  <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
-                    <div>
-                      {schedule.tugas_id && tugasOptions.length > 0
-                        ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                        : 'Tugas tidak ditemukan'}
-                    </div>
-                    {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                      <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
-                        <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
-                        {!isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
-                          <span className="absolute -bottom-4 -right-4">
-                            <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-    // No schedules: show 'Tidak ada jadwal' in left column, left-aligned
-    return (
-      <div className="relative w-full flex flex-col lg:flex-row items-start mt-4 mx-auto gap-6">
-        <div className="w-full lg:w-[470px] flex flex-col md:items-start items-center">
-          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
-            <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
-              –
-            </div>
-            <div className="flex-1 text-[#FFE3B3] text-lg text-left font-bold">
-              Tidak ada jadwal
-              <div className="text-sm text-[#FFE3B3] mt-1 font-normal">
-                {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col"></div>
-      </div>
-    );
-  }
-  // Always show normal user's own schedule regardless of role
-  if (hasSchedule && schedules.length) {
-    return (
-      <div className="relative w-full flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-        {[...schedules]
-          .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
-          .map((schedule, idx) => (
-            <div key={schedule.jadwal_id || idx} className="relative border-black border-1 rounded-4xl px-6 py-4 flex items-center gap-4 max-w-[470px] w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
-              {/* X button for delete, only show if userRole is 1 or 2 */}
-              {(userRole === 1 || userRole === 2) && (
-                <RadixDialog.Root>
-                  <RadixDialog.Trigger asChild>
-                    <button
-                      className="absolute top-2 right-2 text-red-500 hover:text-red-70  0 text-lg font-bold bg-transparent border-none cursor-pointer z-20"
-                      title="Delete schedule"
-                      type="button"
-                    >
-                      ×
-                    </button>
-                  </RadixDialog.Trigger>
-                  <RadixDialog.Portal>
-                    <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                    <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                      <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
-                      <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
-                        Are you sure you want to delete this schedule?
-                      </RadixDialog.Description>
-                      <div className="flex gap-4 justify-center mt-2">
-                        <Button
-                          className="!bg-red-600 text-white hover:bg-red-700"
-                          onClick={async () => {
-                            await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
-                            setSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
-                          }}
-                        >
-                          Yes
-                        </Button>
-                        <RadixDialog.Close asChild>
-                          <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
-                        </RadixDialog.Close>
-                      </div>
-                    </RadixDialog.Content>
-                  </RadixDialog.Portal>
-                </RadixDialog.Root>
-              )}
-              <div className="border-white border-2 rounded-xl w-20 h-20 flex items-center justify-center bg-[#26648B] text-[#FFE3B3] text-3xl font-bold">
-                <SimplificationSVG style={{ width: 48, height: 48 }} />
-              </div>
-              <div className="flex-1 text-[#FFE3B3] text-lg text-left sm:text-left flex flex-col">
-                <div>
-                  {schedule.tugas_id && tugasOptions.length > 0
-                    ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                    : 'Tugas tidak ditemukan'}
-                </div>
-                {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                  <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2">
-                    <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` @ Akuarium ${schedule.akuarium_id}`}
-                    {schedule.user_id && userMap[schedule.user_id] && (
-                      <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{userMap[schedule.user_id]}</Badge>
-                    )}
-                  </div>
                 )}
+                <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
+                  <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
+                </div>
+                <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
+                  <div>
+                    {schedule.tugas_id && tugasOptions.length > 0
+                      ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                      : 'Tugas tidak ditemukan'}
+                  </div>
+                  {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
+                    <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
+                      <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
+                      {(userRole === 1 || userRole === 2) && !isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
+                        <span className="absolute -bottom-4 -right-4">
+                          <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
       </div>
     );
   }
-
-  // If no schedules, show centered 'Tidak ada jadwal' for normal user
+  // No schedules: show 'Tidak ada jadwal' in left column, left-aligned
   return (
-    <div className="relative w-full flex flex-col items-center justify-center mt-4 mx-auto gap-2">
-      <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
-        <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#26648B] text-[#FFE3B3] text-3xl font-bold">
-          –
-        </div>
-        <div className="flex-1 text-[#FFE3B3] text-lg text-left sm:text-left font-bold">
-          Tidak ada jadwal
-          <div className="text-sm text-[#FFE3B3] mt-1 font-normal">
-            {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+    <div className="relative w-full flex flex-col lg:flex-row items-start mt-4 mx-auto gap-6">
+      <div className="w-full lg:w-[470px] flex flex-col md:items-start items-center">
+        <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
+          <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
+            –
+          </div>
+          <div className="flex-1 text-[#FFE3B3] text-lg text-left font-bold">
+            Tidak ada jadwal
+            <div className="text-sm text-[#FFE3B3] mt-1 font-normal">
+              {selectedDate && selectedDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </div>
           </div>
         </div>
       </div>
+      <div className="flex-1 flex flex-col"></div>
     </div>
   );
 }
+//# sourceMappingURL=WeekRow.astro.js.map
