@@ -355,7 +355,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                                           <DropdownMenu.Item
                                             key={option.akuarium_id}
                                             onSelect={() => setSelectedAkuarium(option.akuarium_id)}
-                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
+                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 text-[#26648B] focus:!bg-blue-100 transition-colors"
                                           >
                                             Aquarium {option.akuarium_id}
                                           </DropdownMenu.Item>
@@ -373,7 +373,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                                   <DropdownMenu.Root>
                                     <DropdownMenu.Trigger asChild>
                                      <Button
-                                        className="capitalize w-full text-left !bg-[#FFE3B3]  !hover:bg-gray-200 !border !border-[#26648B] rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
+                                        className="capitalize w-full text-left !bg-[#FFE3B3]  !hover:bg-gray-200 !border  !border-[#26648B] rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
                                         style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
                                       >
                                         {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
@@ -385,7 +385,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                                           <DropdownMenu.Item
                                             key={option.tugas_id}
                                             onSelect={() => setSelectedTugas(option)}
-                                          className="!bg-#FFE3B3 cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
+                                          className="!bg-#FFE3B3 cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 text-[#26648B] focus:!bg-blue-100 transition-colors"
                                           >
                                             {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
                                           </DropdownMenu.Item>
@@ -415,7 +415,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                                           <DropdownMenu.Item
                                             key={option.user_id}
                                             onSelect={() => setSelectedUser(option)}
-                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 focus:!bg-blue-100 transition-colors"
+                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 text-[#26648B] focus:!bg-blue-100 transition-colors"
                                           >
                                             {option.username}
                                           </DropdownMenu.Item>
@@ -443,7 +443,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                         </RadixDialog.Content>
                       </RadixDialog.Portal>
                     </RadixDialog.Root>
-                    <div className="flex-1 text-[#26648B] font-bold text-lg text-center sm:text-left ">
+                    <div className="flex-1 text-[#26648B] font-bold text-lg text-left sm:text-left ">
                       {"Tambah Jadwal Baru"}
                       {selectedDay && (
                         <div className="text-sm mt-1 font-normal">
@@ -537,7 +537,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     return (
       <div className="relative w-full flex flex-col lg:flex-row items-center md:items-start mt-4 mx-auto gap-6">
         <div className="w-full lg:w-[470px] flex flex-col items-center md:items-start">
-          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 w-[90%] md:w-full max-w-[470px] h-full bg-[#4F8FBF] z-10 mb-2 shadow-md">
+          <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 !h-30 w-[90%] md:w-full max-w-[470px] h-full bg-[#4F8FBF] z-10 mb-2 shadow-md">
             <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
               –
             </div>
@@ -566,17 +566,18 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
       (idx % 2 === 0 ? leftCol : rightCol).push(schedule);
     });
 
-  // If there are schedules, show them in two columns
+  // If there are schedules, show them in two columns for md+ and single col for mobile
   if (displaySchedules.length) {
     return (
-      <div className="relative w-full flex flex-col lg:flex-row items-start lg:gap-5 gap-0 justify-center mt-4 mx-auto">
-        <div className="w-full max-w-[470px] flex flex-col md:items-start items-center">
-          {leftCol.map((schedule, idx) => {
+      <>
+        {/* Mobile: single column, chronological order */}
+        <div className="w-full flex flex-col items-center mt-4 gap-0 md:hidden">
+          {displaySchedules.map((schedule, idx) => {
             const isOwn = schedule.user_id === userId;
             return (
               <div
-                key={schedule.jadwal_id || `left-${idx}`}
-                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                key={schedule.jadwal_id || `mobile-${idx}`}
+                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
               >
                 {/* X button for delete, only show if userRole is 1 or 2 */}
                 {(userRole === 1 || userRole === 2) && (
@@ -593,9 +594,9 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                     </RadixDialog.Trigger>
                     <RadixDialog.Portal>
                       <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                        <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
-                        <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
+                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                        <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Schedule</RadixDialog.Title>
+                        <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
                           Are you sure you want to delete this schedule?
                         </RadixDialog.Description>
                         <div className="flex gap-4 justify-center mt-2">
@@ -609,7 +610,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                             Yes
                           </Button>
                           <RadixDialog.Close asChild>
-                            <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
+                            <Button className="!bg-[#26648B] !text-[#FFE3B3] ">No</Button>
                           </RadixDialog.Close>
                         </div>
                       </RadixDialog.Content>
@@ -640,83 +641,156 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
             );
           })}
         </div>
-        <div className="w-full flex flex-col md:items-start items-center">
-          {rightCol.map((schedule, idx) => {
-            const isOwn = schedule.user_id === userId;
-            return (
-              <div
-                key={schedule.jadwal_id || `right-${idx}`}
-                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
-              >
-                {(userRole === 1 || userRole === 2) && (
-                  <RadixDialog.Root>
-                    <RadixDialog.Trigger asChild>
-                      <button
-                        className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
-                        style={{ background: 'transparent' }}
-                        title="Delete schedule"
-                        type="button"
-                      >
-                        ×
-                      </button>
-                    </RadixDialog.Trigger>
-                    <RadixDialog.Portal>
-                      <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                        <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
-                        <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
-                          Are you sure you want to delete this schedule?
-                        </RadixDialog.Description>
-                        <div className="flex gap-4 justify-center mt-2">
-                          <Button
-                            className="!bg-red-600 text-white hover:bg-red-700"
-                            onClick={async () => {
-                              await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
-                              setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
-                            }}
-                          >
-                            Yes
-                          </Button>
-                          <RadixDialog.Close asChild>
-                            <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
-                          </RadixDialog.Close>
-                        </div>
-                      </RadixDialog.Content>
-                    </RadixDialog.Portal>
-                  </RadixDialog.Root>
-                )}
-                <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
-                  <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
-                </div>
-                <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
-                  <div>
-                    {schedule.tugas_id && tugasOptions.length > 0
-                      ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
-                      : 'Tugas tidak ditemukan'}
-                  </div>
-                  {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
-                    <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
-                      <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
-                      {(userRole === 1 || userRole === 2) && !isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
-                        <span className="absolute -bottom-7 -right-4">
-                          <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
-                        </span>
-                      )}
-                    </div>
+        {/* Desktop/tablet: two columns */}
+        <div className="relative w-full flex-col lg:flex-row items-start lg:gap-5 gap-0 justify-center mt-4 mx-auto hidden md:flex">
+          <div className="w-full max-w-[470px] flex flex-col md:items-start items-center">
+            {leftCol.map((schedule, idx) => {
+              const isOwn = schedule.user_id === userId;
+              return (
+                <div
+                  key={schedule.jadwal_id || `left-${idx}`}
+                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                >
+                  {/* X button for delete, only show if userRole is 1 or 2 */}
+                  {(userRole === 1 || userRole === 2) && (
+                    <RadixDialog.Root>
+                      <RadixDialog.Trigger asChild>
+                        <button
+                          className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red text-xl font-bold bg-transparent border-none cursor-pointer z-20"
+                          style={{ background: 'transparent' }}
+                          title="Delete schedule"
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      </RadixDialog.Trigger>
+                      <RadixDialog.Portal>
+                        <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                          <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Schedule</RadixDialog.Title>
+                          <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
+                            Are you sure you want to delete this schedule?
+                          </RadixDialog.Description>
+                          <div className="flex gap-4 justify-center mt-2">
+                            <Button
+                              className="!bg-red-600 text-white hover:bg-red-700"
+                              onClick={async () => {
+                                await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
+                                setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
+                              }}
+                            >
+                              Yes
+                            </Button>
+                            <RadixDialog.Close asChild>
+                              <Button className="!bg-[#26648B] !text-[#FFE3B3] ">No</Button>
+                            </RadixDialog.Close>
+                          </div>
+                        </RadixDialog.Content>
+                      </RadixDialog.Portal>
+                    </RadixDialog.Root>
                   )}
+                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
+                    <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
+                  </div>
+                  <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
+                    <div>
+                      {schedule.tugas_id && tugasOptions.length > 0
+                        ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                        : 'Tugas tidak ditemukan'}
+                    </div>
+                    {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
+                      <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
+                        <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
+                        {(userRole === 1 || userRole === 2) && !isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
+                          <span className="absolute -bottom-7 -right-4">
+                            <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          <div className="w-full flex flex-col md:items-start items-center">
+            {rightCol.map((schedule, idx) => {
+              const isOwn = schedule.user_id === userId;
+              return (
+                <div
+                  key={schedule.jadwal_id || `right-${idx}`}
+                  className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                >
+                  {(userRole === 1 || userRole === 2) && (
+                    <RadixDialog.Root>
+                      <RadixDialog.Trigger asChild>
+                        <button
+                          className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
+                          style={{ background: 'transparent' }}
+                          title="Delete schedule"
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      </RadixDialog.Trigger>
+                      <RadixDialog.Portal>
+                        <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                          <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
+                          <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
+                            Are you sure you want to delete this schedule?
+                          </RadixDialog.Description>
+                          <div className="flex gap-4 justify-center mt-2">
+                            <Button
+                              className="!bg-red-600 text-white hover:bg-red-700"
+                              onClick={async () => {
+                                await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
+                                setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
+                              }}
+                            >
+                              Yes
+                            </Button>
+                            <RadixDialog.Close asChild>
+                              <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
+                            </RadixDialog.Close>
+                          </div>
+                        </RadixDialog.Content>
+                      </RadixDialog.Portal>
+                    </RadixDialog.Root>
+                  )}
+                  <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
+                    <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
+                  </div>
+                  <div className="flex-1 text-[#FFE3B3] font-bold text-lg text-left sm:text-left relative flex flex-col">
+                    <div>
+                      {schedule.tugas_id && tugasOptions.length > 0
+                        ? tugasOptions.find((t: { tugas_id: number; deskripsi_tugas: string | null }) => t.tugas_id === schedule.tugas_id)?.deskripsi_tugas || `Tugas ${schedule.tugas_id}`
+                        : 'Tugas tidak ditemukan'}
+                    </div>
+                    {schedule.akuarium_id && schedule.tanggal && akuariumOptions.length > 0 && (
+                      <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
+                        <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
+                        {(userRole === 1 || userRole === 2) && !isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
+                          <span className="absolute -bottom-7 -right-4">
+                            <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
   // No schedules: show 'Tidak ada jadwal' in left column, left-aligned
   return (
     <div className="relative w-full flex flex-col lg:flex-row items-start mt-4 mx-auto gap-6">
       <div className="w-full lg:w-[470px] flex flex-col md:items-start items-center">
-        <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
+        <div className="relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] !h-30 w-[90%] md:w-full bg-[#4F8FBF] z-10 mb-2 shadow-lg">
           <div className="rounded-xl w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#26648B] text-3xl font-bold">
             –
           </div>
