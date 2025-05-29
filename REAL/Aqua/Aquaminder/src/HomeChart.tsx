@@ -3,7 +3,7 @@ import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import './Chart.css';
 import supabase from '../supabaseClient';
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from './components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogTitle } from './components/ui/dialog';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 

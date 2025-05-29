@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import HomeData from './HomeData';
 import WeekRow from './components/ui/weekrow';
-import FloatingButton from './components/ui/FloatingButton';
 import Background from './components/background';
 import UserMenu from './components/UserMenu';
 import supabase from '../supabaseClient';
