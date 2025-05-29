@@ -6,6 +6,7 @@ import Background from './components/background';
 import UserMenu from './components/UserMenu';
 import supabase from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import AquaminderLogo from './assets/Aquaminder.svg?react';
 
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -40,9 +41,11 @@ function Homepage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      <Background />
       <header>
-        <div className="w-full flex flex-row items-center justify-between pt-6 h-20">
+        <div className="w-full flex md:bg-[#56B1CA] flex-row items-center md:shadow-md justify-between pt-6 h-20">
+          <span className="ml-6 flex items-center h-12">
+            <AquaminderLogo style={{ height: '48px', width: 'auto', display: 'block' }} />
+          </span>
           <UserMenu userName={userName} onLogout={handleLogout} />
         </div>
       </header>
@@ -67,9 +70,7 @@ function Homepage() {
         </section>
         <FloatingButton email={user?.email} />
       </main>
-
-        
-
+      <Background />
     </div>
   );
 }

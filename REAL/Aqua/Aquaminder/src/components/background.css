@@ -12,7 +12,7 @@ body{
   position:absolute;
   width:100%;
   height: 100%;
-  z-index:1;
+  z-index: inherit; /* Inherit the very low z-index from .background-root */
   overflow:hidden;
   top:0;
   left:0;
@@ -115,6 +115,6 @@ body{
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 0;
+  z-index: -10; /* Lowered further to ensure it's always behind everything */
   pointer-events: none; /* So background does not block clicks */
 }

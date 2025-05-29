@@ -2,6 +2,7 @@ import * as DropdownMenu from "./ui/dropdown-menu";
 import React, { useState } from "react";
 import * as Dialog from '@radix-ui/react-dialog';
 import supabase from '../../supabaseClient';
+import UserIcon from '../assets/icons8-user-100 1.svg?react';
 
 interface UserMenuProps {
   userName: string | null;
@@ -45,11 +46,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
     <div className="absolute top-6 right-8 z-10">
       <DropdownMenu.DropdownMenu>
         <DropdownMenu.DropdownMenuTrigger asChild>
-          <button className="!bg-white !rounded-full shadow-md px-6 py-4 inline-block font-semibold focus:outline-none">
-            <h2 className="text-2xl">☰</h2>
+          <button className="!bg-[#FFE3B3] !rounded-full shadow-md px-6 py-4 inline-block font-semibold focus:outline-none flex items-center justify-center">
+            <UserIcon className="w-8 h-8" />
           </button>
         </DropdownMenu.DropdownMenuTrigger>
-        <DropdownMenu.DropdownMenuContent align="center" className="bg-transparent border-transparent shadow-none py-2 min-w-[140px] flex flex-col items-center">
+        <DropdownMenu.DropdownMenuContent align="end" className="bg-transparent border-transparent shadow-none py-2 min-w-[140px] flex flex-col items-end">
           <DropdownMenu.DropdownMenuItem className="!bg-white rounded-full shadow-md px-6 py-4 inline-block focus:outline-none text-center">
             User: {userName}
           </DropdownMenu.DropdownMenuItem>
@@ -65,7 +66,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ userName, onLogout }) => {
             </Dialog.Trigger>
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-              <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+              <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-end">
                 <Dialog.Title className="text-lg font-bold mb-2">All Users</Dialog.Title>
                 <Dialog.Description className="mb-4 text-gray-600 text-center">
                   List of all users in the system

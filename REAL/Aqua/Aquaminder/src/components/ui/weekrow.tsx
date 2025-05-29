@@ -576,7 +576,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
             return (
               <div
                 key={schedule.jadwal_id || `left-${idx}`}
-                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
               >
                 {/* X button for delete, only show if userRole is 1 or 2 */}
                 {(userRole === 1 || userRole === 2) && (
@@ -629,7 +629,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                     <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
                       <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
                       {(userRole === 1 || userRole === 2) && !isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
-                        <span className="absolute -bottom-4 -right-4">
+                        <span className="absolute -bottom-7 -right-4">
                           <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
                         </span>
                       )}
@@ -646,7 +646,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
             return (
               <div
                 key={schedule.jadwal_id || `right-${idx}`}
-                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full h-full bg-[#4F8FBF] z-10 mb-2 shadow-md`}
+                className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
               >
                 {(userRole === 1 || userRole === 2) && (
                   <RadixDialog.Root>
@@ -698,7 +698,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                     <div className="text-sm font-normal text-[#FFE3B3] mt-1 flex items-center gap-2 relative">
                       <span className="font-semibold">{new Date(schedule.tanggal).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>{` ⚲ Akuarium ${schedule.akuarium_id}`}
                       {(userRole === 1 || userRole === 2) && !isOwn && schedule.user_id && allUserMap[schedule.user_id] && (
-                        <span className="absolute -bottom-4 -right-4">
+                        <span className="absolute -bottom-7 -right-4">
                           <Badge variant="outline" className="!border-[#26648B] !text-[#FFE3B3]">{allUserMap[schedule.user_id]}</Badge>
                         </span>
                       )}
