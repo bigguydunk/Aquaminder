@@ -3,7 +3,7 @@ import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import './Chart.css';
 import supabase from '../supabaseClient';
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from './components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogTitle } from './components/ui/dialog';
 import { Button } from './components/ui/button';
 import { Card, CardContent} from './components/ui/card';
 
@@ -230,36 +230,32 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                                     </Button>
                                 </div>
                             </DialogTrigger>
-                            <DialogContent className="max-w-xs w-[90vw] min-w-0">
+                            <DialogContent className="max-w-xs w-[90vw] min-w-0 !bg-[#FFE3B3] !text-[#26648B]">
                                 <button
                                     onClick={this.handleDetailClose}
-                                    className="absolute top-2 right-2 bg-transparent border-none text-lg text-gray-500 hover:text-gray-800 font-bold focus:outline-none z-10"
+                                    className="absolute top-2 right-2 !bg-transparent border-none text-lg text-gray-500 hover:text-gray-800 font-bold focus:outline-none z-10"
                                     aria-label="Close"
                                 >
                                     ×
                                 </button>
                                 <DialogTitle>Detail Akuarium #{this.state.aquariumID}</DialogTitle>
-                                <DialogDescription>Semua data dari tabel akuarium untuk ID ini.</DialogDescription>
+                         
                                 {akuariumDetail ? (
-                                    <Card>
-                                        <CardContent>
-                                            <div className="flex flex-col gap-2">
-                                                <div>
-                                                    <b>Ikan Sehat:</b>{' '}
-                                                    {akuariumDetail.jumlah_ikan_total != null && akuariumDetail.jumlah_ikan_sakit != null
-                                                        ? `${akuariumDetail.jumlah_ikan_total - akuariumDetail.jumlah_ikan_sakit} / ${akuariumDetail.jumlah_ikan_total}`
-                                                        : '-'}
-                                                </div>
-                                                <div><b>Ikan Sakit:</b> {akuariumDetail.jumlah_ikan_sakit ?? '-'}</div>
-                                                <div>
-                                                    <b>Penyakit:</b>{' '}
-                                                    {this.state.penyakitNames && this.state.penyakitNames.length > 0
-                                                        ? this.state.penyakitNames.join(', ')
-                                                        : '-'}
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
+                                    <div className="flex flex-col gap-2 bg-[#FFE3B3] text-[#26648B]">
+                                        <div>
+                                            <b>Ikan Sehat:</b>{' '}
+                                            {akuariumDetail.jumlah_ikan_total != null && akuariumDetail.jumlah_ikan_sakit != null
+                                                ? `${akuariumDetail.jumlah_ikan_total - akuariumDetail.jumlah_ikan_sakit} / ${akuariumDetail.jumlah_ikan_total}`
+                                                : '-'}
+                                        </div>
+                                        <div><b>Ikan Sakit:</b> {akuariumDetail.jumlah_ikan_sakit ?? '-'}</div>
+                                        <div>
+                                            <b>Penyakit:</b>{' '}
+                                            {this.state.penyakitNames && this.state.penyakitNames.length > 0
+                                                ? this.state.penyakitNames.join(', ')
+                                                : '-'}
+                                        </div>
+                                    </div>
                                 ) : (
                                     <div>Loading...</div>
                                 )}

@@ -15,7 +15,7 @@ const FloatingButton = ({ email }: { email?: string }) => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2">
       {isOpen && (
         <>
           <button

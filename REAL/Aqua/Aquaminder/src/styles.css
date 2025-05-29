@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
+
 html, body, #root {
     margin: 0;
     padding: 0;
@@ -21,6 +22,19 @@ html, body, #root {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thick;
+  scrollbar-color: #26648B #FFE3B3;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: #FFE3B3;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #26648B;
+  border-radius: 8px;
 }
 
 .container {

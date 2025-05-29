@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import HomeData from './HomeData';
 import WeekRow from './components/ui/weekrow';
-import FloatingButton from './components/ui/FloatingButton';
 import Background from './components/background';
 import UserMenu from './components/UserMenu';
 import supabase from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import AquaminderLogo from './assets/Aquaminder.svg?react';
+import UserActions from './components/UserActions';
 
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -40,10 +41,20 @@ function Homepage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      <Background />
       <header>
-        <div className="w-full flex flex-row items-center justify-between pt-6 h-20">
-          <UserMenu userName={userName} onLogout={handleLogout} />
+        <div className="w-full flex md:bg-[#56B1CA] flex-row items-center md:shadow-md justify-between pt-3 h-20 pr-6">
+          <span className="ml-6 flex items-center h-12">
+            <AquaminderLogo style={{ height: '48px', width: 'auto', display: 'block' }} />
+            
+          </span>
+
+          {/* Show UserActions on md and above, UserMenu on small screens */}
+          <div className="hidden md:block">
+            <UserActions userName={userName} onLogout={handleLogout} email={user?.email} />
+          </div>
+          <div className="block md:hidden">
+            <UserMenu userName={userName} onLogout={handleLogout} />
+          </div>
         </div>
       </header>
       <main className="flex-1 w-full flex flex-col min-h-screen py-0">
@@ -65,11 +76,9 @@ function Homepage() {
             <WeekRow selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
           </div>
         </section>
-        <FloatingButton email={user?.email} />
-      </main>
-
         
-
+      </main>
+      <Background />
     </div>
   );
 }

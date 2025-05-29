@@ -47,9 +47,10 @@ function HomeData() {
     <div className='sm:h-[30vh] h-[30vh] relative'>
       {/* Navigation Dots moved to top center, with extra spacing to avoid overlap */}
       <div
-        className="absolute left-1/2 z-20 flex justify-center space-x-2"
+        className="absolute left-1/2 z-20 flex justify-center space-x-2 md:top-4 md:bottom-auto bottom-4 md:translate-y-0"
         style={{
-          top: '1rem', // Move nav dots even further up
+          top: undefined,
+          bottom: undefined,
           transform: 'translateX(-50%)',
         }}
       >
