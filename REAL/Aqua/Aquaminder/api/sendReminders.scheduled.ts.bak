@@ -26,7 +26,9 @@ async function getUserEmail(user_id: string): Promise<string | null> {
 }
 
 export default async function handler(res: VercelResponse) {
+  console.log('sendReminders.scheduled.ts triggered');
   const { now, in5min } = getTimeWindow();
+  console.log('Time window:', now, 'to', in5min);
 
   // 1. Get jadwal entries due in the next 5 minutes
   const { data: schedules, error } = await supabase
@@ -35,12 +37,19 @@ export default async function handler(res: VercelResponse) {
     .gte('tanggal', now)
     .lt('tanggal', in5min);
 
-  if (error) return res.status(500).json({ error: error.message });
-  if (!schedules || schedules.length === 0) return res.status(200).json({ message: 'No schedules due.' });
+  if (error) {
+    console.error('Supabase error:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
+  if (!schedules || schedules.length === 0) {
+    console.log('No schedules due.');
+    return res.status(200).json({ message: 'No schedules due.' });
+  }
 
   // 2. Send emails
   for (const schedule of schedules) {
     const email = await getUserEmail(schedule.user_id);
+    console.log('Processing schedule:', schedule, 'Email:', email);
     if (!email) continue;
     try {
       await resend.emails.send({
@@ -49,6 +58,7 @@ export default async function handler(res: VercelResponse) {
         subject: 'Jadwal Reminder',
         text: `You have a scheduled task at ${schedule.tanggal}.`,
       });
+      console.log('Email sent to', email);
     } catch (e) {
       // Log error but continue
       console.error('Failed to send email to', email, e);
