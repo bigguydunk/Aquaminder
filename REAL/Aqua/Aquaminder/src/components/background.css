@@ -105,16 +105,16 @@ body{
     transform:translate(100px);
   }
   100%{
-    bottom:1080px;
+    bottom:100%; /* Changed from 1080px to 100% of the page height */
     transform:translateX(-200px);
   }
 }
 .background-root {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -10; /* Lowered further to ensure it's always behind everything */
-  pointer-events: none; /* So background does not block clicks */
+  width: 100%; /* Fix: use 100% instead of 100vw to prevent right overflow */
+  height: 100%;
+  z-index: -10;
+  pointer-events: none;
 }

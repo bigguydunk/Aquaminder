@@ -220,6 +220,8 @@ export type Database = {
       }
       penyakit: {
         Row: {
+          deskripsi: string | null
+          gambar_url: string | null
           gejala: string | null
           nama_penyakit: string | null
           pengobatan: string | null
@@ -227,6 +229,8 @@ export type Database = {
           penyebab: string | null
         }
         Insert: {
+          deskripsi?: string | null
+          gambar_url?: string | null
           gejala?: string | null
           nama_penyakit?: string | null
           pengobatan?: string | null
@@ -234,6 +238,8 @@ export type Database = {
           penyebab?: string | null
         }
         Update: {
+          deskripsi?: string | null
+          gambar_url?: string | null
           gejala?: string | null
           nama_penyakit?: string | null
           pengobatan?: string | null
@@ -297,7 +303,7 @@ export type Database = {
           username: string
         }
         Insert: {
-          role: number
+          role?: number
           user_id: string
           username: string
         }
@@ -306,7 +312,15 @@ export type Database = {
           user_id?: string
           username?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_role_fkey"
+            columns: ["role"]
+            isOneToOne: false
+            referencedRelation: "role"
+            referencedColumns: ["role_id"]
+          },
+        ]
       }
     }
     Views: {
