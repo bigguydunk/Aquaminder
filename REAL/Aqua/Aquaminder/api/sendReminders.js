@@ -1,5 +1,5 @@
-const { createClient } = require('@supabase/supabase-js');
-const { Resend } = require('resend');
+import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -22,18 +22,16 @@ async function getUserEmail(user_id) {
   return data.user.email;
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   try {
     console.log('sendReminders.js triggered');
     const { now, in5min } = getTimeWindow();
     console.log('Time window:', now, 'to', in5min);
-
     const { data: schedules, error } = await supabase
       .from('jadwal')
       .select('jadwal_id, tanggal, user_id')
       .gte('tanggal', now)
       .lt('tanggal', in5min);
-
     if (error) {
       console.error('Supabase error:', error.message);
       return res.status(500).json({ error: error.message });
@@ -42,7 +40,6 @@ module.exports = async function handler(req, res) {
       console.log('No schedules due.');
       return res.status(200).json({ message: 'No schedules due.' });
     }
-
     for (const schedule of schedules) {
       const email = await getUserEmail(schedule.user_id);
       console.log('Processing schedule:', schedule, 'Email:', email);
@@ -59,10 +56,9 @@ module.exports = async function handler(req, res) {
         console.error('Failed to send email to', email, e);
       }
     }
-
     res.status(200).json({ message: 'Reminders sent.' });
   } catch (err) {
     console.error('Unexpected error:', err);
     res.status(500).json({ error: 'Internal server error', details: String(err) });
   }
-};
+}
