@@ -1,3 +1,4 @@
+// vercel-schedule: every 5 minutes
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
