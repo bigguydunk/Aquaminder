@@ -215,7 +215,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
                                         </CardContent>
                                     </Card>
                                 ) : (
-                                    <div>Loading...</div>
+                                    <div className='!text-[#FFE3B3]'>Loading...</div>
                                 )}
                             </div>
                         </div>
@@ -230,7 +230,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
                                         onClick={this.handleDetailOpen}
                                         className="!bg-[#4F8FBF] focus:outline-none shadow-md focus-visible:outline-none text-[#FFE3B3]"
                                     >
-                                        Detail 🔍︎
+                                        Detail 
                                     </Button>
                                 </div>
                             </DialogTrigger>
@@ -261,7 +261,7 @@ class RadialBar extends Component<{}, RadialBarState, { options: ApexOptions; se
                                         </div>
                                     </div>
                                 ) : (
-                                    <div>Loading...</div>
+                                    <div className='!text-[#FFE3B3]'>Loading...</div>
                                 )}
                             </DialogContent>
                         </Dialog>

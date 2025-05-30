@@ -6,6 +6,7 @@ const SearchBar = ({
   handleKeyDown,
   onFocus,
   onBlur,
+  roundedBottom = true, // new prop
 }: {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
@@ -14,6 +15,7 @@ const SearchBar = ({
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onFocus: () => void;
   onBlur: () => void;
+  roundedBottom?: boolean;
 }) => {
   return (
     <div className="w-full mx-auto relative mt-4">
@@ -27,13 +29,19 @@ const SearchBar = ({
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             onBlur={onBlur}
-            className="w-full border border-black !rounded-t-lg !rounded-b-0 p-2 pr-10 bg-white text-gray-900 !text-2xl placeholder-gray-500 focus:!outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder={inputRef.current && inputRef.current === document.activeElement ? '' : 'Gejala apa yang dialami ikan Anda?'}
+            className={`w-full border border-black shadow-lg !rounded-t-lg p-2 pr-10 bg-[#FFE3B3] text-[#26648B] !text-lg focus:!outline-none focus:ring-2 focus:ring-blue-400 font-inter font-light ${
+              roundedBottom ? '!rounded-b-lg' : '!rounded-b-0'
+            }`}
+            placeholder={
+              inputRef.current && inputRef.current === document.activeElement
+          ? ''
+          : 'Gejala apa yang dialami ikan Anda?'
+            }
           />
           <button
             type="button"
             onClick={handleSearch}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 !bg-white flex items-center justify-center focus:!outline-none"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 !bg-[#FFE3B3] flex items-center justify-center focus:!outline-none"
             aria-label="Search"
           >
             <svg

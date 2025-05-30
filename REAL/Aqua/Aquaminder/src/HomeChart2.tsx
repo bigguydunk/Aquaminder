@@ -226,7 +226,7 @@ class RadialBar2 extends Component<{}, RadialBarState, { options: ApexOptions; s
                                         onClick={this.handleDetailOpen}
                                         className="!bg-[#4F8FBF] focus:outline-none shadow-md focus-visible:outline-none hover:!text-white text-[#FFE3B3]"
                                     >
-                                        Detail 🔍︎
+                                        Detail 
                                     </Button>
                                 </div>
                             </DialogTrigger>

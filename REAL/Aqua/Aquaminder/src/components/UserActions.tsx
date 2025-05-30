@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import UserMenu from "./UserMenu";
 import HomeIcon from '../assets/home-icon-silhouette-svgrepo-com.svg?react';
-import FishIcon from '../assets/fish-svgrepo-com.svg?react';
+import Encyclopedia from '../assets/book-magnifying-glass-svgrepo-com.svg?react';
 
 const UserActions: React.FC<{ userName: string | null; onLogout: () => void; email?: string }> = ({ userName, onLogout, email }) => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const UserActions: React.FC<{ userName: string | null; onLogout: () => void; ema
         type="button"
         style={{ minWidth: 48, minHeight: 48 }}
       >
-        <FishIcon className="w-7 h-7" />
+        <Encyclopedia className="w-7 h-7" />
       </button>
       {/* UserMenu on the right, no extra wrappers */}
       <div className="flex items-center ml-2 !static !relative" style={{ position: 'static' }}>
