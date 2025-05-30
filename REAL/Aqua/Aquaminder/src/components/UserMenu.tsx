@@ -158,9 +158,9 @@ const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: (
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-            <Dialog.Title className="text-lg font-bold mb-2">Delete Account</Dialog.Title>
-            <Dialog.Description className="mb-4 text-gray-600 text-center">
+          <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+            <Dialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Account</Dialog.Title>
+            <Dialog.Description className="mb-4 text-[#26648B] text-center">
               Are you sure you want to delete the account for <span className="font-semibold">{userName}</span>?
             </Dialog.Description>
             <div className="flex gap-4 justify-center mt-2">
@@ -172,7 +172,7 @@ const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: (
                 {loading ? 'Deleting...' : 'Yes'}
               </button>
               <Dialog.Close asChild>
-                <button className="px-4 py-2 !bg-gray-200 text-black rounded hover:bg-gray-300 focus:outline-none">No</button>
+                <button className="px-4 py-2 !bg-[#FFE3B3] text-black rounded hover:bg-gray-300 focus:outline-none">No</button>
               </Dialog.Close>
             </div>
           </Dialog.Content>
