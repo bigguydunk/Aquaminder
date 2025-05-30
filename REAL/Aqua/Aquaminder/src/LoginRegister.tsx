@@ -3,7 +3,8 @@ import './styles.css';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../supabaseClient';
 import { ToastContext } from './components/ui/toast';
-//import Background2 from './components/background2';
+import AquaminderLogo from './assets/Aquaminder.svg?react';
+import Background from './components/background';
 
 const LoginRegister = () => {
   const navigate = useNavigate();
@@ -207,19 +208,22 @@ const LoginRegister = () => {
   }, [navigate]);
 
   return (
-  <div className="display-flex !height-screen">
+  <div className="min-h-screen w-full flex flex-col justify-center items-center px-4 md:px-0">
     {/*<Background2 />*/}
     <div className="container ">
-      <h1 className='display-flex flex-column'>
+      <h1 className='display-flex flex-column' style={{ color: '#26648B' }}>
         Welcome to
         <br />
-        <span className="brand" style={{ fontSize: '2.5rem', fontWeight: 700 }}>Aquaminder</span>
+        <span style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+          <AquaminderLogo style={{ height: '48px', width: 'auto', display: 'inline-block' }} />
+        </span>
       </h1>
-      <div className="form-container w-[350px]">
+      <div className="form-container w-[80vw] max-w-[350px] md:w-[350px] md:max-w-[350px] mx-auto" style={{ color: '#26648B' }}>
         <div className="tab">
           <button
             id="loginTab"
             className={`tab-btn ${activeTab === 'login' ? 'active' : ''}`}
+            style={{ color: activeTab === 'login' ? '#FFE3B3' : '#26648B' }}
             onClick={() => toggleTabs('login')}
           > 
             Login
@@ -227,6 +231,7 @@ const LoginRegister = () => {
           <button
             id="registerTab"
             className={`tab-btn ${activeTab === 'register' ? 'active' : ''}`}
+            style={{ color: activeTab === 'register' ? '#FFE3B3' : '#26648B' }}
             onClick={() => toggleTabs('register')}
           >
             Register
@@ -235,21 +240,22 @@ const LoginRegister = () => {
         {activeTab === 'login' && (
             <form
             id="loginForm"
-            className="form active"
+            className="form active text-sm md:text-base"
+            style={{ color: '#26648B' }}
             onSubmit={handleLogin}
             >
-            <input name="email" type="email" placeholder="Masukkan Email" required />
-            <input name="password" type="password" placeholder="Masukkan Password" required />
-            <button type="submit" className="btn !rounded-full">Login</button>
-            <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0' }}>
+            <input name="email" type="email" placeholder="Masukkan Email" required style={{ color: '#26648B' }} className="text-sm md:text-base" />
+            <input name="password" type="password" placeholder="Masukkan Password" required style={{ color: '#26648B' }} className="text-sm md:text-base" />
+            <button type="submit" className="btn !rounded-full text-sm md:text-base" style={{ color: '#FFE3B3' }}>Login</button>
+            <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0', color: '#26648B' }}>
               <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
-              <span style={{ color: '#888', fontSize: '0.9em', margin: '0 8px', whiteSpace: 'nowrap' }}>or</span>
+              <span style={{ color: '#26648B', fontSize: '0.9em', margin: '0 8px', whiteSpace: 'nowrap' }}>or</span>
               <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
             </div>
             <button
               type="button"
               className="btn !rounded-full google-btn"
-              style={{ marginTop: '0', background: '#fff', color: '#333', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              style={{ marginTop: '0', background: '#FFE3B3', color: '#26648B', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               onClick={async () => {
               try {
                 const { data, error } = await supabase.auth.signInWithOAuth({ 
@@ -286,23 +292,24 @@ const LoginRegister = () => {
         {activeTab === 'register' && (
           <form
             id="registerForm"
-            className="form active"
+            className="form active text-sm md:text-base"
+            style={{ color: '#26648B' }}
             onSubmit={handleRegister}
           >
-            <input name="name" type="text" placeholder="Nama Lengkap" required />
-            <input name="email" type="email" placeholder="Masukkan Email" required />
-            <input name="password" type="password" placeholder="Masukkan Password" required />
-            <input name="confirmPassword" type="password" placeholder="Ulangi Password" required />
-            <button type="submit" className="btn !rounded-full">Register</button>
-            <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0' }}>
+            <input name="name" type="text" placeholder="Nama Lengkap" required style={{ color: '#26648B' }} className="text-sm md:text-base" />
+            <input name="email" type="email" placeholder="Masukkan Email" required style={{ color: '#26648B' }} className="text-sm md:text-base" />
+            <input name="password" type="password" placeholder="Masukkan Password" required style={{ color: '#26648B' }} className="text-sm md:text-base" />
+            <input name="confirmPassword" type="password" placeholder="Ulangi Password" required style={{ color: '#26648B' }} className="text-sm md:text-base" />
+            <button type="submit" className="btn !rounded-full text-sm md:text-base" style={{ color: '#FFE3B3' }}>Register</button>
+            <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0', color: '#26648B' }}>
               <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
-              <span style={{ color: '#888', fontSize: '0.9em', margin: '0 8px', whiteSpace: 'nowrap' }}>or</span>
+              <span style={{ color: '#26648B', fontSize: '0.9em', margin: '0 8px', whiteSpace: 'nowrap' }}>or</span>
               <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
             </div>
             <button
               type="button"
               className="btn !rounded-full google-btn"
-              style={{ marginTop: '0', background: '#fff', color: '#333', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              style={{ marginTop: '0', background: '#FFE3B3', color: '#26648B', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               onClick={async () => {
                 try {
                   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -338,7 +345,9 @@ const LoginRegister = () => {
         )}
       </div>
     </div>
+    <Background />
   </div>
+  
   );
 };
 

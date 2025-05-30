@@ -4,11 +4,13 @@ import DatabaseSearch from "./pages/DatabaseSearch";
 import DiseaseDetail from "./pages/DiseaseDetail";
 import LoginRegister from "./LoginRegister";
 import { ToastProviderWithContext } from '@/components/ui/toast';
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <ToastProviderWithContext>
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<LoginRegister/>} />
           <Route path="/homepage" element={<Homepage />}/>
