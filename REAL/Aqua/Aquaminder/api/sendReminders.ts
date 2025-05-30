@@ -57,3 +57,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   res.status(200).json({ message: 'Reminders sent.' });
 }
+
+// No changes to the function code itself. This file should be renamed to enable Vercel Scheduled Functions.
