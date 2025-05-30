@@ -1,11 +1,5 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
-  ],
-  "cron": [
-    {
-      "path": "/api/sendReminders",
-      "schedule": "*/5 * * * *"
-    }
   ]
 }
