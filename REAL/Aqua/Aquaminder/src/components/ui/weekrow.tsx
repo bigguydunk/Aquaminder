@@ -682,7 +682,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                               Yes
                             </Button>
                             <RadixDialog.Close asChild>
-                              <Button className="!bg-[#26648B] !text-[#FFE3B3] ">No</Button>
+                              <Button className="!bg-[#FFE3B3] !text-[#26648B] ">No</Button>
                             </RadixDialog.Close>
                           </div>
                         </RadixDialog.Content>
@@ -735,9 +735,9 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                       </RadixDialog.Trigger>
                       <RadixDialog.Portal>
                         <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#4F8FBF] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                          <RadixDialog.Title className="text-lg font-bold mb-2 text-[#FFE3B3]">Delete Schedule</RadixDialog.Title>
-                          <RadixDialog.Description className="mb-4 text-[#FFE3B3] text-center">
+                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                          <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Schedule</RadixDialog.Title>
+                          <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
                             Are you sure you want to delete this schedule?
                           </RadixDialog.Description>
                           <div className="flex gap-4 justify-center mt-2">
