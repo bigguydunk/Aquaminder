@@ -23,7 +23,7 @@ async function getUserEmail(user_id) {
   return data.user.email;
 }
 
-export default async function handler(req, res) {
+export default async function handler() {
   try {
     console.log('sendReminders.js triggered');
     const { now, in5min } = getTimeWindow();
@@ -35,11 +35,11 @@ export default async function handler(req, res) {
       .lt('tanggal', in5min);
     if (error) {
       console.error('Supabase error:', error.message);
-      return res.status(500).json({ error: error.message });
+      return;
     }
     if (!schedules || schedules.length === 0) {
       console.log('No schedules due.');
-      return res.status(200).json({ message: 'No schedules due.' });
+      return;
     }
     for (const schedule of schedules) {
       const email = await getUserEmail(schedule.user_id);
@@ -57,9 +57,8 @@ export default async function handler(req, res) {
         console.error('Failed to send email to', email, e);
       }
     }
-    res.status(200).json({ message: 'Reminders sent.' });
+    console.log('Reminders sent.');
   } catch (err) {
     console.error('Unexpected error:', err);
-    res.status(500).json({ error: 'Internal server error', details: String(err) });
   }
 }
