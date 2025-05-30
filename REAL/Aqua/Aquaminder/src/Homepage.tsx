@@ -7,6 +7,7 @@ import supabase from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import AquaminderLogo from './assets/Aquaminder.svg?react';
 import UserActions from './components/UserActions';
+import FloatingButton from './components/ui/FloatingButton';
 
 function Homepage() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -57,6 +58,7 @@ function Homepage() {
           </div>
         </div>
       </header>
+      <FloatingButton />
       <main className="flex-1 w-full flex flex-col min-h-screen py-0">
         <section className="flex flex-1 w-full min-h-screen flex-col md:flex-row items-start  gap-2">
           {/* HomeData on the far left (1/3) */}
@@ -78,8 +80,11 @@ function Homepage() {
         </section>
         
       </main>
+      
       <Background />
+      
     </div>
+    
   );
 }
 

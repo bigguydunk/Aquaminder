@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HomeIcon from '../../assets/home-icon-silhouette-svgrepo-com.svg?react';
+import FishIcon from '../../assets/fish-svgrepo-com.svg?react';
+import Encyclopedia from '../../assets/book-magnifying-glass-svgrepo-com.svg?react';
+
 
 // Accept email as a prop
 const FloatingButton = ({ email }: { email?: string }) => {
@@ -15,31 +19,42 @@ const FloatingButton = ({ email }: { email?: string }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div
+      className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2 md:hidden"
+      style={{ pointerEvents: 'auto' }}
+    >
       {isOpen && (
         <>
           <button
             onClick={() => navigate("/homepage", { state: { email } })}
-            className="focus:outline-none focus-visible:outline-none w-12 h-12 !rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
+            className="focus:outline-none focus-visible:outline-none w-18 h-12 !rounded-2xl !bg-[#FFE3B3] text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
             title="Home"
+            type="button"
+            style={{ minWidth: 48, minHeight: 48 }}
           >
-            🏠
+            <HomeIcon className="w-7 h-7" />
           </button>
           <button
             onClick={goToDatabase}
-            className="focus:outline-none focus-visible:outline-none w-12 h-12 !rounded-full !bg-white text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
+            className="focus:outline-none focus-visible:outline-none w-18 h-12 !rounded-2xl !bg-[#FFE3B3] text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
             title="D-Database"
+            type="button"
+            style={{ minWidth: 48, minHeight: 48 }}
           >
-            📝
+            <Encyclopedia className="w-7 h-7" />
           </button>
         </>
       )}
       <button
         onClick={toggleButtons}
-        className="focus:outline-none focus-visible:outline-none w-14 h-14 !rounded-full !bg-white text-white shadow-lg hover:bg-gray-900 flex items-center justify-center"
+        className="focus:outline-none focus-visible:outline-none w-18 h-12 !rounded-2xl !bg-[#FFE3B3] text-black shadow-lg hover:bg-gray-200 flex items-center justify-center"
         title="Toggle"
+        type="button"
+        style={{ minWidth: 56, minHeight: 56 }}
       >
-        {isOpen ? "⬇️" : "⬆️"}
+        <span>
+          <FishIcon className="w-7 h-7" />
+        </span>
       </button>
     </div>
   );
