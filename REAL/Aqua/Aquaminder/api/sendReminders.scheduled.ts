@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelResponse } from '@vercel/node';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -25,7 +25,7 @@ async function getUserEmail(user_id: string): Promise<string | null> {
   return data.user.email;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(res: VercelResponse) {
   const { now, in5min } = getTimeWindow();
 
   // 1. Get jadwal entries due in the next 5 minutes
