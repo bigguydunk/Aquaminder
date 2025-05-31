@@ -1,4 +1,3 @@
-// vercel-schedule: every 5 minutes
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
@@ -23,7 +22,7 @@ async function getUserEmail(user_id) {
   return data.user.email;
 }
 
-export default async function handler() {
+export default async function handler(req, res) {
   try {
     console.log('sendReminders.js triggered');
     const { now, in5min } = getTimeWindow();
@@ -35,11 +34,11 @@ export default async function handler() {
       .lt('tanggal', in5min);
     if (error) {
       console.error('Supabase error:', error.message);
-      return;
+      return res.status(500).json({ error: error.message });
     }
     if (!schedules || schedules.length === 0) {
       console.log('No schedules due.');
-      return;
+      return res.status(200).json({ message: 'No schedules due.' });
     }
     for (const schedule of schedules) {
       const email = await getUserEmail(schedule.user_id);
@@ -57,8 +56,9 @@ export default async function handler() {
         console.error('Failed to send email to', email, e);
       }
     }
-    console.log('Reminders sent.');
+    res.status(200).json({ message: 'Reminders sent.' });
   } catch (err) {
     console.error('Unexpected error:', err);
+    res.status(500).json({ error: 'Internal server error', details: String(err) });
   }
 }
