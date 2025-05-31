@@ -27,6 +27,8 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-toast": "^1.2.14",
     "@radix-ui/themes": "^3.2.1",
+    "@react-email/components": "^0.0.41",
+    "@react-email/render": "^1.1.2",
     "@supabase/supabase-js": "^2.49.4",
     "@tailwindcss/vite": "^4.1.4",
     "apexcharts": "^4.7.0",
