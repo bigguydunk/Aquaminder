@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     console.log('Time window:', now, 'to', in5min);
     const { data: schedules, error } = await supabase
       .from('jadwal')
-      .select('jadwal_id, tanggal, user_id')
+      .select('jadwal_id, tanggal, user_id, tugas_id, akuarium_id')
       .gte('tanggal', now)
       .lt('tanggal', in5min);
     if (error) {
@@ -81,6 +81,8 @@ export default async function handler(req, res) {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
+        timeZone: 'Asia/Jakarta', // WIB (UTC+7)
       });
       // Render HTML from static template
       const templatePath = path.join(__dirname, 'notion-magic-link.html');
