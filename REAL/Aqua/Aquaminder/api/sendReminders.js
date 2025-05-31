@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
-import { render } from '@react-email/render';
-import NotionMagicLinkEmail from '../react-email-starter/emails/notion-magic-link';
+import fs from 'fs';
+import path from 'path';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -78,16 +78,15 @@ export default async function handler(req, res) {
         hour: '2-digit',
         minute: '2-digit',
       });
-      // Render React Email template to HTML
-      const html = render(
-        <NotionMagicLinkEmail
-          loginCode={undefined}
-          tugasDesc={tugasDesc}
-          akuariumId={schedule.akuarium_id}
-          formattedDate={formattedDate}
-          username={username}
-        />
-      );
+      // Render HTML from static template
+      const templatePath = path.join(process.cwd(), 'REAL', 'Aqua', 'Aquaminder', 'react-email-starter', 'emails', 'notion-magic-link.html');
+      let templateHtml = fs.readFileSync(templatePath, 'utf8');
+      templateHtml = templateHtml
+        .replace(/\{\{tugasDesc\}\}/g, tugasDesc)
+        .replace(/\{\{akuariumId\}\}/g, schedule.akuarium_id)
+        .replace(/\{\{formattedDate\}\}/g, formattedDate)
+        .replace(/\{\{username\}\}/g, username || '');
+      const html = templateHtml;
       try {
         await resend.emails.send({
           from: 'onboarding@resend.dev',
