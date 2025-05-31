@@ -2,12 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function getTimeWindow() {
   const now = new Date();
