@@ -6,35 +6,19 @@
   <title>Jadwal Reminder</title>
 </head>
 <body style="background-color:#26648B;padding:0;margin:0;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#26648B;">
-    <tr>
-      <td align="center">
-        <table cellpadding="0" cellspacing="0" border="0" style="background-color:#26648B;border-radius:12px;max-width:420px;width:100%;padding:24px;">
-          <tr>
-            <td style="background-color:#4F8FBF;border-radius:15px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-              <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr>
-                  <td style="width:64px;height:64px;background-color:#FFE3B3;border-radius:12px;text-align:center;vertical-align:top;padding-right:20px;">
-                    <img src="/Simplification.png" width="64" height="64" alt="Schedule Icon" style="border-radius:12px;background:#FFE3B3;display:block;" />
-                  </td>
-                  <td style="color:#FFE3B3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;vertical-align:top;">
-                    <h1 style="color:#FFE3B3;font-size:20px;font-weight:bold;margin:0 0 8px 0;padding:0;">{{tugasDesc}}</h1>
-                    <p style="color:#FFE3B3;font-size:15px;margin:2px 0;">⚲ Akuarium {{akuariumId}}</p>
-                    <p style="color:#FFE3B3;font-size:15px;margin:2px 0;">{{formattedDate}}</p>
-                    <p style="color:#FFE3B3;font-size:15px;margin:2px 0;">👤 {{username}}</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p style="color:#898989;font-size:12px;line-height:22px;margin-top:18px;margin-bottom:8px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;">Jadwal dikirim oleh Aquaminder</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+  <div style="padding:24px;margin:0 auto;background-color:#26648B;border-radius:12px;max-width:420px;">
+    <div style="display:flex;align-items:center;background-color:#4F8FBF;border-radius:15px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+      <div style="width:64px;height:64px;background-color:#FFE3B3;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:20px;">
+        <img src="https://i.imgur.com/KK6gyUo.png" referrerpolicy="no-referrer" width="48" height="48" alt="Schedule Icon" style="border-radius:12px;background:#FFE3B3;" />
+      </div>
+      <div style="flex:1;color:#FFE3B3;">
+        <h1 style="color:#FFE3B3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:20px;font-weight:bold;margin:0 0 8px 0;padding:0;">{{tugasDesc}}</h1>
+        <p style="color:#FFE3B3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:15px;margin:2px 0;">⚲ Akuarium {{akuariumId}}</p>
+        <p style="color:#FFE3B3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:15px;margin:2px 0;">{{formattedDate}}</p>
+        <p style="color:#FFE3B3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:15px;margin:2px 0;">👤 {{username}}</p>
+      </div>
+    </div>
+    <p style="color:#898989;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:12px;line-height:22px;margin-top:18px;margin-bottom:8px;text-align:center;">Jadwal dikirim oleh Aquaminder</p>
+  </div>
 </body>
 </html>
