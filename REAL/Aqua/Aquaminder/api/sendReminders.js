@@ -79,7 +79,7 @@ export default async function handler(req, res) {
         minute: '2-digit',
       });
       // Render HTML from static template
-      const templatePath = path.join(process.cwd(), 'REAL', 'Aqua', 'Aquaminder', 'public', 'notion-magic-link.html');
+      const templatePath = path.join(process.cwd(), 'REAL', 'Aqua', 'Aquaminder', 'api', 'notion-magic-link.html');
       let templateHtml = fs.readFileSync(templatePath, 'utf8');
       templateHtml = templateHtml
         .replace(/\{\{tugasDesc\}\}/g, tugasDesc)
