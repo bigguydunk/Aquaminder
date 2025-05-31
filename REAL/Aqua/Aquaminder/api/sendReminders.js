@@ -9,10 +9,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 function getTimeWindow() {
   const now = new Date();
-  const in5min = new Date(now.getTime() + 5 * 60 * 1000);
+  const in1min = new Date(now.getTime() + 1 * 60 * 1000);
   return {
     now: now.toISOString().slice(0, 16),
-    in5min: in5min.toISOString().slice(0, 16),
+    in5min: in1min.toISOString().slice(0, 16),
   };
 }
 
