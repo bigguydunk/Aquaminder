@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { render } from '@react-email/render';
+import NotionMagicLinkEmail from '../react-email-starter/emails/notion-magic-link';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -44,12 +46,54 @@ export default async function handler(req, res) {
       const email = await getUserEmail(schedule.user_id);
       console.log('Processing schedule:', schedule, 'Email:', email);
       if (!email) continue;
+      // Fetch task description
+      let tugasDesc = `Tugas ${schedule.tugas_id}`;
+      try {
+        const { data: tugasData } = await supabase
+          .from('tugas')
+          .select('deskripsi_tugas')
+          .eq('tugas_id', schedule.tugas_id)
+          .single();
+        if (tugasData && tugasData.deskripsi_tugas) {
+          tugasDesc = tugasData.deskripsi_tugas;
+        }
+      } catch {}
+      // Fetch username (assignee)
+      let username = '';
+      try {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('username')
+          .eq('user_id', schedule.user_id)
+          .single();
+        if (userData && userData.username) {
+          username = userData.username;
+        }
+      } catch {}
+      // Format date
+      const formattedDate = new Date(schedule.tanggal).toLocaleString('en-GB', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      // Render React Email template to HTML
+      const html = render(
+        <NotionMagicLinkEmail
+          loginCode={undefined}
+          tugasDesc={tugasDesc}
+          akuariumId={schedule.akuarium_id}
+          formattedDate={formattedDate}
+          username={username}
+        />
+      );
       try {
         await resend.emails.send({
           from: 'onboarding@resend.dev',
           to: email,
           subject: 'Jadwal Reminder',
-          text: `You have a scheduled task at ${schedule.tanggal}.`,
+          html,
         });
         console.log('Email sent to', email);
       } catch (e) {
