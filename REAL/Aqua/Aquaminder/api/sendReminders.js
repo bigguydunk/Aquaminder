@@ -95,7 +95,7 @@ export default async function handler(req, res) {
       const html = templateHtml;
       try {
         await resend.emails.send({
-          from: 'onboarding@resend.dev',
+          from: 'reminder@aquaminder.live',
           to: email,
           subject: 'Jadwal Reminder',
           html,
