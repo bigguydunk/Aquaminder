@@ -126,3 +126,17 @@ input:focus {
     background: #4F8FBF;
 }
 
+/* Hide the clock icon in Chrome, Safari, Edge, Opera */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+/* Hide the clock icon in Firefox */
+input[type="time"]::-moz-focus-inner {
+  border: 0;
+}
+/* Hide the clock icon in Edge (old) */
+input[type="time"]::-ms-clear {
+  display: none;
+}
+

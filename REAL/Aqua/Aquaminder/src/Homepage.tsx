@@ -55,6 +55,7 @@ function Homepage() {
           </div>
           <div className="block md:hidden">
             <UserMenu userName={userName} onLogout={handleLogout} />
+            
           </div>
         </div>
       </header>
@@ -71,11 +72,13 @@ function Homepage() {
             {/* Main colored box */}
             <div className="relative z-10 flex flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow  md:h-full md:min-h-screen">
               <HomeData />
+              
             </div>
           </div>
           {/* WeekRow (add schedule + calendar) on the right (2/3) */}
           <div className="w-full  flex flex-col items-center md:overflow-y-auto lg:pt-20 md:h-screen md:max-h-screen md:min-h-screen">
             <WeekRow selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
+            
           </div>
         </section>
         

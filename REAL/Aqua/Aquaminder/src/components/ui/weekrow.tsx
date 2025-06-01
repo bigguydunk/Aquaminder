@@ -4,6 +4,14 @@ import { Button } from "@heroui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge"
 
+import {
+  DropdownMenu as DropdownMenuShadCN,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+
 import { TimePickerDemo } from "@/components/ui/timePicker";
 
 import {
@@ -21,6 +29,7 @@ import supabase from '../../../supabaseClient';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { ToastContext } from '@/components/ui/toast';
+import { format } from 'date-fns';
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 import SimplificationSVG from "../../assets/Simplification.svg?react";
@@ -40,10 +49,10 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
   const setSelectedDay = externalSetSelectedDay !== undefined ? externalSetSelectedDay : internalSetSelectedDay;
   const [akuariumOptions, setAkuariumOptions] = useState<{ akuarium_id: number }[]>([]);
   const [tugasOptions, setTugasOptions] = useState<{ tugas_id: number; deskripsi_tugas: string | null }[]>([]);
-  const [userOptions, setUserOptions] = useState<{ user_id: number; username: string }[]>([]);
+  const [userOptions, setUserOptions] = useState<{ user_id: string; username: string }[]>([]);
   const [selectedAkuarium, setSelectedAkuarium] = useState<number | null>(null);
   const [selectedTugas, setSelectedTugas] = useState<{ tugas_id: number; deskripsi_tugas: string | null } | null>(null);
-  const [selectedUser, setSelectedUser] = useState<{ user_id: number; username: string } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{ user_id: string; username: string } | null>(null);
   const [time, setTime] = useState<Date | undefined>(new Date());
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
@@ -83,7 +92,8 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
       if (error) {
         console.error('Error fetching user data:', error);
       } else {
-        setUserOptions(data || []);
+        // Ensure user_id is always a string
+        setUserOptions((data || []).map(u => ({ user_id: String(u.user_id), username: u.username })));
       }
     };
     fetchUserData();
@@ -214,6 +224,49 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
     }
   };
 
+  // Edit schedule state (move to parent)
+  const [editDialog, setEditDialog] = useState<{ open: boolean; schedule: any | null }>({ open: false, schedule: null });
+  const [editForm, setEditForm] = useState<{ akuarium_id: string; user_id: string; tugas_id: string; time: string }>({ akuarium_id: '', user_id: '', tugas_id: '', time: '' });
+
+  useEffect(() => {
+    if (editDialog.open && editDialog.schedule) {
+      const s = editDialog.schedule;
+      setEditForm({
+        akuarium_id: s.akuarium_id ? String(s.akuarium_id) : '',
+        user_id: s.user_id ? String(s.user_id) : '',
+        tugas_id: s.tugas_id ? String(s.tugas_id) : '',
+        time: s.tanggal ? format(new Date(s.tanggal), 'HH:mm') : ''
+      });
+    } else if (!editDialog.open) {
+      setEditForm({ akuarium_id: '', user_id: '', tugas_id: '', time: '' });
+    }
+  }, [editDialog]);
+
+  async function handleEditSchedule(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editDialog.schedule) return;
+    let newTime = editDialog.schedule.tanggal;
+    if (editForm.time) {
+      const date = new Date(editDialog.schedule.tanggal);
+      const [h, m] = editForm.time.split(':');
+      date.setHours(Number(h));
+      date.setMinutes(Number(m));
+      date.setSeconds(0);
+      date.setMilliseconds(0);
+      newTime = date.toISOString();
+    }
+    await supabase.from('jadwal').update({
+      akuarium_id: Number(editForm.akuarium_id),
+      user_id: editForm.user_id, // FIX: keep as string
+      tugas_id: Number(editForm.tugas_id),
+      tanggal: newTime
+    }).eq('jadwal_id', editDialog.schedule.jadwal_id);
+    setEditDialog({ open: false, schedule: null });
+  }
+
+  // Delete schedule dialog state
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; schedule: any | null }>({ open: false, schedule: null });
+
   return (
     <div className="w-full flex flex-col  md:flex-col lg:pl-10 md:pl-20 lg:-pl-0" >
       {/* Desktop: Two columns for Add Schedule and Calendar, schedule list below in two columns */}
@@ -329,114 +382,71 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                               ×
                             </button>
                           </RadixDialog.Close>
-                          <RadixDialog.Title className="text-xl font-bold mb-2">Schedule</RadixDialog.Title>
+                          <RadixDialog.Title className="text-xl font-bold mb-2">Add Schedule</RadixDialog.Title>
                           <RadixDialog.Description className="mb-4">
                             Tambahkan jadwal baru.
                           </RadixDialog.Description>
                           <form onSubmit={handleSaveSchedule}>
                             <div className="grid gap-4 py-4">
                               <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="dropdown" className="text-right">
+                                <Label htmlFor="add-aquarium" className="text-right">
                                   Aquarium
                                 </Label>
                                 <div className="col-span-3">
-                                  <DropdownMenu.Root>
-                                    <DropdownMenu.Trigger asChild>
-                                      <Button
-                                        className="capitalize w-full text-left !bg-[#FFE3B3]  !hover:bg-gray-200 !border !border-[#26648B] rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                                        style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
-                                      >
-                                        {selectedAkuarium !== null ? `Aquarium ${selectedAkuarium}` : 'Pilih aquarium'}
-                                      </Button>
-                                    </DropdownMenu.Trigger>
-                                    <DropdownMenu.Portal>
-                                      <DropdownMenu.Content className="!bg-[#FFE3B3] border rounded shadow-lg p-2 z-50">
-                                        {akuariumOptions.map((option) => (
-                                          <DropdownMenu.Item
-                                            key={option.akuarium_id}
-                                            onSelect={() => setSelectedAkuarium(option.akuarium_id)}
-                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 text-[#26648B] focus:!bg-blue-100 transition-colors"
-                                          >
-                                            Aquarium {option.akuarium_id}
-                                          </DropdownMenu.Item>
-                                        ))}
-                                      </DropdownMenu.Content>
-                                    </DropdownMenu.Portal>
-                                  </DropdownMenu.Root>
+                                  <select id="add-aquarium" className="w-full rounded-lg border border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]" value={selectedAkuarium ?? ''} onChange={e => setSelectedAkuarium(e.target.value ? Number(e.target.value) : null)}>
+                                    <option value="">Pilih aquarium</option>
+                                    {akuariumOptions.map(opt => <option key={opt.akuarium_id} value={String(opt.akuarium_id)}>{`Aquarium ${opt.akuarium_id}`}</option>)}
+                                  </select>
                                 </div>
                               </div>
                               <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="tugas-dropdown" className="text-right">
+                                <Label htmlFor="add-tugas" className="text-right">
                                   Tugas
                                 </Label>
                                 <div className="col-span-3">
-                                  <DropdownMenu.Root>
-                                    <DropdownMenu.Trigger asChild>
-                                     <Button
-                                        className="capitalize w-full text-left !bg-[#FFE3B3]  !hover:bg-gray-200 !border  !border-[#26648B] rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                                        style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
-                                      >
-                                        {selectedTugas ? (selectedTugas.deskripsi_tugas || `Tugas ${selectedTugas.tugas_id}`) : 'Pilih tugas'}
-                                      </Button>
-                                    </DropdownMenu.Trigger>
-                                    <DropdownMenu.Portal>
-                                      <DropdownMenu.Content className="!bg-[#FFE3B3] border rounded shadow-lg p-2 z-50">
-                                        {tugasOptions.map((option) => (
-                                          <DropdownMenu.Item
-                                            key={option.tugas_id}
-                                            onSelect={() => setSelectedTugas(option)}
-                                          className="!bg-#FFE3B3 cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 text-[#26648B] focus:!bg-blue-100 transition-colors"
-                                          >
-                                            {option.deskripsi_tugas || `Tugas ${option.tugas_id}`}
-                                          </DropdownMenu.Item>
-                                        ))}
-                                      </DropdownMenu.Content>
-                                    </DropdownMenu.Portal>
-                                  </DropdownMenu.Root>
+                                  <select id="add-tugas" className="w-full rounded-lg border border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]" value={selectedTugas?.tugas_id ?? ''} onChange={e => {
+                                    const t = tugasOptions.find(opt => String(opt.tugas_id) === e.target.value);
+                                    setSelectedTugas(t ?? null);
+                                  }}>
+                                    <option value="">Pilih tugas</option>
+                                    {tugasOptions.map(opt => <option key={opt.tugas_id} value={String(opt.tugas_id)}>{opt.deskripsi_tugas || `Tugas ${opt.tugas_id}`}</option>)}
+                                  </select>
                                 </div>
                               </div>
                               <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="user-dropdown" className="text-right">
-                                  User
+                                <Label htmlFor="add-user" className="text-right">
+                                  Cleaner
                                 </Label>
                                 <div className="col-span-3">
-                                  <DropdownMenu.Root>
-                                    <DropdownMenu.Trigger asChild>
-                                      <Button
-                                        className="capitalize w-full text-left !bg-[#FFE3B3] !hover:bg-gray-200 !border !border-[#26648B] rounded-md focus:outline-none focus-visible:outline-none transition-colors duration-150"
-                                        style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: '#bdbdbd' }}
-                                      >
-                                        {selectedUser ? selectedUser.username : 'Pilih user'}
-                                      </Button>
-                                    </DropdownMenu.Trigger>
-                                    <DropdownMenu.Portal>
-                                      <DropdownMenu.Content className="!bg-[#FFE3B3] border rounded shadow-lg p-2 z-50">
-                                        {userOptions.map((option) => (
-                                          <DropdownMenu.Item
-                                            key={option.user_id}
-                                            onSelect={() => setSelectedUser(option)}
-                                            className="!bg-[#FFE3B3] cursor-pointer hover:!bg-blue-100 active:!bg-blue-200 text-[#26648B] focus:!bg-blue-100 transition-colors"
-                                          >
-                                            {option.username}
-                                          </DropdownMenu.Item>
-                                        ))}
-                                      </DropdownMenu.Content>
-                                    </DropdownMenu.Portal>
-                                  </DropdownMenu.Root>
+                                  <select id="add-user" className="w-full rounded-lg border border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]" value={selectedUser?.user_id ?? ''} onChange={e => {
+                                    const u = userOptions.find(opt => String(opt.user_id) === e.target.value);
+                                    setSelectedUser(u ?? null);
+                                  }}>
+                                    <option value="">Pilih user</option>
+                                    {userOptions.map(opt => <option key={opt.user_id} value={opt.user_id}>{opt.username}</option>)}
+                                  </select>
                                 </div>
                               </div>
                               <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="tanggal-picker" className="text-right">
-                                  Waktu
+                                <Label htmlFor="add-time" className="text-right">
+                                  Time
                                 </Label>
                                 <div className="col-span-3 flex justify-center">
-                                  <TimePickerDemo date={time} setDate={setTime} />
+                                  <input type="time" id="add-time" className="w-full !rounded-lg !border !border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]" value={time ? `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}` : ''} onChange={e => {
+                                    const [h, m] = e.target.value.split(':');
+                                    if (h !== undefined && m !== undefined) {
+                                      const newDate = new Date(time ?? new Date());
+                                      newDate.setHours(Number(h));
+                                      newDate.setMinutes(Number(m));
+                                      setTime(newDate);
+                                    }
+                                  }} />
                                 </div>
                               </div>
                             </div>
-                            <div className="flex justify-center w-full">
+                            <div className="flex justify-center w-full mt-4">
                               <Button type="submit" className="w-full !bg-[#0F354D] text-[#FFE3B3]" disabled={loading}>
-                              {loading ? 'Saving...' : 'Save Changes'}
+                                {loading ? 'Saving...' : 'Save Changes'}
                               </Button>
                             </div>
                           </form>
@@ -470,9 +480,107 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
             tugasOptions={tugasOptions}
             akuariumOptions={akuariumOptions}
             userRole={userRole ?? undefined}
+            setEditDialog={setEditDialog}
+            setDeleteDialog={setDeleteDialog}
           />
         )}
       </div>
+      {editDialog.open && (
+        <RadixDialog.Root open={editDialog.open} onOpenChange={(open) => setEditDialog((prev) => ({ ...prev, open }))}>
+          <RadixDialog.Portal>
+            <RadixDialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
+            <RadixDialog.Content className="fixed left-1/2 top-1/2 w-1/3.5 min-w-[90vw] text-[#26648B] sm:min-w-[425px] max-w-[95vw] sm:max-w-[425px] -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-4 sm:p-6 z-50">
+              <RadixDialog.Close asChild>
+                <button
+                  type="button"
+                  aria-label="Close"
+                  className="absolute top-2 right-2 !bg-[#FFE3B3] text-gray-500 hover:text-gray-800 text-2xl font-bold focus:outline-none"
+                  style={{ zIndex: 100 }}
+                >
+                  ×
+                </button>
+              </RadixDialog.Close>
+              <RadixDialog.Title className="text-xl font-bold mb-2">Edit Schedule</RadixDialog.Title>
+              <RadixDialog.Description className="mb-4">Edit jadwal yang sudah ada.</RadixDialog.Description>
+              <form onSubmit={handleEditSchedule}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="edit-aquarium" className="text-right">Aquarium</Label>
+                    <div className="col-span-3">
+                      <select id="edit-aquarium" className="w-full rounded-lg border border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]" value={editForm.akuarium_id} onChange={e => setEditForm(f => ({ ...f, akuarium_id: e.target.value }))}>
+                        <option value="">Pilih aquarium</option>
+                        {akuariumOptions.map(opt => <option key={opt.akuarium_id} value={String(opt.akuarium_id)}>{`Aquarium ${opt.akuarium_id}`}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="edit-tugas" className="text-right">Tugas</Label>
+                    <div className="col-span-3">
+                      <select id="edit-tugas" className="w-full rounded-lg border border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]" value={editForm.tugas_id} onChange={e => setEditForm(f => ({ ...f, tugas_id: e.target.value }))}>
+                        <option value="">Pilih tugas</option>
+                        {tugasOptions.map(opt => <option key={opt.tugas_id} value={String(opt.tugas_id)}>{opt.deskripsi_tugas || `Tugas ${opt.tugas_id}`}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="edit-user" className="text-right">Cleaner</Label>
+                    <div className="col-span-3">
+                      <select
+                        id="edit-user"
+                        className="w-full rounded-lg border border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]"
+                        value={editForm.user_id}
+                        onChange={e => setEditForm(f => ({ ...f, user_id: e.target.value }))}
+                      >
+                        <option value="">Pilih user</option>
+                        {userOptions && userOptions.length > 0 ? (
+                          userOptions.map(opt => (
+                            <option key={opt.user_id} value={opt.user_id}>{opt.username}</option>
+                          ))
+                        ) : (
+                          editForm.user_id && (
+                            <option value={editForm.user_id}>User ID {editForm.user_id}</option>
+                          )
+                        )}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="edit-time" className="text-right">Time</Label>
+                    <div className="col-span-3 flex justify-center">
+                      <input type="time" id="edit-time" className="w-full !rounded-lg !border !border-[#26648B] px-2 py-1 bg-[#FFE3B3] text-[#26648B]" value={editForm.time} onChange={e => setEditForm(f => ({ ...f, time: e.target.value }))} />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center w-full mt-4">
+                  <Button type="submit" className="w-full !bg-[#0F354D] text-[#FFE3B3]">Save Changes</Button>
+                </div>
+              </form>
+            </RadixDialog.Content>
+          </RadixDialog.Portal>
+        </RadixDialog.Root>
+      )}
+      {deleteDialog.open && (
+        <RadixDialog.Root open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog((prev) => ({ ...prev, open }))}>
+          <RadixDialog.Portal>
+            <RadixDialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
+            <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+              <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Schedule</RadixDialog.Title>
+              <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
+                Are you sure you want to delete this schedule?
+              </RadixDialog.Description>
+              <div className="flex gap-4 justify-center mt-2">
+                <Button className="!bg-red-600 text-white hover:bg-red-700" onClick={async () => {
+                  await supabase.from('jadwal').delete().eq('jadwal_id', deleteDialog.schedule.jadwal_id);
+                  setDeleteDialog({ open: false, schedule: null });
+                }}>Yes</Button>
+                <RadixDialog.Close asChild>
+                  <Button className="!bg-[#26648B] !text-[#FFE3B3]">No</Button>
+                </RadixDialog.Close>
+              </div>
+            </RadixDialog.Content>
+          </RadixDialog.Portal>
+        </RadixDialog.Root>
+      )}
     </div>
   );
 }
@@ -480,12 +588,14 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
 import { useEffect as useEffectBox, useState as useStateBox } from 'react';
 
 // Update ScheduleForUserBox to always use two-column layout for all users
-function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOptions, userRole }: {
+function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOptions, userRole, setEditDialog, setDeleteDialog }: {
   userId: string,
   selectedDate: Date | null,
   tugasOptions: { tugas_id: number; deskripsi_tugas: string | null }[],
   akuariumOptions: { akuarium_id: number }[],
-  userRole?: number, // Add userRole as optional prop
+  userRole?: number,
+  setEditDialog: (v: { open: boolean; schedule: any | null }) => void,
+  setDeleteDialog: (v: { open: boolean; schedule: any | null }) => void,
 }) {
   const [_hasSchedule, setHasSchedule] = useStateBox(false);
   const [loading, setLoading] = useStateBox(true);
@@ -581,41 +691,22 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
               >
                 {/* X button for delete, only show if userRole is 1 or 2 */}
                 {(userRole === 1 || userRole === 2) && (
-                  <RadixDialog.Root>
-                    <RadixDialog.Trigger asChild>
+                  <DropdownMenuShadCN>
+                    <DropdownMenuTrigger asChild>
                       <button
-                        className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red text-xl font-bold bg-transparent border-none cursor-pointer z-20"
-                        style={{ background: 'transparent' }}
-                        title="Delete schedule"
+                        className="absolute top-2 right-2 text-[#FFE3B3] hover:text-[#FFD6B3] text-xl font-bold bg-transparent border-none cursor-pointer z-20 flex items-center justify-center"
+                        style={{ background: 'transparent', padding: 0 }}
+                        title="Open menu"
                         type="button"
                       >
-                        ×
+                        <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>...</span>
                       </button>
-                    </RadixDialog.Trigger>
-                    <RadixDialog.Portal>
-                      <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                      <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                        <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Schedule</RadixDialog.Title>
-                        <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
-                          Are you sure you want to delete this schedule?
-                        </RadixDialog.Description>
-                        <div className="flex gap-4 justify-center mt-2">
-                          <Button
-                            className="!bg-red-600 text-white hover:bg-red-700"
-                            onClick={async () => {
-                              await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
-                              setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
-                            }}
-                          >
-                            Yes
-                          </Button>
-                          <RadixDialog.Close asChild>
-                            <Button className="!bg-[#26648B] !text-[#FFE3B3] ">No</Button>
-                          </RadixDialog.Close>
-                        </div>
-                      </RadixDialog.Content>
-                    </RadixDialog.Portal>
-                  </RadixDialog.Root>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="!bg-[#FFE3B3]  !rounded-lg shadow-lg p-2 z-50">
+                      <DropdownMenuItem className="!bg-[#FFE3B3] text-[#26648B] hover:!bg-[#E6C48B] focus:!bg-[#E6C48B] transition-colors" onSelect={() => setEditDialog({ open: true, schedule })}>Edit</DropdownMenuItem>
+                      <DropdownMenuItem className="!bg-[#FFE3B3] text-red-600 hover:!bg-[#FFD6B3] focus:!bg-[#FFD6B3] transition-colors" onSelect={() => setDeleteDialog({ open: true, schedule })}>Delete</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenuShadCN>
                 )}
                 <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
                   <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
@@ -653,41 +744,22 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                 >
                   {/* X button for delete, only show if userRole is 1 or 2 */}
                   {(userRole === 1 || userRole === 2) && (
-                    <RadixDialog.Root>
-                      <RadixDialog.Trigger asChild>
+                    <DropdownMenuShadCN>
+                      <DropdownMenuTrigger asChild>
                         <button
-                          className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red text-xl font-bold bg-transparent border-none cursor-pointer z-20"
-                          style={{ background: 'transparent' }}
-                          title="Delete schedule"
+                          className="absolute top-2 right-2 text-[#FFE3B3] hover:text-[#FFD6B3] text-xl font-bold bg-transparent border-none cursor-pointer z-20 flex items-center justify-center"
+                          style={{ background: 'transparent', padding: 0 }}
+                          title="Open menu"
                           type="button"
                         >
-                          ×
+                          <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>...</span>
                         </button>
-                      </RadixDialog.Trigger>
-                      <RadixDialog.Portal>
-                        <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                          <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Schedule</RadixDialog.Title>
-                          <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
-                            Are you sure you want to delete this schedule?
-                          </RadixDialog.Description>
-                          <div className="flex gap-4 justify-center mt-2">
-                            <Button
-                              className="!bg-red-600 text-white hover:bg-red-700"
-                              onClick={async () => {
-                                await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
-                                setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
-                              }}
-                            >
-                              Yes
-                            </Button>
-                            <RadixDialog.Close asChild>
-                              <Button className="!bg-[#FFE3B3] !text-[#26648B] ">No</Button>
-                            </RadixDialog.Close>
-                          </div>
-                        </RadixDialog.Content>
-                      </RadixDialog.Portal>
-                    </RadixDialog.Root>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="!bg-[#FFE3B3]  !rounded-lg shadow-lg p-2 z-50">
+                        <DropdownMenuItem className="!bg-[#FFE3B3] text-[#26648B] hover:!bg-[#E6C48B] focus:!bg-[#E6C48B] transition-colors" onSelect={() => setEditDialog({ open: true, schedule })}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="!bg-[#FFE3B3] text-red-600 hover:!bg-[#FFD6B3] focus:!bg-[#FFD6B3] transition-colors" onSelect={() => setDeleteDialog({ open: true, schedule })}>Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenuShadCN>
                   )}
                   <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
                     <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
@@ -722,41 +794,22 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                   className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
                 >
                   {(userRole === 1 || userRole === 2) && (
-                    <RadixDialog.Root>
-                      <RadixDialog.Trigger asChild>
+                    <DropdownMenuShadCN>
+                      <DropdownMenuTrigger asChild>
                         <button
-                          className="absolute top-2 right-2 text-[#FFE3B3] hover:text-red-500 text-xl font-bold bg-transparent border-none cursor-pointer z-20"
-                          style={{ background: 'transparent' }}
-                          title="Delete schedule"
+                          className="absolute top-2 right-2 text-[#FFE3B3] hover:text-[#FFD6B3] text-xl font-bold bg-transparent border-none cursor-pointer z-20 flex items-center justify-center"
+                          style={{ background: 'transparent', padding: 0 }}
+                          title="Open menu"
                           type="button"
                         >
-                          ×
+                          <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>...</span>
                         </button>
-                      </RadixDialog.Trigger>
-                      <RadixDialog.Portal>
-                        <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
-                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
-                          <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Schedule</RadixDialog.Title>
-                          <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
-                            Are you sure you want to delete this schedule?
-                          </RadixDialog.Description>
-                          <div className="flex gap-4 justify-center mt-2">
-                            <Button
-                              className="!bg-red-600 text-white hover:bg-red-700"
-                              onClick={async () => {
-                                await supabase.from('jadwal').delete().eq('jadwal_id', schedule.jadwal_id);
-                                setAllSchedules((prev) => prev.filter((s) => s.jadwal_id !== schedule.jadwal_id));
-                              }}
-                            >
-                              Yes
-                            </Button>
-                            <RadixDialog.Close asChild>
-                              <Button className="!bg-[#FFE3B3] !text-[#4F8FBF] !hover:bg-[#FFE3B3]">No</Button>
-                            </RadixDialog.Close>
-                          </div>
-                        </RadixDialog.Content>
-                      </RadixDialog.Portal>
-                    </RadixDialog.Root>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="!bg-[#FFE3B3]  !rounded-lg shadow-lg p-2 z-50">
+                        <DropdownMenuItem className="!bg-[#FFE3B3] text-[#26648B] hover:!bg-[#E6C48B] focus:!bg-[#E6C48B] transition-colors" onSelect={() => setEditDialog({ open: true, schedule })}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="!bg-[#FFE3B3] text-red-600 hover:!bg-[#FFD6B3] focus:!bg-[#FFD6B3] transition-colors" onSelect={() => setDeleteDialog({ open: true, schedule })}>Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenuShadCN>
                   )}
                   <div className="rounded-md w-16 h-16 flex items-center justify-center bg-[#FFE3B3] text-[#FFE3B3] text-3xl font-bold ">
                     <SimplificationSVG style={{ width: '80%', height: 'auto' }} strokeWidth={1} />
