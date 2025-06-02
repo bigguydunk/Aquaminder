@@ -180,7 +180,7 @@ const DatabaseSearch = () => {
     <div className="min-h-screen w-screen  text-gray-800">
       <header>
         <div className="w-full flex md:bg-[#56B1CA] flex-row items-center md:shadow-md justify-between pt-3 h-20 pr-6">
-          <span className="ml-6 flex items-center h-12">
+          <span className="ml-6 flex items-center h-12 cursor-pointer" onClick={() => navigate('/homepage') }>
             <AquaminderLogo style={{ height: '48px', width: 'auto', display: 'block' }} />
           </span>
           {/* Show UserActions on md and above, UserMenu on small screens */}

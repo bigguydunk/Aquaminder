@@ -44,7 +44,7 @@ function Homepage() {
     <div className="min-h-screen w-full flex flex-col">
       <header>
         <div className="w-full flex md:bg-[#56B1CA] flex-row items-center md:shadow-md justify-between pt-3 h-20 pr-6">
-          <span className="ml-6 flex items-center h-12">
+          <span className="ml-6 flex items-center h-12 cursor-pointer" onClick={() => navigate('/homepage') }>
             <AquaminderLogo style={{ height: '48px', width: 'auto', display: 'block' }} />
             
           </span>
@@ -66,11 +66,11 @@ function Homepage() {
           <div className="relative lg:w-[25%] md:w-[35%] w-full flex flex-col h-auto md:h-full md:pl-0 pl-5 items-stretch">
             {/* White box behind, slightly offset */}
             <div
-              className="hidden md:block absolute right-[-16px] w-full  md:h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0"
+              className="hidden block absolute right-[-16px] w-full  md:h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0"
               style={{ filter: 'blur(0.5px)' }}
             />
             {/* Main colored box */}
-            <div className="relative z-10 flex flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow  md:h-full md:min-h-screen">
+            <div className="relative z-10 flex flex-col md:bg-[#26648B]  md:rounded-r-xl md:rounded-b-none md:shadow  md:h-full md:min-h-screen">
               <HomeData />
               
             </div>

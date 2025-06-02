@@ -19,6 +19,9 @@ const SearchBar = ({
 }) => {
   return (
     <div className="w-full mx-auto relative mt-4">
+      <div className="mb-1 text-2xs text-[#4F8FBF] font-semibold text-center">
+        Ketik "ikan" untuk menampilkan seluruh list penyakit!
+      </div>
       <div className="flex w-full">
         <div className="relative w-full">
           <input

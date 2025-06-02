@@ -53,13 +53,17 @@ const UserMenu: React.FC<UserMenuProps & { className?: string }> = ({ userName, 
           </DropdownMenu.DropdownMenuTrigger>
           <DropdownMenu.DropdownMenuContent align="end" className="bg-[#FFE3B3] border-none shadow-lg py-4 px-2 min-w-[180px] flex flex-col items-center rounded-lg gap-2">
             <div className="flex flex-col w-full gap-2">
-              <DropdownMenu.DropdownMenuItem className="!bg-[#FFE3B3] rounded-full  px-6 py-3 w-full text-right focus:outline-none !text-[#26648B] font-semibold cursor-default">
-                User: {userName}
+              <DropdownMenu.DropdownMenuItem
+                className="text-[#26648B] text-center focus:outline-none cursor-pointer font-semibold"
+                onClick={() => window.location.assign('/settings')}
+              >
+                Settings
               </DropdownMenu.DropdownMenuItem>
+              <DropdownMenu.DropdownMenuSeparator className="!bg-[#26648B] !opacity-40 h-px w-full" />
               <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
                 <Dialog.Trigger asChild>
                   <DropdownMenu.DropdownMenuItem
-                    className="!bg-[#4F8FBF] rounded-lg shadow px-6 py-3 w-full text-[#FFE3B3] text-center focus:outline-none cursor-pointer hover:scale-105 transition-transform font-semibold"
+                    className="text-[#26648B] text-center focus:outline-none cursor-pointer font-semibold"
                     onClick={e => { e.preventDefault(); handlePegawaiClick(); }}
                   >
                     All Users
@@ -105,9 +109,10 @@ const UserMenu: React.FC<UserMenuProps & { className?: string }> = ({ userName, 
                   </Dialog.Content>
                 </Dialog.Portal>
               </Dialog.Root>
+              <DropdownMenu.DropdownMenuSeparator className="!bg-[#26648B] !opacity-40 h-px w-full" />
               <DropdownMenu.DropdownMenuItem
                 onClick={onLogout}
-                className="!bg-red-300 rounded-lg shadow px-6 py-3 w-full text-right focus:outline-none cursor-pointer text-red-600 hover:!bg-red-400 hover:!text-red-700 hover:scale-105 transition-transform font-semibold"
+                className="text-red-600 text-right focus:outline-none cursor-pointer font-semibold"
               >
                 Log out
               </DropdownMenu.DropdownMenuItem>
@@ -122,6 +127,7 @@ const UserMenu: React.FC<UserMenuProps & { className?: string }> = ({ userName, 
 const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: () => void }> = ({ userId, userName, onDelete }) => {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [confirmText, setConfirmText] = React.useState("");
   const handleDelete = async () => {
     setLoading(true);
     // Call backend API to delete from Supabase Auth
@@ -143,6 +149,7 @@ const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: (
       return;
     }
     setOpen(false);
+    setConfirmText("");
     onDelete();
   };
   return (
@@ -161,18 +168,26 @@ const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: (
           <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
             <Dialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Delete Account</Dialog.Title>
             <Dialog.Description className="mb-4 text-[#26648B] text-center">
-              Are you sure you want to delete the account for <span className="font-semibold">{userName}</span>?
+              Type <span className="font-mono font-bold">{userName}</span> to confirm deletion of this account.
             </Dialog.Description>
+            <input
+              className="w-full px-3 py-2 rounded-lg border border-[#26648B] mb-2 text-center"
+              value={confirmText}
+              onChange={e => setConfirmText(e.target.value)}
+              placeholder={`Type ${userName} to confirm`}
+              autoFocus
+              disabled={loading}
+            />
             <div className="flex gap-4 justify-center mt-2">
               <button
-                className="px-4 py-2 !bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none"
+                className={`px-4 py-2 !bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none ${loading || confirmText !== userName ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                 onClick={handleDelete}
-                disabled={loading}
+                disabled={loading || confirmText !== userName}
               >
-                {loading ? 'Deleting...' : 'Yes'}
+                {loading ? 'Deleting...' : 'Delete'}
               </button>
               <Dialog.Close asChild>
-                <button className="px-4 py-2 !bg-[#FFE3B3] text-black rounded hover:bg-gray-300 focus:outline-none">No</button>
+                <button className="px-4 py-2 !bg-[#FFE3B3] text-black rounded hover:bg-gray-300 focus:outline-none">Cancel</button>
               </Dialog.Close>
             </div>
           </Dialog.Content>
