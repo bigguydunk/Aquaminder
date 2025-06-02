@@ -18,10 +18,13 @@ const DiseaseDetail = () => {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<number | null>(null);
   const [akuariumOptions, setAkuariumOptions] = useState<{ akuarium_id: number }[]>([]);
   const [selectedAkuarium, setSelectedAkuarium] = useState<number | null>(null);
   const [jumlahIkanSakit, setJumlahIkanSakit] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const toastCtx = React.useContext(ToastContext);
 
   useEffect(() => {
@@ -48,23 +51,26 @@ const DiseaseDetail = () => {
     if (id) fetchDisease();
   }, [id]);
 
-  // Get the current user from Supabase Auth (copied from DatabaseSearch)
+  // Get the current user from Supabase Auth and fetch role from users table
   useEffect(() => {
-    const getUser = async () => {
+    const getUserAndRole = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       if (user) {
         const { data } = await supabase
           .from('users')
-          .select('username')
+          .select('username, role')
           .eq('user_id', user.id)
           .single();
         if (data && data.username) {
           setUserName(data.username);
         }
+        if (data && data.role !== undefined && data.role !== null) {
+          setUserRole(Number(data.role));
+        }
       }
     };
-    getUser();
+    getUserAndRole();
   }, []);
 
   useEffect(() => {
@@ -157,6 +163,55 @@ const DiseaseDetail = () => {
     setSelectedAkuarium(null);
   };
 
+  // Delete penyakit and image with confirmation dialog
+  const handleDelete = async () => {
+    if (!disease) return;
+    setLoading(true);
+    let errorMsg = '';
+    try {
+      // Delete image from storage if exists
+      if (disease.gambar_url) {
+        // Extract the path after '/penyakit-image/'
+        const match = disease.gambar_url.match(/penyakit-image\/(.+)$/);
+        let filePath = match ? match[1] : null;
+        if (filePath) {
+          // Remove any leading forward or backward slash
+          filePath = filePath.replace(/^\/+|^\/+/, '');
+          const { error: storageError } = await supabase.storage.from('penyakit-image').remove([filePath]);
+          if (storageError) errorMsg += 'Gagal hapus gambar. ';
+        }
+      }
+      // Delete row from penyakit table
+      const { error: deleteError } = await supabase.from('penyakit').delete().eq('penyakit_id', disease.penyakit_id);
+      if (deleteError) errorMsg += 'Gagal hapus penyakit.';
+      if (!errorMsg) {
+        toastCtx?.showToast({
+          title: 'Penyakit berhasil dihapus.',
+          variant: 'success',
+        });
+        navigate('/database-search');
+      } else {
+        toastCtx?.showToast({
+          title: 'Gagal menghapus penyakit',
+          description: errorMsg,
+          variant: 'error',
+        });
+      }
+    } catch (err: any) {
+      toastCtx?.showToast({
+        title: 'Gagal menghapus penyakit',
+        description: err.message || String(err),
+        variant: 'error',
+      });
+    }
+    setLoading(false);
+    setDeleteDialogOpen(false);
+    setDeleteConfirmText("");
+  };
+
+  // Only allow Supervisor (1) or Manager (2) to delete penyakit
+  const canDelete = userRole === 1 || userRole === 2;
+
   return (
     <div className="min-h-screen w-screen text-gray-800">
       <header>
@@ -184,12 +239,16 @@ const DiseaseDetail = () => {
                 </div>
               ) : disease ? (
                 <>
-                  <img
-                    src={disease.gambar_url || "https://via.placeholder.com/300x150"}
-                    alt="Gambar Penyakit"
-                    className="w-full max-w-xs rounded-lg mb-4"
-                    style={{ objectFit: 'cover' }}
-                  />
+                  {disease.gambar_url ? (
+                    <img
+                      src={disease.gambar_url}
+                      alt="Gambar Penyakit"
+                      className="w-full max-w-xs rounded-lg mb-4"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div className="w-full text-center text-[#FFE3B3] italic mb-4">Foto tidak tersedia</div>
+                  )}
                   {/* Add to Akuarium Section */}
                   <div className="flex flex-col items-center w-full mt-6">
                     <span className="text-[#FFE3B3] text-lg font-semibold mb-2">Add to akuarium?</span>
@@ -227,7 +286,7 @@ const DiseaseDetail = () => {
                             <input
                               type="number"
                               min="1"
-                              className="w-full px-4 py-2 rounded-lg border border-[#26648B] text-[#26648B] focus:outline-none"
+                              className="w-full px-4 py-2 !rounded-lg !border !border-[#26648B] text-[#26648B] focus:outline-none"
                               placeholder="Masukkan jumlah ikan sakit"
                               value={jumlahIkanSakit}
                               onChange={e => setJumlahIkanSakit(e.target.value)}
@@ -274,12 +333,16 @@ const DiseaseDetail = () => {
                   <>
                     <h2 className="text-4xl font-bold mb-4 mt-2 ">{disease.nama_penyakit}</h2>
                     <div className="block md:hidden w-full mb-4">
-                      <img
-                        src={disease.gambar_url || "https://via.placeholder.com/300x150"}
-                        alt="Gambar Penyakit"
-                        className="max-w-xs rounded-lg mx-auto mb-2"
-                        style={{ objectFit: 'cover' }}
-                      />
+                      {disease.gambar_url ? (
+                        <img
+                          src={disease.gambar_url}
+                          alt="Gambar Penyakit"
+                          className="max-w-xs rounded-lg mx-auto mb-2"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div className="w-full text-center text-[#26648B] italic mb-2">Foto tidak tersedia</div>
+                      )}
                       <div className="flex flex-col items-center w-full px-4">
                         <RadixDialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
                           <RadixDialog.Trigger asChild>
@@ -314,7 +377,7 @@ const DiseaseDetail = () => {
                                 <input
                                   type="number"
                                   min="1"
-                                  className="w-full px-4 py-2 rounded-lg border border-[#26648B] text-[#26648B] focus:outline-none"
+                                  className="w-full px-4 py-2 !rounded-lg border !border-[#26648B] text-[#26648B] focus:outline-none"
                                   placeholder="Masukkan jumlah ikan sakit"
                                   value={jumlahIkanSakit}
                                   onChange={e => setJumlahIkanSakit(e.target.value)}
@@ -358,6 +421,48 @@ const DiseaseDetail = () => {
                         <p className="bg-[#FFE3B3] p-2 rounded-lg text-left shadow-lg">{disease.pengobatan || '-'}</p>
                       </div>
                     </div>
+                    <div className="flex flex-row gap-2 mt-4">
+                      {canDelete && (
+                        <button
+                          className="px-4 py-2 rounded-lg !bg-red-500 text-white font-bold hover:!bg-red-700 transition-colors"
+                          onClick={() => setDeleteDialogOpen(true)}
+                          disabled={loading}
+                        >
+                          Hapus Penyakit
+                        </button>
+                      )}
+                    </div>
+                    <RadixDialog.Root open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                      <RadixDialog.Portal>
+                        <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+                        <RadixDialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xs -translate-x-1/2 -translate-y-1/2 bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
+                          <RadixDialog.Title className="text-lg font-bold mb-2 text-[#26648B]">Hapus Penyakit</RadixDialog.Title>
+                          <RadixDialog.Description className="mb-4 text-[#26648B] text-center">
+                            Ketik <span className="font-mono font-bold">{disease?.nama_penyakit || 'nama penyakit'}</span> untuk konfirmasi penghapusan penyakit ini.
+                          </RadixDialog.Description>
+                          <input
+                            className="w-full px-3 py-2 rounded-lg border border-[#26648B] mb-2 text-center"
+                            value={deleteConfirmText}
+                            onChange={e => setDeleteConfirmText(e.target.value)}
+                            placeholder={`Ketik ${disease?.nama_penyakit || 'nama penyakit'} untuk konfirmasi`}
+                            autoFocus
+                            disabled={loading}
+                          />
+                          <div className="flex gap-4 justify-center mt-2">
+                            <button
+                              className={`px-4 py-2 !bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none ${loading || deleteConfirmText !== disease?.nama_penyakit ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                              onClick={handleDelete}
+                              disabled={loading || deleteConfirmText !== disease?.nama_penyakit}
+                            >
+                              {loading ? 'Menghapus...' : 'Hapus'}
+                            </button>
+                            <RadixDialog.Close asChild>
+                              <button className="px-4 py-2 !bg-[#FFE3B3] text-black rounded hover:bg-gray-300 focus:outline-none">Batal</button>
+                            </RadixDialog.Close>
+                          </div>
+                        </RadixDialog.Content>
+                      </RadixDialog.Portal>
+                    </RadixDialog.Root>
                   </>
                 ) : (
                   <div className="mt-8 text-2xl">Disease not found.</div>

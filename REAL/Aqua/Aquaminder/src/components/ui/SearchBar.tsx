@@ -1,3 +1,6 @@
+import AddPenyakitDialog from './AddPenyakitDialog';
+import { useState } from 'react';
+
 const SearchBar = ({
   searchTerm,
   setSearchTerm,
@@ -17,6 +20,8 @@ const SearchBar = ({
   onBlur: () => void;
   roundedBottom?: boolean;
 }) => {
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+
   return (
     <div className="w-full mx-auto relative mt-4">
       <div className="mb-1 text-2xs text-[#4F8FBF] font-semibold text-center">
@@ -60,6 +65,19 @@ const SearchBar = ({
           </button>
         </div>
       </div>
+      {/* Add Penyakit Button at bottom right */}
+      {searchTerm.trim() === '' && (
+        <div className="w-full flex justify-end mt-2">
+          <button
+            className="text-xs text-[#26648B] !bg-transparent underline hover:text-blue-700 focus:outline-none"
+            onClick={() => setAddDialogOpen(true)}
+            type="button"
+          >
+            Tidak menemukan penyakit? Tambahkan sendiri
+          </button>
+          <AddPenyakitDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
+        </div>
+      )}
     </div>
   );
 };
