@@ -26,11 +26,11 @@ html, body, #root {
 
 .custom-scrollbar {
   scrollbar-width: thick;
-  scrollbar-color: #26648B #FFE3B3;
+  scrollbar-color: #26648B  transparent;
 }
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
-  background: #FFE3B3;
+  background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #26648B;
