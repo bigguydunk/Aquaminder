@@ -210,7 +210,7 @@ const LoginRegister = () => {
   return (
   <div className="min-h-screen w-full flex flex-col justify-center items-center px-4 md:px-0">
     {/*<Background2 />*/}
-    <div className="container ">
+    <div className="container shadow-lg">
       <h1 className='display-flex flex-column' style={{ color: '#26648B' }}>
         Welcome to
         <br />
