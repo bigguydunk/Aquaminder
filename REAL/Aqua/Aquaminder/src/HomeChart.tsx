@@ -347,15 +347,15 @@ class RadialBar extends Component<RadialBarProps, RadialBarState, { options: Ape
                                         <div className="flex flex-col gap-2">
                                             <label>
                                                 Total Ikan:
-                                                <input type="number" className="border rounded p-1 w-full" value={this.editableFields.total} onChange={e => this.handleEditableFieldChange('total', e.target.value)} />
+                                                <input type="number" className="border !border-[#4F8FBF] !rounded-lg p-1 w-full" value={this.editableFields.total} onChange={e => this.handleEditableFieldChange('total', e.target.value)} />
                                             </label>
                                             <label>
                                                 Ikan Sakit:
-                                                <input type="number" className="border rounded p-1 w-full" value={this.editableFields.sakit} onChange={e => this.handleEditableFieldChange('sakit', e.target.value)} />
+                                                <input type="number" className="border !border-[#4F8FBF] !rounded-lg p-1 w-full" value={this.editableFields.sakit} onChange={e => this.handleEditableFieldChange('sakit', e.target.value)} />
                                             </label>
                                             <label>
                                                 Penyakit:
-                                                <div className="flex flex-col gap-1 max-h-40 overflow-y-auto rounded p-2 border" style={{ background: '#FFE3B3' }}>
+                                                <div className="flex flex-col gap-1 max-h-40 !border-[#4F8FBF] !rounded-lg overflow-y-auto p-2 border custom-scrollbar" style={{ background: '#FFE3B3' }}>
                                                     {this.state.allPenyakit && this.state.allPenyakit.length > 0 ? (
                                                         // Sort: selected first, then by name
                                                         [...this.state.allPenyakit].sort((a, b) => {
@@ -448,15 +448,15 @@ class RadialBar extends Component<RadialBarProps, RadialBarState, { options: Ape
                                         <div className="flex flex-col gap-2">
                                             <label>
                                                 Total Ikan:
-                                                <input type="number" className="border rounded p-1 w-full" value={this.editableFields.total} onChange={e => this.handleEditableFieldChange('total', e.target.value)} />
+                                                <input type="number" className="border !border-[#4F8FBF] !rounded-lg rounded p-1 w-full" value={this.editableFields.total} onChange={e => this.handleEditableFieldChange('total', e.target.value)} />
                                             </label>
                                             <label>
                                                 Ikan Sakit:
-                                                <input type="number" className="border rounded p-1 w-full" value={this.editableFields.sakit} onChange={e => this.handleEditableFieldChange('sakit', e.target.value)} />
+                                                <input type="number" className="border  !border-[#4F8FBF] !rounded-lg rounded p-1 w-full" value={this.editableFields.sakit} onChange={e => this.handleEditableFieldChange('sakit', e.target.value)} />
                                             </label>
                                             <label>
                                                 Penyakit:
-                                                <div className="flex flex-col gap-1 max-h-40 overflow-y-auto rounded p-2 border" style={{ background: '#FFE3B3' }}>
+                                                <div className="flex flex-col gap-1 max-h-40 !border-[#4F8FBF] !rounded-lg overflow-y-auto rounded p-2 border custom-scrollbar" style={{ background: '#FFE3B3' }}>
                                                     {this.state.allPenyakit && this.state.allPenyakit.length > 0 ? (
                                                         // Sort: selected first, then by name
                                                         [...this.state.allPenyakit].sort((a, b) => {
