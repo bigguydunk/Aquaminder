@@ -161,6 +161,22 @@ const DiseaseDetail = () => {
     setDialogOpen(false);
     setJumlahIkanSakit("");
     setSelectedAkuarium(null);
+    // Notify managers after successful addition
+    try {
+      await fetch('/api/notifyManagers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          akuarium_id: selectedAkuarium,
+          penyakit_id,
+          jumlah_ikan_sakit: jumlahTambah,
+          disease_name: disease?.nama_penyakit || penyakit_id,
+        }),
+      });
+    } catch (e) {
+      // Optionally show a toast or log
+      console.error('Failed to notify managers', e);
+    }
   };
 
   // Delete penyakit and image with confirmation dialog
