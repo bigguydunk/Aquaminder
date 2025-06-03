@@ -19,10 +19,10 @@ export default async function handler(req, res) {
   }
   const { akuarium_id, penyakit_id, jumlah_ikan_sakit, disease_name, added_by } = req.body;
   try {
-    // Get all manager emails (role === 2)
+    // Get all manager user_ids (role === 2)
     const { data: managers, error } = await supabase
       .from('users')
-      .select('email, username')
+      .select('user_id, username')
       .eq('role', 2);
     if (error) {
       console.error('Supabase error:', error);
@@ -48,16 +48,26 @@ export default async function handler(req, res) {
       .replace(/\{\{addedBy\}\}/g, added_by || '-');
     const subject = 'Aquaminder: Penykakit ditambahkan ke Aquarium';
     for (const manager of managers) {
-      if (!manager.email) continue;
+      // Fetch email from auth.users
+      let email = null;
+      try {
+        const { data: userData, error: userError } = await supabase.auth.admin.getUserById(manager.user_id);
+        if (userError) throw userError;
+        email = userData?.user?.email;
+      } catch (e) {
+        console.error('Failed to fetch email for manager', manager.user_id, e);
+        continue;
+      }
+      if (!email) continue;
       try {
         await resend.emails.send({
           from: 'reminder@aquaminder.live',
-          to: manager.email,
+          to: email,
           subject,
           html: templateHtml,
         });
       } catch (e) {
-        console.error('Failed to send to', manager.email, e);
+        console.error('Failed to send to', email, e);
       }
     }
     res.status(200).json({ message: 'Notification sent to managers.' });
