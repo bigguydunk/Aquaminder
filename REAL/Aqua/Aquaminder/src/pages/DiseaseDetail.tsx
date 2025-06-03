@@ -180,25 +180,20 @@ const DiseaseDetail = () => {
     }
   };
 
-  // Delete penyakit and image with confirmation dialog
   const handleDelete = async () => {
     if (!disease) return;
     setLoading(true);
     let errorMsg = '';
     try {
-      // Delete image from storage if exists
       if (disease.gambar_url) {
-        // Extract the path after '/penyakit-image/'
         const match = disease.gambar_url.match(/penyakit-image\/(.+)$/);
         let filePath = match ? match[1] : null;
         if (filePath) {
-          // Remove any leading forward or backward slash
           filePath = filePath.replace(/^\/+|^\/+/, '');
           const { error: storageError } = await supabase.storage.from('penyakit-image').remove([filePath]);
           if (storageError) errorMsg += 'Gagal hapus gambar. ';
         }
       }
-      // Delete row from penyakit table
       const { error: deleteError } = await supabase.from('penyakit').delete().eq('penyakit_id', disease.penyakit_id);
       if (deleteError) errorMsg += 'Gagal hapus penyakit.';
       if (!errorMsg) {
@@ -226,7 +221,6 @@ const DiseaseDetail = () => {
     setDeleteConfirmText("");
   };
 
-  // Only allow Supervisor (1) or Manager (2) to delete penyakit
   const canDelete = userRole === 1 || userRole === 2;
 
   return (
@@ -246,7 +240,7 @@ const DiseaseDetail = () => {
       </header>
       <main className="flex-1 w-full flex flex-col min-h-screen py-0">
         <section className="flex flex-1 w-full min-h-screen flex-col md:flex-row items-start gap-2">
-          {/* Left: Disease Image */}
+          {/* Disease Image */}
           <div className="relative lg:w-[25%] md:w-[35%] w-full flex flex-col h-auto md:h-full md:pl-0 pl-5 items-stretch">
             <div className="hidden md:block absolute right-[-16px] w-full md:h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0" style={{ filter: 'blur(0.5px)' }} />
             <div className="hidden md:flex relative z-10 flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow md:h-full md:min-h-screen p-4 items-center justify-center">
@@ -266,7 +260,7 @@ const DiseaseDetail = () => {
                   ) : (
                     <div className="w-full text-center text-[#FFE3B3] italic mb-4">Foto tidak tersedia</div>
                   )}
-                  {/* Add to Akuarium Section */}
+                  {/* Add to Akuarium */}
                   <div className="flex flex-col items-center w-full mt-6">
                     <span className="text-[#FFE3B3] text-lg font-semibold mb-2">Add to akuarium?</span>
                     <RadixDialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -289,7 +283,6 @@ const DiseaseDetail = () => {
                               value={selectedAkuarium ?? ''}
                               onChange={e => setSelectedAkuarium(Number(e.target.value) || null)}
                             >
-                              {/* Placeholder label, not an option */}
                               {selectedAkuarium === null && (
                                 <option value="" disabled hidden>Pilih Akuarium</option>
                               )}
@@ -326,7 +319,7 @@ const DiseaseDetail = () => {
               )}
             </div>
           </div>
-          {/* Right: Disease Details */}
+          {/* Disease Details */}
           <div className="w-full flex flex-col items-start md:overflow-y-auto md:pl-10 lg:pt-15 md:h-screen md:max-h-screen md:min-h-screen">
             <div className="w-full px-0 max-w-[1000px] md:px-0 mb-0">
               <button onClick={() => navigate(-1)} className=" hidden text-xl mb-4 text-[#34e7ff] absolute top-24 left-4 md:static md:mb-6 md:mt-6">

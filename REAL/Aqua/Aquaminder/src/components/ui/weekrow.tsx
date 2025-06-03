@@ -61,8 +61,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
   const email = location.state?.email;
   const toastCtx = useContext(ToastContext);
 
-  // Set your Supabase project ref here (from your Supabase URL, e.g. abcd1234)
-  const SUPABASE_PROJECT_REF = "your-project-ref"; // <-- CHANGE THIS to your actual project ref
+  const SUPABASE_PROJECT_REF = "ccwxfchigguamlrxzokd";
 
   useEffect(() => {
     const fetchAkuariumData = async () => {
@@ -91,21 +90,17 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
       if (error) {
         console.error('Error fetching user data:', error);
       } else {
-        // Ensure user_id is always a string
         setUserOptions((data || []).map(u => ({ user_id: String(u.user_id), username: u.username })));
       }
     };
     fetchUserData();
 
-    // Get current user from Supabase Auth, checking localStorage if needed
     const fetchUserRole = async () => {
       let userId = null;
-      // Try to get user from Supabase Auth
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         userId = user.id;
       } else {
-        // Fallback: try to get user from localStorage (Supabase stores session here by default)
         const sessionStr = localStorage.getItem('sb-' + SUPABASE_PROJECT_REF + '-auth-token');
         if (sessionStr) {
           try {
@@ -116,7 +111,6 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
       }
       if (userId) {
         setCurrentUserId(userId);
-        // Fetch role from users table
         const { data } = await supabase
           .from('users')
           .select('username, role')
@@ -145,15 +139,12 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
     setSelectedDay({ week: weekIndex, day: dayIndex });
   };
 
-  // Helper to get the selected date from the calendar week/day selection
+  // Helper selected date
   const getSelectedDate = () => {
     if (!selectedDay) return null;
-    // Calculate the base date for the first day (Sunday) of the selected week
     const baseDate = new Date(today);
     baseDate.setHours(0, 0, 0, 0);
-    // Move to the first day (Sunday) of the selected week
     baseDate.setDate(today.getDate() - today.getDay() + (selectedDay.week - 5) * 7);
-    // Now move to the selected day in that week
     baseDate.setDate(baseDate.getDate() + selectedDay.day);
     return baseDate;
   };
@@ -177,7 +168,6 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
       return;
     }
     setLoading(true);
-    // Combine selected calendar date with selected time
     const selectedDate = getSelectedDate();
     if (!selectedDate) {
       setLoading(false);
@@ -188,19 +178,17 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
       });
       return;
     }
-    // Set the time from TimePickerDemo
     selectedDate.setHours(time.getHours());
     selectedDate.setMinutes(time.getMinutes());
     selectedDate.setSeconds(0);
     selectedDate.setMilliseconds(0);
-    // Convert to Asia/Jakarta (WIB) timezone ISO string
     const tanggalJakarta = selectedDate.toISOString();
     const insertData = {
       akuarium_id: selectedAkuarium,
       tugas_id: selectedTugas.tugas_id,
       user_id: selectedUser.user_id,
       tanggal: tanggalJakarta,
-      created_by: currentUserId, // Use the user ID instead of userName
+      created_by: currentUserId, 
     };
     const { error } = await supabase.from('jadwal').insert([insertData]);
     setLoading(false);
@@ -223,7 +211,6 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
     }
   };
 
-  // Edit schedule state (move to parent)
   const [editDialog, setEditDialog] = useState<{ open: boolean; schedule: any | null }>({ open: false, schedule: null });
   const [editForm, setEditForm] = useState<{ akuarium_id: string; user_id: string; tugas_id: string; time: string }>({ akuarium_id: '', user_id: '', tugas_id: '', time: '' });
 
@@ -256,19 +243,18 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
     }
     await supabase.from('jadwal').update({
       akuarium_id: Number(editForm.akuarium_id),
-      user_id: editForm.user_id, // FIX: keep as string
+      user_id: editForm.user_id,
       tugas_id: Number(editForm.tugas_id),
       tanggal: newTime
     }).eq('jadwal_id', editDialog.schedule.jadwal_id);
     setEditDialog({ open: false, schedule: null });
   }
 
-  // Delete schedule dialog state
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; schedule: any | null }>({ open: false, schedule: null });
 
   return (
     <div className="w-full flex flex-col  md:flex-col lg:pl-10 md:pl-20 lg:-pl-0" >
-      {/* Desktop: Two columns for Add Schedule and Calendar, schedule list below in two columns */}
+      {/* Desktop */}
       <div className="w-full flex flex-col  lg:flex-row  md:items-start gap-5">
         {/* Calendar (left) */}
         {!onlyAddScheduleBox && (
@@ -296,7 +282,7 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
                   </div>
 
                   <Carousel>
-                    {/* Carousel navigation buttons at top right, but inside Carousel for context */}
+                    {/* Carousel navigation buttons */}
                     <div className="absolute -top-5 right-11 flex gap-2 z-20">
                       <CarouselPrevious
                         variant="ghost"
@@ -586,7 +572,6 @@ export default function WeekRow({ onlyAddScheduleBox = false, onlyCalendar = fal
 
 import { useEffect as useEffectBox, useState as useStateBox } from 'react';
 
-// Update ScheduleForUserBox to always use two-column layout for all users
 function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOptions, userRole, setEditDialog, setDeleteDialog }: {
   userId: string,
   selectedDate: Date | null,
@@ -621,7 +606,6 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     const dayStringDate = new Date(selectedDate);
     dayStringDate.setDate(dayStringDate.getDate() + 1);
     const dayString = dayStringDate.toISOString().slice(0, 10);
-    // Always fetch all schedules for the day
     supabase
       .from('jadwal')
       .select('*')
@@ -629,19 +613,17 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
       .lte('tanggal', dayString + 'T23:59:59+07:00')
       .then(({ data }) => {
         setAllSchedules(data || []);
-        // For employees, filter only their own
         if (userRole !== 1 && userRole !== 2) {
           const own = (data || []).filter((s: any) => s.user_id === userId);
           setSchedules(own);
           setHasSchedule(own.length > 0);
         } else {
-          setHasSchedule(false); // not used for manager layout
+          setHasSchedule(false); 
         }
         setTimeout(() => setLoading(false), 200);
       });
   }, [userId, selectedDate, userRole]);
 
-  // Skeleton loading UI
   if (loading) {
     return (
       <div className="relative w-full flex flex-col lg:flex-row items-center md:items-start mt-4 mx-auto gap-6">
@@ -661,12 +643,10 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
     );
   }
 
-  // Always use two-column layout for all users
   const leftCol: any[] = [];
   const rightCol: any[] = [];
   let displaySchedules = allSchedules;
   if (userRole !== 1 && userRole !== 2) {
-    // For employees, only show their own schedules
     displaySchedules = allSchedules.filter((s: any) => s.user_id === userId);
   }
   displaySchedules
@@ -675,11 +655,10 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
       (idx % 2 === 0 ? leftCol : rightCol).push(schedule);
     });
 
-  // If there are schedules, show them in two columns for md+ and single col for mobile
   if (displaySchedules.length) {
     return (
       <>
-        {/* Mobile: single column, chronological order */}
+        {/* Mobile */}
         <div className="w-full flex flex-col items-center mt-4 gap-0 md:hidden">
           {displaySchedules.map((schedule, idx) => {
             const isOwn = schedule.user_id === userId;
@@ -688,7 +667,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                 key={schedule.jadwal_id || `mobile-${idx}`}
                 className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
               >
-                {/* X button for delete, only show if userRole is 1 or 2 */}
+                {/* X button for delete */}
                 {(userRole === 1 || userRole === 2) && (
                   <DropdownMenuShadCN>
                     <DropdownMenuTrigger asChild>
@@ -741,7 +720,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
                   key={schedule.jadwal_id || `left-${idx}`}
                   className={`relative rounded-[15px] px-6 py-4 flex items-center gap-4 max-w-[470px] w-[90%] md:w-full !h-30 bg-[#4F8FBF] z-10 mb-2 shadow-md`}
                 >
-                  {/* X button for delete, only show if userRole is 1 or 2 */}
+                  {/* X button for delete */}
                   {(userRole === 1 || userRole === 2) && (
                     <DropdownMenuShadCN>
                       <DropdownMenuTrigger asChild>
@@ -838,7 +817,7 @@ function ScheduleForUserBox({ userId, selectedDate, tugasOptions, akuariumOption
       </>
     );
   }
-  // No schedules: show 'Tidak ada jadwal' in left column, left-aligned
+  // No schedules BOX
   return (
     <div className="relative w-full flex flex-col lg:flex-row items-start mt-4 mx-auto gap-6">
       <div className="w-full lg:w-[470px] flex flex-col md:items-start items-center">
