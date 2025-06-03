@@ -10,6 +10,9 @@ const supabase = createClient(
 );
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -28,8 +31,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: 'No managers found.' });
     }
     // Read HTML template
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
     const templatePath = path.join(__dirname, 'notify-managers.html');
     let templateHtml = fs.readFileSync(templatePath, 'utf8');
     templateHtml = templateHtml
