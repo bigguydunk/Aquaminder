@@ -171,6 +171,7 @@ const DiseaseDetail = () => {
           penyakit_id,
           jumlah_ikan_sakit: jumlahTambah,
           disease_name: disease?.nama_penyakit || penyakit_id,
+          added_by: userName || '-',
         }),
       });
     } catch (e) {
