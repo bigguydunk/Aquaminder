@@ -1,6 +1,7 @@
-
 ## Aquaminder
 Aquaminder adalah aplikasi web yang dirancang untuk membantu pengguna dalam manajemen perikanan, mulai dari penjadwalan hingga pengingat aktivitas penting. Selain itu, Aquaminder memudahkan pencarian informasi penyakit pada ikan dan memungkinkan pengguna menambahkannya ke akuarium untuk memantau serta menginformasikan adanya penyakit secara efisien.
+
+---
 
 ## Tim Kami
 
@@ -9,6 +10,8 @@ Aquaminder adalah aplikasi web yang dirancang untuk membantu pengguna dalam mana
 -  ADAM NAUFAL (G6401231082) - Frontend developer, Backend developer, Website Integration
 -  BENADEO ELDIAN MANTING (G6401231117) - Frontend developer
 -  RIZAL HABIBI (G6401231152) - Backend developer
+
+---
 
 ## Features
 Semua fitur yang ditunjukkan sudah ada dan terintegrasi.
@@ -48,6 +51,67 @@ Semua fitur yang ditunjukkan sudah ada dan terintegrasi.
 
 ### Notification by Email
 ![email](https://github.com/user-attachments/assets/bc350a7f-537f-422c-ae80-aed1fbdab0f0)
+
+---
+
+## Tech Stack
+
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS
+- **Backend:** Node.js, Supabase, Resend (Email API)
+- **Database:** Supabase (PostgreSQL)
+- **Deployment:** Vercel
+
+---
+
+## Installation
+
+1. **Clone this repository:**
+   ```bash
+   git clone https://github.com/your-username/Aquaminder2.git
+   cd Aquaminder2/REAL/Aqua/Aquaminder
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Setup environment variables:**
+   - Copy `.env.example` to `.env` and fill in your Supabase and Resend credentials.
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## Usage
+
+- Buka [http://localhost:5173](http://localhost:5173) di browser untuk melihat aplikasi.
+- Untuk build production:
+  ```bash
+  npm run build
+  npm run preview
+  ```
+
+---
+
+## Contributing
+
+1. Fork repo ini
+2. Buat branch baru (`git checkout -b fitur-baru`)
+3. Commit perubahan Anda (`git commit -am 'Add fitur baru'`)
+4. Push ke branch (`git push origin fitur-baru`)
+5. Buat Pull Request
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
 
 ## Link
 ### [https://aquaminder.live](https://aquaminder.live)
