@@ -25,14 +25,22 @@ export default async function handler(req, res) {
       .select('email, username')
       .eq('role', 2);
     if (error) {
+      console.error('Supabase error:', error);
       return res.status(500).json({ error: error.message });
     }
     if (!managers || managers.length === 0) {
+      console.warn('No managers found.');
       return res.status(200).json({ message: 'No managers found.' });
     }
     // Read HTML template
     const templatePath = path.join(__dirname, 'notify-managers.html');
-    let templateHtml = fs.readFileSync(templatePath, 'utf8');
+    let templateHtml;
+    try {
+      templateHtml = fs.readFileSync(templatePath, 'utf8');
+    } catch (e) {
+      console.error('Failed to read notify-managers.html:', e);
+      return res.status(500).json({ error: 'Failed to read notify-managers.html', details: String(e) });
+    }
     templateHtml = templateHtml
       .replace(/\{\{diseaseName\}\}/g, disease_name || penyakit_id)
       .replace(/\{\{akuariumId\}\}/g, akuarium_id)
@@ -49,12 +57,12 @@ export default async function handler(req, res) {
           html: templateHtml,
         });
       } catch (e) {
-        // Log but don't fail all
         console.error('Failed to send to', manager.email, e);
       }
     }
     res.status(200).json({ message: 'Notification sent to managers.' });
   } catch (err) {
+    console.error('Handler error:', err);
     res.status(500).json({ error: 'Internal server error', details: String(err) });
   }
 }
