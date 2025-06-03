@@ -136,14 +136,14 @@ class RadialBar extends Component<RadialBarProps, RadialBarState, { options: Ape
             let penyakitNames: string[] | null = null;
             let penyakitIds: number[] | null = null;
             if (data && data.akuarium_id != null) {
-                // Fetch all penyakit_ids for this akuarium from the join table
+                // Fetch penyakit_id
                 const { data: apData, error: apError } = await supabase
                     .from('akuarium_penyakit')
                     .select('penyakit_id')
                     .eq('akuarium_id', data.akuarium_id);
                 if (!apError && apData && apData.length > 0) {
                     const penyakitIdsArr = apData.map((row: any) => row.penyakit_id);
-                    // Fetch all penyakit names and ids in one query
+                    // Fetch penyakit names and ids in one query
                     const { data: penyakitData, error: penyakitError } = await supabase
                         .from('penyakit')
                         .select('nama_penyakit, penyakit_id')
@@ -151,7 +151,7 @@ class RadialBar extends Component<RadialBarProps, RadialBarState, { options: Ape
                     if (!penyakitError && penyakitData) {
                         penyakitNames = penyakitData.map((row: any) => row.nama_penyakit);
                         penyakitIds = penyakitData.map((row: any) => row.penyakit_id);
-                        // Store both names and ids in state
+                        // Store nama dan id penyakit
                         this.setState({
                             akuariumDetail: data,
                             penyakitNames,
@@ -220,14 +220,13 @@ class RadialBar extends Component<RadialBarProps, RadialBarState, { options: Ape
 
     handleEditableDialogOpen = async () => {
         const { akuariumDetail, penyakitIds } = this.state;
-        // Fetch all penyakit for the multi-select
         const { data: allPenyakit } = await supabase
             .from('penyakit')
             .select('penyakit_id, nama_penyakit');
         this.editableFields = {
             total: akuariumDetail && akuariumDetail.jumlah_ikan_total != null ? String(akuariumDetail.jumlah_ikan_total) : '',
             sakit: akuariumDetail && akuariumDetail.jumlah_ikan_sakit != null ? String(akuariumDetail.jumlah_ikan_sakit) : '',
-            penyakit: '', // not used anymore
+            penyakit: '', 
         };
         this.setState({
             editableDialogOpen: true,
@@ -340,7 +339,6 @@ class RadialBar extends Component<RadialBarProps, RadialBarState, { options: Ape
                                 ) : (
                                     <div className='!text-[#FFE3B3]'>Loading...</div>
                                 )}
-                                {/* Editable Dialog */}
                                 <Dialog open={!!editableDialogOpen} onOpenChange={(open) => { if (!open) this.handleEditableDialogClose(); }}>
                                     <DialogContent className="max-w-xs w-[90vw] min-w-0 bg-[#FFE3B3] text-[#26648B] ">
                                         <DialogTitle>Edit Data Akuarium</DialogTitle>
@@ -458,7 +456,7 @@ class RadialBar extends Component<RadialBarProps, RadialBarState, { options: Ape
                                                 Penyakit:
                                                 <div className="flex flex-col gap-1 max-h-40 !border-[#4F8FBF] !rounded-lg overflow-y-auto rounded p-2 border custom-scrollbar" style={{ background: '#FFE3B3' }}>
                                                     {this.state.allPenyakit && this.state.allPenyakit.length > 0 ? (
-                                                        // Sort: selected first, then by name
+                                                        // Sortibg
                                                         [...this.state.allPenyakit].sort((a, b) => {
                                                             const aSelected = this.state.selectedPenyakitIds.includes(a.penyakit_id);
                                                             const bSelected = this.state.selectedPenyakitIds.includes(b.penyakit_id);

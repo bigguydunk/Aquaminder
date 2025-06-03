@@ -33,7 +33,6 @@ function SettingsPage() {
   const [deleteTugasDialogOpen, setDeleteTugasDialogOpen] = useState<number | null>(null);
   const [deleteTugasConfirmText, setDeleteTugasConfirmText] = useState('');
   const [deletingTugas, setDeletingTugas] = useState(false);
-  // Add userRole state
   const [userRole, setUserRole] = useState<number | null>(null);
 
   useEffect(() => {
@@ -90,7 +89,7 @@ function SettingsPage() {
     setChanging(false);
   };
 
-  // Fetch aquarium list when component mounts
+
   useEffect(() => {
     setLoadingAquarium(true);
     supabase.from('akuarium').select('akuarium_id, jumlah_ikan_total, jumlah_ikan_sakit').then(({ data }) => {
@@ -99,7 +98,7 @@ function SettingsPage() {
     });
   }, []);
 
-  // Fetch tugas list when component mounts
+
   useEffect(() => {
     setLoadingTugas(true);
     supabase.from('tugas').select('tugas_id, deskripsi_tugas').then(({ data }) => {
@@ -126,7 +125,6 @@ function SettingsPage() {
       <FloatingButton />
       <main className="flex-1 w-full flex flex-col min-h-screen py-0">
         <section className="flex flex-col items-center w-full min-h-screen gap-8 py-8 px-4 md:px-0">
-          {/* Account Settings Box - match width of below boxes */}
           <div className="bg-[#FFE3B3] rounded-xl shadow-lg p-6 w-full max-w-6xl text-[#26648B] flex flex-col items-start relative min-h-[180px] md:min-h-0">
             <div className="font-semibold mb-2 text-lg">Account</div>
             <div className="mb-2 flex flex-row items-center gap-2">
@@ -150,7 +148,6 @@ function SettingsPage() {
               </button>
             </div>
           </div>
-          {/* Aquarium and Tugas side by side, only for role 1 or 2 */}
           {(userRole === 1 || userRole === 2) && (
             <div className="flex flex-col md:flex-row w-full max-w-6xl gap-8 justify-center">
               {/* Aquarium Box */}
@@ -177,7 +174,6 @@ function SettingsPage() {
                             >
                               ×
                             </button>
-                            {/* Delete confirmation dialog using app's Dialog components */}
                             <Dialog open={deleteDialogOpen === aq.akuarium_id} onOpenChange={open => { if (!open) setDeleteDialogOpen(null); }}>
                               <DialogContent className="bg-[#FFE3B3] rounded-xl shadow-lg p-6 z-50 flex flex-col items-center">
                                 <DialogHeader>
@@ -284,7 +280,7 @@ function SettingsPage() {
                         {tugasList.map(tg => (
                           <li key={tg.tugas_id} className="flex items-center justify-between py-2 px-2 group relative">
                             <div>
-                              <span className="font-semibold">ID: {tg.tugas_id}</span> - {tg.deskripsi_tugas}
+                             - {tg.deskripsi_tugas}
                             </div>
                             <button
                               className="absolute right-2 top-1 text-red-500 hover:text-red-700 text-lg font-bold !bg-transparent border-none cursor-pointer z-20"

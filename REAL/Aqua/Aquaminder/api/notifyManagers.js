@@ -19,7 +19,6 @@ export default async function handler(req, res) {
   }
   const { akuarium_id, penyakit_id, jumlah_ikan_sakit, disease_name, added_by } = req.body;
   try {
-    // Get all manager user_ids (role === 2)
     const { data: managers, error } = await supabase
       .from('users')
       .select('user_id, username')
@@ -32,7 +31,6 @@ export default async function handler(req, res) {
       console.warn('No managers found.');
       return res.status(200).json({ message: 'No managers found.' });
     }
-    // Read HTML template
     const templatePath = path.join(__dirname, 'notify-managers.html');
     let templateHtml;
     try {
@@ -48,7 +46,6 @@ export default async function handler(req, res) {
       .replace(/\{\{addedBy\}\}/g, added_by || '-');
     const subject = 'Aquaminder: Penykakit ditambahkan ke Aquarium';
     for (const manager of managers) {
-      // Fetch email from auth.users
       let email = null;
       try {
         const { data: userData, error: userError } = await supabase.auth.admin.getUserById(manager.user_id);

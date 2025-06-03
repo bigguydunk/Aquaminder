@@ -50,7 +50,6 @@ export default async function handler(req, res) {
       const email = await getUserEmail(schedule.user_id);
       console.log('Processing schedule:', schedule, 'Email:', email);
       if (!email) continue;
-      // Fetch task description
       let tugasDesc = `Tugas ${schedule.tugas_id}`;
       try {
         const { data: tugasData } = await supabase
@@ -62,7 +61,6 @@ export default async function handler(req, res) {
           tugasDesc = tugasData.deskripsi_tugas;
         }
       } catch {}
-      // Fetch username (assignee)
       let username = '';
       try {
         const { data: userData } = await supabase
@@ -74,7 +72,6 @@ export default async function handler(req, res) {
           username = userData.username;
         }
       } catch {}
-      // Format date
       const formattedDate = new Date(schedule.tanggal).toLocaleString('en-GB', {
         year: 'numeric',
         month: 'long',
@@ -84,7 +81,6 @@ export default async function handler(req, res) {
         hour12: false,
         timeZone: 'Asia/Jakarta', // WIB (UTC+7)
       });
-      // Render HTML from static template
       const templatePath = path.join(__dirname, 'notion-magic-link.html');
       let templateHtml = fs.readFileSync(templatePath, 'utf8');
       templateHtml = templateHtml

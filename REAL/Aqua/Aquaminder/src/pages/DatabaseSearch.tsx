@@ -11,7 +11,7 @@ import Background from '../components/background';
 const DatabaseSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<any[]>([]);
-  const [query, setQuery] = useState(""); // <-- query system state
+  const [query, setQuery] = useState(""); 
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [inputFocused, setInputFocused] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
@@ -20,20 +20,17 @@ const DatabaseSearch = () => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null) as React.RefObject<HTMLInputElement>;
 
-  // Fetch all penyakit data on mount or when query changes
+
   useEffect(() => {
     const fetchPenyakit = async () => {
       let supabaseQuery = supabase.from('penyakit').select('*');
       if (query) {
-        // Split query into words, ignore extra spaces, and filter out common Indonesian filler words
         const fillerWords: string[] = [
           'dan', 'atau', 'yang', 'ikan',  'di', 'ke', 'dari', 'untuk', 'dengan', 'pada', 'adalah', 'itu', 'ini', 'sebagai', 'juga', 'karena', 'tetapi', 'namun', 'sehingga', 'agar', 'supaya', 'oleh', 'sebelum', 'sesudah', 'setelah', 'saat', 'ketika', 'bila', 'jika', 'sejak', 'hingga', 'sampai', 'dalam', 'luar', 'atas', 'bawah', 'antara', 'tanpa', 'selain', 'bahwa', 'pun', 'lagi', 'saja', 'sudah', 'belum', 'masih', 'akan', 'harus', 'boleh', 'mungkin', 'dapat', 'per', 'para', 'oleh', 'kepada', 'tentang', 'seperti', 'misal', 'contoh', 'dst', 'dll', 'ter'
         ];
         const words = query.trim().split(/\s+/).filter(word => !fillerWords.includes(word.toLowerCase()));
-        // Supabase doesn't support dynamic AND of ORs directly, so fetch all and filter in JS
         const { data, error } = await supabaseQuery;
         if (!error && data) {
-          // Only include results where every word is found in either field
           const filtered = data.filter((row: any) =>
             words.every(word =>
               (row.nama_penyakit && row.nama_penyakit.toLowerCase().includes(word.toLowerCase())) ||
@@ -46,7 +43,6 @@ const DatabaseSearch = () => {
         }
         return;
       }
-      // If no query, fetch all
       const { data, error } = await supabaseQuery;
       if (!error && data) {
         setResults(data);
@@ -57,23 +53,19 @@ const DatabaseSearch = () => {
     fetchPenyakit();
   }, [query]);
 
-  // Show results as user types: update query on every keystroke
   useEffect(() => {
     setQuery(searchTerm);
   }, [searchTerm]);
 
-  // Reset focus index when results or searchTerm changes
   useEffect(() => {
     setFocusedIndex(0);
   }, [results, searchTerm]);
 
-  // Get the current user from Supabase Auth
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       if (user) {
-        // Fetch username from users table using user_id
         const { data } = await supabase
           .from('users')
           .select('username')
@@ -87,18 +79,15 @@ const DatabaseSearch = () => {
     getUser();
   }, []);
 
-  // Load recent searches from localStorage on mount ONLY
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('recentSearches') || '[]');
     setRecentSearches(stored);
   }, []);
 
-  // Debug: log when recentSearches state changes
   useEffect(() => {
     console.log('recentSearches state updated:', recentSearches);
   }, [recentSearches]);
 
-  // Keyboard navigation handler
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -120,11 +109,10 @@ const DatabaseSearch = () => {
     navigate('/', { replace: true });
   };
 
-  // Utility: update recent searches in localStorage and state
+  // recent searches management
   const updateRecentSearches = (term: string) => {
     if (!term.trim()) return;
     try {
-      // Check cookies/localStorage as before
       document.cookie = "testcookie=1";
       if (document.cookie.indexOf("testcookie=1") === -1) {
         return;
@@ -158,7 +146,6 @@ const DatabaseSearch = () => {
   const handleSearch = () => {
     console.log('handleSearch called with searchTerm:', searchTerm);
     setQuery(searchTerm);
-    // Only add to recent searches if the search term matches a result
     const match = results.find(
       (r) => r.nama_penyakit && r.nama_penyakit.toLowerCase() === searchTerm.trim().toLowerCase()
     );
@@ -168,7 +155,6 @@ const DatabaseSearch = () => {
   };
 
   const handleResultClick = (penyakit_id: number) => {
-    // Find the clicked result by id
     const clicked = results.find(r => r.penyakit_id === penyakit_id);
     if (clicked && clicked.nama_penyakit) {
       updateRecentSearches(clicked.nama_penyakit);
@@ -183,7 +169,6 @@ const DatabaseSearch = () => {
           <span className="ml-6 flex items-center h-12 cursor-pointer" onClick={() => navigate('/homepage') }>
             <AquaminderLogo style={{ height: '48px', width: 'auto', display: 'block' }} />
           </span>
-          {/* Show UserActions on md and above, UserMenu on small screens */}
           <div className="hidden md:block">
             <UserActions userName={userName} onLogout={handleLogout} email={user?.email} />
           </div>
@@ -194,14 +179,11 @@ const DatabaseSearch = () => {
       </header>
       <main className="flex-1 w-full flex flex-col min-h-screen py-0">
         <section className="flex flex-1 w-full min-h-screen flex-col md:flex-row items-start gap-2">
-          {/* Left side blue box (now with recent searches) */}
           <div className="relative lg:w-[25%] md:w-[35%] w-full flex flex-col h-auto md:h-full md:pl-0 pl-5 items-stretch">
-            {/* White box behind, slightly offset */}
             <div
               className="hidden md:block absolute right-[-16px] w-full md:h-full bg-[#4F8FBF] rounded-r-2xl md:rounded-b-none shadow-lg z-0"
               style={{ filter: 'blur(0.5px)' }}
             />
-            {/* Main colored box with recent searches */}
             <div className="hidden md:flex relative z-10 flex-col md:bg-[#26648B] md:rounded-r-xl md:rounded-b-none md:shadow md:h-full md:min-h-screen p-4">
               <h2 className="text-xl mb-2 text-[#FFE3B3] text-left">
                 <span className="font-bold">Recent</span> Searches
@@ -234,7 +216,6 @@ const DatabaseSearch = () => {
                     >
                       {item}
                     </button>
-                    {/* Only show the Remove button after the last item */}
                     {idx === recentSearches.length - 1 && recentSearches.length > 0 && (
                       <div className="flex w-full justify-end mt-2">
                         <button
@@ -251,7 +232,6 @@ const DatabaseSearch = () => {
               </ul>
             </div>
           </div>
-          {/* Right side: search bar and results */}
           <div className="w-full flex flex-col items-center md:overflow-y-auto lg:pt-15 md:h-screen md:max-h-screen md:min-h-screen">
             <div className="w-full max-w-2xl px-2 md:px-0 mb-0">
               <SearchBar
@@ -293,7 +273,6 @@ const DatabaseSearch = () => {
                 ) : null}
               </ul>
             </div>
-            {/* Recent searches below search/results for mobile (below md) */}
             <div className="block md:hidden w-full max-w-2xl mt-6 px-2">
               <div className="bg-[#26648B] rounded-xl shadow p-4">
                 <h2 className="text-xl mb-2 text-[#FFE3B3] text-left">
@@ -327,7 +306,6 @@ const DatabaseSearch = () => {
                       >
                         {item}
                       </button>
-                      {/* Only show the Remove button after the last item */}
                       {idx === recentSearches.length - 1 && recentSearches.length > 0 && (
                         <div className="flex w-full justify-end mt-2">
                           <button

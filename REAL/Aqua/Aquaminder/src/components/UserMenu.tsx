@@ -18,7 +18,6 @@ const UserMenu: React.FC<UserMenuProps & { className?: string }> = ({ userName, 
 
   const handlePegawaiClick = async () => {2
     setDialogOpen(true);
-    // Fetch users and roles only when dialog opens
     const [{ data: usersData }, { data: rolesData }] = await Promise.all([
       supabase.from('users').select('user_id, username, role'),
       supabase.from('role').select('role_id, description'),
@@ -27,14 +26,11 @@ const UserMenu: React.FC<UserMenuProps & { className?: string }> = ({ userName, 
     setRoles(rolesData || []);
   };
 
-  // Fetch current user's role and user_id on mount
   React.useEffect(() => {
     const fetchRole = async () => {
-      // Get the current user's user_id from Supabase Auth
       const { data: { user } } = await supabase.auth.getUser();
       if (!user || !user.id) return;
       const userId = user.id;
-      // Get the user's role and user_id by user_id
       const { data } = await supabase.from('users').select('role, user_id').eq('user_id', userId).single();
       if (data && data.role !== undefined) setCurrentUserRole(data.role);
       if (data && data.user_id) setCurrentUserId(data.user_id);
@@ -92,7 +88,7 @@ const UserMenu: React.FC<UserMenuProps & { className?: string }> = ({ userName, 
                                   />
                                 </span>
                               </div>
-                              {/* Show delete button if current user is manager (role 2) and not deleting self (by user_id, not username) */}
+                              {/* delete user */}
                               {currentUserRole === 2 && currentUserId && currentUserId !== user.user_id && (
                                 <div className="ml-2 flex-shrink-0">
                                   <DeleteUserDialog userId={user.user_id} userName={user.username} onDelete={() => setUsers(users.filter(u => u.user_id !== user.user_id))} />
@@ -130,7 +126,6 @@ const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: (
   const [confirmText, setConfirmText] = React.useState("");
   const handleDelete = async () => {
     setLoading(true);
-    // Call backend API to delete from Supabase Auth
     const res = await fetch('/api/deleteUser', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -141,7 +136,6 @@ const DeleteUserDialog: React.FC<{ userId: string; userName: string; onDelete: (
       alert('Failed to delete user from Auth: ' + (await res.text()));
       return;
     }
-    // Delete from users table
     const { error } = await supabase.from('users').delete().eq('user_id', userId);
     setLoading(false);
     if (error) {
@@ -235,7 +229,6 @@ const RoleChanger: React.FC<{
   };
 
   if (!canEdit) {
-    // Just show the role label
     const foundRole = roles.find(r => r.role_id === Number(user.role));
     return <span className="text-xs text-[#26648B]  ml-2">{foundRole ? foundRole.description : 'No role'}</span>;
   }
@@ -251,7 +244,7 @@ const RoleChanger: React.FC<{
           onBlur={() => setEditing(false)}
           autoFocus
         >
-          {/* Only allow promotion to Manager, not demotion */}
+          {/* Only allow promotion to Manager, not demotion ? Mungkin diganti (idk)*/}
           {Number(user.role) === 2 ? (
             <option value="2">Manager</option>
           ) : (

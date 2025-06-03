@@ -9,7 +9,7 @@
   flex-direction: column;
   align-items: stretch;
   text-align: center;
-  height: auto; /* Full viewport height */
+  height: auto; 
   position: relative;
   background: transparent !important;
   
@@ -32,7 +32,6 @@
   gap: 1rem;
 }
 
-/* Add a class for full-width white background behind Header */
 .header-bg-white {
   width: 35vw;
   background: #3443E9;
@@ -49,7 +48,7 @@
 }
 
 .chart {
-  margin: auto; /* Centers the chart vertically and horizontally */
+  margin: auto; 
   height: 6em;
   padding: 1.5em;
   will-change: filter;

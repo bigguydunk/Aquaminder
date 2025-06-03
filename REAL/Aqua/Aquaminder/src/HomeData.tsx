@@ -17,7 +17,6 @@ function HomeData() {
   const [aquariumIds, setAquariumIds] = useState<number[]>([]);
 
   useEffect(() => {
-    // Fetch all aquarium IDs from Supabase
     const fetchAquariumIds = async () => {
       const { data, error } = await supabase
         .from('akuarium')
@@ -60,7 +59,6 @@ function HomeData() {
 
   return (
     <div className='sm:h-[30vh] h-[30vh] relative'>
-      {/* Navigation Dots moved to top center, with extra spacing to avoid overlap */}
       <div
         className="absolute left-1/2 z-20 flex justify-center space-x-2 md:top-4 md:bottom-auto bottom-4 md:translate-y-0"
         style={{
@@ -79,7 +77,7 @@ function HomeData() {
           />
         ))}
       </div>
-      <div className="h-6 " /> {/* Add extra vertical space between nav dots and radial bar */}
+      <div className="h-6 " /> 
       <Carousel setApi={handleSetApi} className='h-full'>
         <CarouselContent>
           {aquariumIds.map(id => (

@@ -5,7 +5,6 @@ import FishIcon from '../../assets/fish-svgrepo-com.svg?react';
 import Encyclopedia from '../../assets/book-magnifying-glass-svgrepo-com.svg?react';
 
 
-// Accept email as a prop
 const FloatingButton = ({ email }: { email?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
